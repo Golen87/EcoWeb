@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>EcoWeb</title>
+		<meta charset="utf-8">
+
+		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+
+		<meta name="author" content="Måns Gezelius">
+		<meta name="description" content="Project description.">
+		<meta name="keywords" content="Golen, Måns Gezelius, Måns, Gezelius, programming, Sweden, programmering, linköpings universitet, spel, games, browser, online">
+
+		<meta property="og:title" content="EcoWeb">
+		<meta property="og:description" content="Project description.">
+		<meta property="og:image" content="thumbnail url">
+		<meta property="og:url" content="website url">
+		<meta property="og:type" content="game" />
+
+		<!-- Vue -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.5.16/vue.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/vue-resource@1.5.0"></script>
+		<!-- JQuery -->
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+		<!-- Bootstrap -->
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<!-- Font Awesome -->
+		<script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
+
+		<link href="web/style.css" type="text/css" rel="stylesheet" />
+
+		<!-- Phaser -->
+		<script src="web/phaser_3_16_2.min.js"></script>
+		<script src="web/numeric.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
+
+		<!-- Script includes -->
+		<script src="js/utils.js"></script>
+
+		<script src="js/ecoweb/organism.js"></script>
+		<script src="js/ecoweb/ecoweb.js"></script>
+
+		<script src="js/components/Button.js"></script>
+		<script src="js/components/CircleButton.js"></script>
+
+		<script src="js/scenes/ExampleScene1.js"></script>
+		<script src="js/scenes/ExampleScene2.js"></script>
+		<script src="js/scenes/ExampleScene3.js"></script>
+		<script src="js/scenes/ClickScene.js"></script>
+
+		<script src="js/graph/graphUtils.js"></script>
+		<script src="js/graph/vue.js"></script>
+		<script src="js/graph/chart.js"></script>
+
+		<script src="js/index.js"></script>
+	</head>
+
+	<body>
+		<div class="m-4">
+
+			<div class="">
+
+			<div class="" style="min-width: 500px; max-width: 1000px; background: white; margin: auto;">
+				<canvas id="myChart" ></canvas>
+			</div>
+
+			<div id="graphTools" class="row justify-content-center" style="">
+
+				<div class="m-1">
+					<div class="card" style="width: 250px;">
+						<div class="card-header row no-gutters p-2">
+							<div class="col-sm-1"></div>
+							<span class="col-sm font-weight-bold">Main</span>
+							<i class="fas col-sm-1 fa-angle-down"
+								style="font-size: 1.5em; cursor: pointer;"
+								v-on:click="toggleShow($event, main)"></i>
+						</div>
+						<div v-if="main.show" class="card-body p-2">
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Time</small></span>
+								<input class="col-sm mx-2"
+									type="range"
+									min="0" max="500" step="10"
+									v-model="duration"
+									v-on:input="updateDuration($event)"
+									v-on:change="updateDuration($event)">
+								<input class="col-sm-3"
+									type="number"
+									min="0" max="1000" step="10"
+									v-model="duration"
+									v-on:change="updateDuration($event)"/>
+							</div>
+							<button type="button" class="btn btn-secondary"
+								title="Apply slight randomness to all interaction values"
+								v-on:click="wiggle">
+								Wiggle
+							</button>
+							<button type="button" class="btn btn-secondary"
+								title="Skip in time to where populations have stabilized"
+								v-on:click="stabilize">
+								Stabilize
+							</button>
+							<button type="button" class="btn btn-secondary"
+								title="Reset populations to initial values"
+								v-on:click="reset">
+								Reset
+							</button>
+						</div>
+					</div>
+				</div>
+
+				<div v-for="s in species" class="m-1">
+					<div class="card" style="width: 250px;">
+						<div class="card-header row no-gutters p-2" v-bind:style="{ backgroundColor: s.color }">
+							<input type="checkbox" class="col-sm-1"
+								style="width: 25px; height: 25px;"
+								v-model="s.enable"
+								v-on:click="toggleEnable($event, s)">
+							<span class="col-sm font-weight-bold">{{s.name}}</span>
+							<i class="fas col-sm-1 fa-angle-down"
+								style="font-size: 1.5em; cursor: pointer;"
+								v-on:click="toggleShow($event, s)"></i>
+						</div>
+						<div v-if="s.show" class="card-body p-2">
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Pop</small></span>
+								<input class="col-sm mx-2"
+									type="range"
+									min="0.01" max="1" step="0.01"
+									v-model="s.startPopulation"
+									v-on:input="updateValue($event, s, 'startPopulation')"
+									v-on:change="updateValue($event, s, 'startPopulation')">
+								<input class="col-sm-3"
+									type="number"
+									min="0" max="1" step="0.01"
+									v-model="s.startPopulation"
+									v-on:change="updateValue($event, s, 'startPopulation')"/>
+							</div>
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Grow</small></span>
+								<input class="col-sm mx-2"
+									type="range"
+									min="-1" max="1" step="0.01"
+									v-model="s.growthRate"
+									v-on:input="updateValue($event, s, 'growthRate')"
+									v-on:change="updateValue($event, s, 'growthRate')">
+								<input class="col-sm-3"
+									type="number"
+									min="-1" max="1" step="0.01"
+									v-model="s.growthRate"
+									v-on:change="updateValue($event, s, 'growthRate')"/>
+							</div>
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Self</small></span>
+								<input class="col-sm mx-2"
+									type="range"
+									min="-1" max="0" step="0.01"
+									v-model="s.selfCompetition"
+									v-on:input="updateValue($event, s, 'selfCompetition')"
+									v-on:change="updateValue($event, s, 'selfCompetition')">
+								<input class="col-sm-3"
+									type="number"
+									min="-1" max="0" step="0.01"
+									v-model="s.selfCompetition"
+									v-on:change="updateValue($event, s, 'selfCompetition')"/>
+							</div>
+							<hr>
+							<div v-for="value, key in s.relationship" class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>{{key}}</small></span>
+								<input class="col-sm mx-2"
+									type="range"
+									min="-1" max="1" step="0.01"
+									v-model="s.relationship[key]"
+									v-on:input="updateValue($event, s, 'relationship[key]')"
+									v-on:change="updateValue($event, s, 'relationship[key]')">
+								<input class="col-sm-3"
+									type="number"
+									min="-1" max="0" step="0.01"
+									v-model="s.relationship[key]"
+									v-on:change="updateValue($event, s, 'relationship[key]')"/>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			</div>
+
+			<div id="game"></div>
+
+		</div>
+	</body>
+</html>
