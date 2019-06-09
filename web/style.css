@@ -3,10 +3,39 @@ body {
 	background: #33333A;
 	margin: auto;
 	text-align: center;
-	#overflow: hidden;
 }
 
 canvas {
-	margin: auto;
-	#width: 100%;
+}
+
+#graphTools {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 255px);
+	grid-auto-rows: max-content;
+	background: rgba(0,255,0,0.0);
+	width: 1040px;
+}
+
+@media only screen and (max-width: 2000px) {
+	#graphTools {
+		width: 780px;
+	}
+}
+
+@media only screen and (max-width: 1600px) {
+	#graphTools {
+		width: 520px;
+	}
+}
+
+@media only screen and (max-width: 1200px) {
+	#graphTools {
+		width: 260px;
+	}
+}
+
+@media only screen and (max-width: 930px) {
+	#graphTools {
+		width: 100%;
+	}
 }

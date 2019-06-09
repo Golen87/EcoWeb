@@ -18,8 +18,10 @@ class Organism {
 		//this.predators = [];
 		//this.preys = [];
 		this.requirements = {};
+		this.diet = {};
 
 		this.enable = true;
+		this.showGraph = true;
 		this.show = false;
 	}
 
@@ -50,12 +52,20 @@ class Organism {
 		prey.addPredator(this, penalty);
 	}
 
-	requires(component, level) {
-		this.requirements[component.name] = level;
+	setDiet() {
+		let total = 0;
+		for (var i = 0; i < arguments.length; i+=2)
+			total += arguments[i+1];
+
+		for (var i = 0; i < arguments.length; i+=2) {
+			let prey = arguments[i];
+			let amount = arguments[i+1];
+			this.diet[prey.name] = amount / total;
+		}
 	}
 
-	test(x) {
-		console.log(this, x);
+	requires(component, level) {
+		this.requirements[component.name] = level;
 	}
 
 	//neutralism
@@ -66,6 +76,11 @@ class Organism {
 	//predation/parasitism
 }
 
+class Carnivore extends Organism {}
+class Herbivore extends Organism {}
+class Plant extends Organism {}
+
+
 
 function addRelationship(predator, benefit, prey, penalty) {
 	predator.addPrey(prey, benefit);
@@ -73,4 +88,12 @@ function addRelationship(predator, benefit, prey, penalty) {
 }
 
 function addEqualCompetition(species, penalty) {
+	for (let i = 0; i < species.length; i++) {
+		let s = species[i];
+		for (let j = i+1; j < species.length; j++) {
+			let t = species[j];
+
+			addRelationship(s, penalty, t, penalty);
+		}
+	}
 }

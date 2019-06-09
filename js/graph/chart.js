@@ -29,15 +29,13 @@ function initChart() {
 		}
 	};
 	window.chart = Chart.Scatter(ctx, config);
-
-	updateChart();
 };
 
 function resetChart() {
 	chartData.datasets = [];
 }
 
-function addSpecies(name, color) {
+function addSpecies(name, color, showGraph) {
 	chartData.datasets.push({
 		label: name,
 		data: [],
@@ -46,13 +44,14 @@ function addSpecies(name, color) {
 		pointRadius: 1,
 		fill: false,
 		tension: 0,
-		showLine: true
+		showLine: true,
+		hidden: !showGraph
 	});
 }
 
-function addData(species, x, y) {
+/*function addData(species, x, y) {
 	chartData.datasets[species].data.push({x,y});
-}
+}*/
 
 function updateChart() {
 	chartData.labels = [];

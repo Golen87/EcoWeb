@@ -18,6 +18,25 @@ class EcoWeb {
 			x: [],
 			y: []
 		};
+
+		this.scenarios = [];
+	}
+
+	setScenarios(scenarios) {
+		this.scenarios = scenarios;
+	}
+
+	startScenario(i) {
+		web.build(this.scenarios[i]());
+		web.initWiggle();
+		web.solve(100);
+		updateChart();
+
+		if (!this.vue) {
+			this.vue = createGraphTools(this.species, this.scenarios);
+		}
+		this.vue.species = this.species;
+		this.vue.scenarios = this.scenarios;
 	}
 
 	getComponent(name) {
@@ -42,7 +61,7 @@ class EcoWeb {
 
 		for (let i = 0; i < species.length; i++) {
 			let s = species[i];
-			addSpecies(s.name, s.color);
+			addSpecies(s.name, s.color, s.showGraph);
 			this.startPop[i] = (s.enable ? s.startPopulation : 0);
 			this.r[i] = s.growthRate;
 			this.K[i] = s.carryingCapacity;
@@ -93,41 +112,77 @@ class EcoWeb {
 	}
 
 	applyWiggle() {
+		/*
 		for (let i = 0; i < this.size; i++) {
 			for (let j = 0; j < this.size; j++) {
 				this.A[i][j] *= this.wiggle[i][j];
 			}
 		}
+		*/
 	}
 
 	solve(duration) {
 		// Lotka-Volterra equation (classical model for predator-prey interaction)
-		let f = function(t, x) {
-			let dxList = [];
-			for (let i = 0; i < x.length; i++) {
+		let f = function(t, pop) {
+			// Calculate interactions for diet
+			let matrix = [];
+			for (let i = 0; i < pop.length; i++) {
+				matrix[i] = [];
+				for (let j = 0; j < pop.length; j++) {
+					matrix[i][j] = 0;
+				}
+			}
+
+			for (let i = 0; i < pop.length; i++) {
+				let s = this.species[i];
+				let eating = [];
+				let total = 0.0;
+				for (let j = 0; j < pop.length; j++) {
+					let p = this.species[j];
+					let amount = s.diet[p.name] || 0.0;
+					eating[j] = amount * pop[j];
+					total += eating[j];
+				}
+				if (total > 0) {
+					for (let j = 0; j < pop.length; j++) {
+						matrix[i][j] +=  0.3 * eating[j] / total; // Predator
+						matrix[j][i] += -1.0 * eating[j] / total; // Prey
+						//console.log(s.name, 'eats', this.species[j].name, this.A[i][j], this.A[j][i]);
+					}
+				}
+				//matrix[i][i] = s.selfCompetition;
+			}
+			for (let i = 0; i < pop.length; i++) {
+				for (let j = 0; j < pop.length; j++) {
+					matrix[i][j] += this.A[i][j];
+					//matrix[i][j] *= this.wiggle[i][j];
+				}
+			}
+
+			// Calculate population derivative
+			let dPopList = [];
+			for (let i = 0; i < pop.length; i++) {
 
 				let sum = 0;
-				for (let j = 0; j < x.length; j++) {
-					if (this.A[i][j] != null) {
-						sum += this.A[i][j] * x[j];
+				for (let j = 0; j < pop.length; j++) {
+					if (matrix[i][j] != null) {
+						sum += matrix[i][j] * pop[j];
 					}
 					if (this.B[i][j] != null) {
-						sum -= this.B[i][j](x[j]);
+						sum -= this.B[i][j](pop[j]);
 					}
 				}
 
 				// Impact on the environment resulting from consumption
-				//let I = x[i] * this.K[i];
+				//let I = pop[i] * this.K[i];
 				let I = this.K[i];
 
-				let dx = x[i] * ( this.r[i] + sum ) / I;
-				dxList.push(dx);
+				dPopList[i] = pop[i] * ( this.r[i] + sum ) / I;
 			}
-			return dxList;
+			return dPopList;
 		}
 
-		// Now we solve the ODE:
-		//sol = numeric.dopri(0,20,[-1,3,4],f,1e-6,2000);
+		// ODE Solver
 		let start = this.time;
 		let end = start + duration;
 		let sol = numeric.dopri(start, end, this.population, f.bind(this), 1e-6, 2000);
@@ -178,7 +233,7 @@ function scenario_2 () {
 
 	const S = 1/40;
 	const M = 2/40;
-	const L = 4/40;
+	const L = 3/40;
 
 	hare.eats	( blabar,	S );
 	hare.eats	( orter,	L );
@@ -191,6 +246,8 @@ function scenario_2 () {
 	rav.eats	( hare,		L );
 	rav.eats	( radjur,	M );
 
+	addEqualCompetition([blabar, orter, gras, svamp], -0.05);
+
 	return [blabar, orter, gras, svamp, hare, radjur, rav];
 }
 
@@ -202,25 +259,89 @@ function scenario_3 () {
 	let ph		= new Organism(	"PH värde",		0.01,	0.1,	-0.1,	'#9E9E9E',	"component" );
 
 	// target value, healthy range, decay range
-	sur.requires	( ph, normRange(0.0, 0.1, 0.5) );
+	sur.requires	( ph, normRange(0.4, 0.1, 0.5) );
 	normal.requires	( ph, normRange(0.5, 0.1, 0.5) );
-	basisk.requires	( ph, normRange(1.0, 0.1, 0.5) );
+	basisk.requires	( ph, normRange(0.6, 0.1, 0.5) );
 
 	addEqualCompetition([sur, normal, basisk], -0.05);
-	//this.A[i][j] -= 0.05;
 
 	return [sur, normal, basisk, ph];
+}
+
+function scenario_4 () {
+	//	var						name		pop		growth	self	color
+	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'#FFD54F');
+	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'#FFA726');
+	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'#FB8C00');
+	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'#FFF176');
+	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.1,	'#FF3D00');
+
+	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'#536DFE');
+	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'#795548');
+	let gras	= new Plant( "Gräs",	1.0,	1.0,	-1.0,	'#66BB6A');
+	let orter	= new Plant( "Örter",	1.0,	1.0,	-1.0,	'#26A69A');
+	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'#AFB42B');
+
+	// namn			ålder	mat		barn
+	// Dovhjort		14.0	3.5		1.2
+	// Rådjur 		10.0	3.0		2.0
+	// Hare			3.5		2.5		12.0
+	// Koltrast		3.0		0.3		10.0
+	// Räv			3.5		1.0		4.0
+
+	dovhjort.setDiet(
+		trad,	1.0,
+		orter,	0.6,
+		blabar,	0.4,
+		gras,	0.2,
+	);
+	radjur.setDiet(
+		orter,	1.0,
+		trad,	0.6,
+		svamp,	0.3,
+		blabar,	0.2,
+		gras,	0.1,
+	);
+	hare.setDiet(
+		orter,	1.0,
+		blabar,	0.7,
+		gras,	0.4,
+		trad,	0.2,
+	);
+	koltrast.setDiet(
+		trad,	1.0,
+		blabar,	0.6,
+		svamp,	0.6,
+	);
+	rodrav.setDiet(
+		hare,		1.0,
+		blabar,		0.6,
+		svamp,		0.4,
+		dovhjort,	0.2,
+		radjur,		0.2,
+		koltrast,	0.2,
+	);
+
+	addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
+	addEqualCompetition([blabar, trad, gras, orter, svamp], -0.05);
+
+	return [hare, radjur, dovhjort, koltrast, rodrav, blabar, trad, gras, orter, svamp];
 }
 
 
 let web = new EcoWeb();
 
 window.onload = function() {
-	web.build(scenario_2());
-	web.initWiggle();
-	web.solve(100);
-
 	initChart();
 
-	createGraphTools(web.species);
+	web.setScenarios([
+		scenario_4,
+		scenario_1,
+		scenario_2,
+		scenario_3,
+	]);
+	web.startScenario(0);
+	//web.build(scenario_4());
+	//web.initWiggle();
+	//web.solve(100);
 }

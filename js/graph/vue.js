@@ -1,10 +1,11 @@
 
-function createGraphTools(species) {
+function createGraphTools() {
 	return new Vue({
 		el: '#graphTools',
 		data: {
 			duration: 100,
-			species: species,
+			species: [],
+			scenarios: [],
 			main: {show: false},
 			isActive: true
 		},
@@ -25,6 +26,9 @@ function createGraphTools(species) {
 			reset(event) {
 				this.updateGraph();
 			},
+			startScenario(id) {
+				web.startScenario(id);
+			},
 			updateValue(event, s, key) {
 				s[key] = parseFloat(event.target.value);
 				this.updateGraph();
@@ -44,6 +48,10 @@ function createGraphTools(species) {
 			},
 			toggleEnable(event, s) {
 				s.enable = !s.enable;
+				this.updateGraph();
+			},
+			toggleShowGraph(event, s) {
+				s.showGraph = !s.showGraph;
 				this.updateGraph();
 			},
 		},
