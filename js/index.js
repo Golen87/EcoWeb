@@ -15,10 +15,15 @@ var config = {
 		}
 	},
 	scene: [
+		PreloadScene,
+		TitleScene,
+		WorldScene,
+		LevelScene,
+
 		ExampleScene1,
 		ExampleScene2,
 		ExampleScene3,
-		ClickScene
+		ClickScene,
 	]
 };
 

@@ -7,24 +7,20 @@ class TextButton extends Phaser.GameObjects.Text {
 			.on('pointerout', () => this.enterButtonRestState() )
 			.on('pointerdown', () => this.enterButtonActiveState() )
 			.on('pointerup', () => {
-				console.log('up');
 				this.enterButtonHoverState();
 				callback();
 			});
 	}
 
 	enterButtonHoverState() {
-		console.log('hover');
 		this.setStyle({ fill: '#ff0'});
 	}
 
 	enterButtonRestState() {
-		console.log('rest');
 		this.setStyle({ fill: '#0f0'});
 	}
 
 	enterButtonActiveState() {
-		console.log('active');
 		this.setStyle({ fill: '#0ff' });
 	}
 }
