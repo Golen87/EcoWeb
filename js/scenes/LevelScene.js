@@ -4,6 +4,9 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	preload() {
+		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { font: "20px Courier" });
+		this.loading.setOrigin(0.5);
+
 		this.load.image('bakgrund', 'assets/images/backgrounds/Bakgrund.png');
 		this.load.image('bakrund2', 'assets/images/backgrounds/Bakrund2.png');
 		this.load.image('bakrund3', 'assets/images/backgrounds/Bakrund3.png');
@@ -28,6 +31,9 @@ class LevelScene extends Phaser.Scene {
 		this.load.image('varg', 'assets/images/icons/Varg.png');
 
 		this.load.image('ui_symbol', 'assets/images/UI_Symbol.png');
+	
+		this.load.image('slider_background', 'assets/images/slider/background.png');
+		this.load.image('slider_button', 'assets/images/slider/button.png');
 
 		this.load.image('cat', 'assets/images/cat.jpeg');
 		this.load.image('circle', 'assets/images/circle.png');
@@ -36,6 +42,8 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	create() {
+		this.loading.destroy();
+
 		this.title = this.add.text(0, 0, "Level", { font: "40px Courier" });
 
 		let button = new TextButton(this, 100, 100, 'Back', {
@@ -43,15 +51,30 @@ class LevelScene extends Phaser.Scene {
 		}, () => {
 			this.scene.start("WorldScene");
 		});
-		this.add.existing(button);
 
-		this.button = new CircleButton(this, 300, 100, () => {
-			web.solve(10);
-			updateChart();
-		});
-		this.add.existing(this.button);
+		this.nodes = [];
+		for (let i = 0; i < 3; i++) {
+			let x = this.cameras.main.centerX + (i-1) * 150;
+			let y = this.cameras.main.centerY;
+			let s = ["räv", "skogshare", "örter"][i];
+			this.nodes[i] = new Node(this, x, y, s, () => {
+				//web.solve(10);
+				//updateChart();
+				console.log("click");
+			});
+		}
+
+		let x = this.cameras.main.centerX;
+		let y = this.cameras.main.displayHeight * 0.75;
+		this.slider = new Slider(this, x, y);
 	}
 
 	update(delta) {
+		this.slider.update(delta);
+
+		for (let i = 0; i < 3; i++) {
+			let s = 0.5 + 0.5 * Math.sin(this.time.now / 1000 + i*Math.PI/1.5);
+			this.nodes[i].setPopulation(s);
+		}
 	}
 }
