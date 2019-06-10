@@ -16,7 +16,6 @@ class WorldScene extends Phaser.Scene {
 			}, () => {
 				this.scene.start("LevelScene");
 			});
-			this.add.existing(button);
 		}
 	}
 

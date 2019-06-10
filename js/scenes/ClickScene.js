@@ -11,13 +11,11 @@ class ClickScene extends Phaser.Scene {
 		this.clickCountText = this.add.text(100, 200, '');
 
 		this.clickButton = new TextButton(this, 100, 100, 'Click me!', { fill: '#0f0'}, () => this.updateClickCountText());
-		this.add.existing(this.clickButton);
 
 		this.button = new CircleButton(this, 300, 100, () => {
 			web.solve(10);
 			updateChart();
 		});
-		this.add.existing(this.button);
 
 		this.updateClickCountText();
 		this.scale.refresh();

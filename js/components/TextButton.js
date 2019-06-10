@@ -1,6 +1,7 @@
 class TextButton extends Phaser.GameObjects.Text {
 	constructor(scene, x, y, text, style, callback) {
 		super(scene, x, y, text, style);
+		scene.add.existing(this);
 
 		this.setInteractive({ useHandCursor: true })
 			.on('pointerover', () => this.enterButtonHoverState() )

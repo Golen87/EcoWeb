@@ -16,7 +16,6 @@ class TitleScene extends Phaser.Scene {
 		}, () => {
 			this.scene.start("WorldScene");
 		});
-		this.add.existing(startButton);
 	}
 
 	update(delta) {

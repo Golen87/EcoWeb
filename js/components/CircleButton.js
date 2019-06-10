@@ -2,6 +2,7 @@ class CircleButton extends Phaser.GameObjects.Image {
 	constructor(scene, x, y, callback) {
 		super(scene, x, y, "circle");
 		this.callback = callback;
+		scene.add.existing(this);
 
 		this.setInteractive({ useHandCursor: true })
 			.on('pointerout', this.onOut )
