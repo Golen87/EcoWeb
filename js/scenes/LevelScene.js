@@ -4,7 +4,7 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	preload() {
-		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { font: "20px Courier" });
+		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { font: "20px 'Crete Round'" });
 		this.loading.setOrigin(0.5);
 
 		this.load.image('bakgrund', 'assets/images/backgrounds/Bakgrund.png');
