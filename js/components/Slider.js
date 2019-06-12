@@ -26,6 +26,6 @@ class Slider extends Phaser.GameObjects.Container {
 
 
 	get value() {
-		return this.button.value;
+		return this.button.softValue / this.stepMax;
 	}
 }

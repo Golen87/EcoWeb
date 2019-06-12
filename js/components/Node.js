@@ -1,17 +1,17 @@
 class Node extends Phaser.GameObjects.Container {
-	constructor(scene, x, y, image) {
+	constructor(scene, x, y, species) {
 		super(scene, x, y);
 		scene.add.existing(this);
 
 		this.population = 0.5;
-		this.size = 100;
+		this.size = 150;
 
 		this.circle = scene.add.image(0, 0, 'circle');
 		this.circle.setScale(this.size / this.circle.height);
 		this.circle.setTint(0x879959);
 		this.add(this.circle);
 
-		this.image = scene.add.image(0, 0, image);
+		this.image = scene.add.image(0, 0, 'icon_' + species);
 		this.image.setScale(this.size / this.image.height);
 		this.add(this.image);
 
@@ -33,7 +33,7 @@ class Node extends Phaser.GameObjects.Container {
 
 	get scale() {
 		let x = this.population;
-		let smooth = 0.5 + Math.atan(5 * (x - 0.5)) / Math.PI;
+		let smooth = 0.5 + Math.atan(3 * (x - 0.5)) / Math.PI;
 		return 0.5 + 1 * smooth;
 	}
 

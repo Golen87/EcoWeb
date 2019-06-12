@@ -2,7 +2,7 @@ class LevelScene extends Phaser.Scene {
 	constructor() {
 		super({key: 'LevelScene'});
 
-		this.species = ['icon_dovhjort', 'icon_radjur', 'icon_rav', 'icon_skogshare'];
+		this.species = ['rav', 'skogshare', 'radjur', 'dovhjort'];
 	}
 
 	create() {
@@ -32,7 +32,7 @@ class LevelScene extends Phaser.Scene {
 		timeBar.setOrigin(0, 1);
 		this.slider = new Slider(this, 0.35*this.W, this.H - 40);
 
-		this.socket = new SocketButton(this, this.CX * 0.5, this.CY);
+		this.socket = new SocketButton(this, this.CX * 0.1, this.CY);
 	}
 
 	update(delta) {
@@ -40,8 +40,10 @@ class LevelScene extends Phaser.Scene {
 		this.socket.update(delta);
 
 		for (let i = 0; i < this.species.length; i++) {
-			let s = 0.5 + 0.5 * Math.sin(this.time.now / 1000 + i*2*Math.PI/this.species.length);
-			this.nodes[i].setPopulation(s);
+			//let s = 0.5 + 0.5 * Math.sin(this.time.now / 1000 + i*2*Math.PI/this.species.length);
+			//this.nodes[i].setPopulation(s);
+			this.title.setText(this.slider.value * web.time);
+			this.nodes[i].setPopulation(web.getValueAt(i, this.slider.value * web.time));
 		}
 	}
 

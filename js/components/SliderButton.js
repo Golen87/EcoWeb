@@ -97,8 +97,10 @@ class SliderButton extends Phaser.GameObjects.Image {
 		}
 
 		if (this.softValue != this.value) {
-			let speed = (this.isHeld ? 2.0 : 5.0);
+			let speed = (this.isHeld ? 2 : 5);
 			this.softValue += (this.value - this.softValue) / speed;
+			if (Math.abs(this.softValue - this.value) < 0.01)
+				this.softValue = this.value;
 		}
 
 		this.x = (this.softValue - this.stepMax/2) * this.stepSize;

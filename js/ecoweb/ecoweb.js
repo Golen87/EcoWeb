@@ -86,7 +86,7 @@ class EcoWeb {
 				}
 			}
 		}
-
+		
 		this.reset();
 	}
 
@@ -201,6 +201,35 @@ class EcoWeb {
 			this.species[i].startPopulation = this.result.y[this.result.y.length-1][i];
 		}
 	}
+
+	getValueAt(speciesIndex, pos) {
+		if (pos <= this.result.x[0]) {
+			return this.result.y[0][speciesIndex];
+		}
+		if (pos >= this.result.x[this.result.x.length-1]) {
+			return this.result.y[this.result.x.length-1][speciesIndex];
+		}
+
+		// Binary search for closest x pair
+		let index = Math.floor(this.result.x.length / 2);
+		let step = Math.floor(index / 2);
+		while (this.result.x[index] > pos || pos > this.result.x[index+1]) {
+			if (this.result.x[index] < pos) {
+				index += step;
+			}
+			else {
+				index -= step;
+			}
+			step = Math.ceil(step / 4);
+		}
+
+		let minX = this.result.x[index];
+		let maxX = this.result.x[index+1];
+		let minY = this.result.y[index][speciesIndex];
+		let maxY = this.result.y[index+1][speciesIndex];
+		let slope = (maxY - minY) / (maxX - minX);
+		return minY + slope * (pos - minX);
+	}
 }
 
 
@@ -270,11 +299,12 @@ function scenario_3 () {
 
 function scenario_4 () {
 	//	var						name		pop		growth	self	color
+	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.1,	'#FF3D00');
+
 	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'#FFD54F');
 	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'#FFA726');
 	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'#FB8C00');
 	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'#FFF176');
-	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.1,	'#FF3D00');
 
 	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'#536DFE');
 	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'#795548');
@@ -289,6 +319,14 @@ function scenario_4 () {
 	// Koltrast		3.0		0.3		10.0
 	// Räv			3.5		1.0		4.0
 
+	rodrav.setDiet(
+		hare,		1.0,
+		blabar,		0.6,
+		svamp,		0.4,
+		dovhjort,	0.2,
+		radjur,		0.2,
+		koltrast,	0.2,
+	);
 	dovhjort.setDiet(
 		trad,	1.0,
 		orter,	0.6,
@@ -313,19 +351,11 @@ function scenario_4 () {
 		blabar,	0.6,
 		svamp,	0.6,
 	);
-	rodrav.setDiet(
-		hare,		1.0,
-		blabar,		0.6,
-		svamp,		0.4,
-		dovhjort,	0.2,
-		radjur,		0.2,
-		koltrast,	0.2,
-	);
 
 	addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
 	addEqualCompetition([blabar, trad, gras, orter, svamp], -0.05);
 
-	return [hare, radjur, dovhjort, koltrast, rodrav, blabar, trad, gras, orter, svamp];
+	return [rodrav, hare, radjur, dovhjort, koltrast, blabar, trad, gras, orter, svamp];
 }
 
 
