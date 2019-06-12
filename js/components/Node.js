@@ -34,7 +34,7 @@ class Node extends Phaser.GameObjects.Container {
 	get scale() {
 		let x = this.population;
 		let smooth = 0.5 + Math.atan(3 * (x - 0.5)) / Math.PI;
-		return 0.5 + 1 * smooth;
+		return 0.25 + 1 * smooth;
 	}
 
 	setPopulation(pop) {

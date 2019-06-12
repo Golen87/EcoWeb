@@ -40,10 +40,8 @@ class LevelScene extends Phaser.Scene {
 		this.socket.update(delta);
 
 		for (let i = 0; i < this.species.length; i++) {
-			//let s = 0.5 + 0.5 * Math.sin(this.time.now / 1000 + i*2*Math.PI/this.species.length);
-			//this.nodes[i].setPopulation(s);
-			this.title.setText(this.slider.value * web.time);
-			this.nodes[i].setPopulation(web.getValueAt(i, this.slider.value * web.time));
+			let s = 0.03 * Math.sin(this.time.now / 500 + 2*Math.PI * i/this.species.length);
+			this.nodes[i].setPopulation(web.getValueAt(i, this.slider.value * web.time) + s);
 		}
 	}
 
