@@ -1,80 +1,53 @@
 class LevelScene extends Phaser.Scene {
 	constructor() {
 		super({key: 'LevelScene'});
-	}
 
-	preload() {
-		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { font: "20px 'Crete Round'" });
-		this.loading.setOrigin(0.5);
-
-		this.load.image('bakgrund', 'assets/images/backgrounds/Bakgrund.png');
-		this.load.image('bakrund2', 'assets/images/backgrounds/Bakrund2.png');
-		this.load.image('bakrund3', 'assets/images/backgrounds/Bakrund3.png');
-		this.load.image('bakrund4', 'assets/images/backgrounds/Bakrund4.png');
-		this.load.image('bakrund5', 'assets/images/backgrounds/Bakrund5.png');
-		this.load.image('bakrund6', 'assets/images/backgrounds/Bakrund6.png');
-
-		this.load.image('älg', 'assets/images/icons/Älg.png');
-		this.load.image('blåbär', 'assets/images/icons/Blåbär.png');
-		this.load.image('fiskgjuse_lås', 'assets/images/icons/Fiskgjuse_Lås.png');
-		this.load.image('fiskgjuse', 'assets/images/icons/Fiskgjuse.png');
-		this.load.image('gräs', 'assets/images/icons/Gräs.png');
-		this.load.image('näckros', 'assets/images/icons/Näckros.png');
-		this.load.image('örter', 'assets/images/icons/Örter.png');
-		this.load.image('rådjur', 'assets/images/icons/Rådjur.png');
-		this.load.image('räv', 'assets/images/icons/Räv.png');
-		this.load.image('skogshare', 'assets/images/icons/Skogshare.png');
-		this.load.image('svamp', 'assets/images/icons/Svamp.png');
-		this.load.image('träd', 'assets/images/icons/Träd.png');
-		this.load.image('trollflugelarv_lås', 'assets/images/icons/Trollflugelarv_Lås.png');
-		this.load.image('trollflugelarv', 'assets/images/icons/Trollflugelarv.png');
-		this.load.image('varg', 'assets/images/icons/Varg.png');
-
-		this.load.image('ui_symbol', 'assets/images/UI_Symbol.png');
-	
-		this.load.image('slider_background', 'assets/images/slider/background.png');
-		this.load.image('slider_button', 'assets/images/slider/button.png');
-
-		this.load.image('cat', 'assets/images/cat.jpeg');
-		this.load.image('circle', 'assets/images/circle.png');
-		this.load.image('image', 'assets/images/image.png');
-		this.load.image('items', 'assets/images/items.png');
+		this.species = ['icon_dovhjort', 'icon_radjur', 'icon_rav', 'icon_skogshare'];
 	}
 
 	create() {
-		this.loading.destroy();
+		let bg = this.add.image(this.CX, this.CY, 'bg_title');
+		bg.setScale(this.H / bg.height);
+		this.title = this.add.text(20, 20, "Level", { font: "40px 'Crete Round'" });
 
-		this.title = this.add.text(0, 0, "Level", { font: "40px Courier" });
-
-		let button = new TextButton(this, 100, 100, 'Back', {
-			font: "30px Courier", fill: '#0f0'
+		let button = new TextButton(this, this.W-20, this.H-20, 'Back', {
+			font: "30px 'Crete Round'"
 		}, () => {
 			this.scene.start("WorldScene");
 		});
+		button.setOrigin(1);
 
 		this.nodes = [];
-		for (let i = 0; i < 3; i++) {
-			let x = this.cameras.main.centerX + (i-1) * 150;
-			let y = this.cameras.main.centerY;
-			let s = ["räv", "skogshare", "örter"][i];
-			this.nodes[i] = new Node(this, x, y, s, () => {
-				//web.solve(10);
-				//updateChart();
-				console.log("click");
-			});
+		for (let i = 0; i < this.species.length; i++) {
+			let x = this.CX + (i-(this.species.length-1)/2) * 150;
+			let y = this.CY;
+			let s = this.species[i];
+			this.nodes[i] = new Node(this, x, y, s);
+			//web.solve(10);
+			//updateChart();
 		}
 
-		let x = this.cameras.main.centerX;
-		let y = this.cameras.main.displayHeight * 0.75;
-		this.slider = new Slider(this, x, y);
+		let timeBar = this.add.image(0, this.H, 'time_bar');
+		timeBar.setScale(0.75*this.W / timeBar.width);
+		timeBar.setOrigin(0, 1);
+		this.slider = new Slider(this, 0.35*this.W, this.H - 40);
+
+		this.socket = new SocketButton(this, this.CX * 0.5, this.CY);
 	}
 
 	update(delta) {
 		this.slider.update(delta);
+		this.socket.update(delta);
 
-		for (let i = 0; i < 3; i++) {
-			let s = 0.5 + 0.5 * Math.sin(this.time.now / 1000 + i*Math.PI/1.5);
+		for (let i = 0; i < this.species.length; i++) {
+			let s = 0.5 + 0.5 * Math.sin(this.time.now / 1000 + i*2*Math.PI/this.species.length);
 			this.nodes[i].setPopulation(s);
 		}
 	}
+
+
+	get W() { return this.cameras.main.displayWidth; }
+	get H() { return this.cameras.main.displayHeight; }
+	get CX() { return this.cameras.main.centerX; }
+	get CY() { return this.cameras.main.centerY; }
 }
