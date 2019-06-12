@@ -1,9 +1,9 @@
 class SliderButton extends Phaser.GameObjects.Image {
-	constructor(scene, x, y) {
-		super(scene, x, y, 'slider_button');
+	constructor(scene, x, y, stepSize, stepMax) {
+		super(scene, x, y, 'time_button');
 
-		this.stepSize = 80;
-		this.stepMax = 4;
+		this.stepSize = stepSize;
+		this.stepMax = stepMax;
 
 		this._value = 0;
 		this.softValue = 0;
@@ -18,13 +18,19 @@ class SliderButton extends Phaser.GameObjects.Image {
 			.on('dragstart', this.onDragStart )
 			.on('drag', this.onDrag )
 			.on('dragend', this.onDragEnd );
-
 		this.onOut();
+
+		this.soundHover = scene.sound.add('hover_button');
+		this.soundHover.setVolume(0.2);
+		this.soundPress = scene.sound.add('press_button');
+		this.soundPress.setVolume(1.0);
+		this.soundRelease = scene.sound.add('release_button');
+		this.soundRelease.setVolume(1.0);
 	}
 
 
 	get scale() {
-		return 1;
+		return 60 / this.height;
 	}
 
 	set value(x) {
@@ -58,6 +64,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 
 	onDragStart(pointer, dragX, dragY) {
 		this.isHeld = true;
+		this.soundPress.play();
 	}
 
 	onDrag(pointer, dragX, dragY) {
@@ -66,11 +73,20 @@ class SliderButton extends Phaser.GameObjects.Image {
 		let nearest = Math.round(this.value);
 		if (Math.abs(this.value - nearest) < 1/6) {
 			this.value = nearest;
+
+			if (this.latestNearest != nearest) {
+				this.soundHover.play();
+			}
+			this.latestNearest = nearest;
+		}
+		else {
+			this.latestNearest = null;
 		}
 	}
 
 	onDragEnd(pointer, dragX, dragY, dropped) {
 		this.isHeld = false;
+		this.soundRelease.play();
 	}
 
 

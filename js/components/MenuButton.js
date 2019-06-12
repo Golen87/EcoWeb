@@ -1,10 +1,20 @@
-class TextButton extends Phaser.GameObjects.Text {
+class MenuButton extends Phaser.GameObjects.Container {
 	constructor(scene, x, y, text, style, callback) {
-		super(scene, x, y, text, style);
+		super(scene, x, y);
 		this.callback = callback;
 		scene.add.existing(this);
 
-		this.setInteractive({ useHandCursor: true })
+		this.background = scene.add.sprite(0, 0, 'menu_bar');
+		this.background.setOrigin(0, 0.5);
+		//this.background.setScale(60 / this.background.height);
+		this.background.setScale(scene.cameras.main.displayHeight / 1500);
+		this.add(this.background);
+
+		this.text = scene.add.text(30, 0, text, style);
+		this.text.setOrigin(0, 0.5);
+		this.add(this.text);
+
+		this.background.setInteractive({ useHandCursor: true })
 			.on('pointerout', this.onOut.bind(this) )
 			.on('pointerover', this.onOver.bind(this) )
 			.on('pointerdown', this.onDown.bind(this) )
@@ -19,17 +29,21 @@ class TextButton extends Phaser.GameObjects.Text {
 		this.soundRelease.setVolume(1.0);
 	}
 
+
 	onOut() {
-		this.setTint(0xBBBBBB);
+		this.background.setTexture('menu_bar');
+		this.text.setTint(0xBBBBBB);
 	}
 
 	onOver() {
-		this.setTint(0xFFFFFF);
+		this.background.setTexture('menu_bar_hover');
+		this.text.setTint(0xFFFFFF);
 		this.soundHover.play();
 	}
 
 	onDown() {
-		this.setTint(0x888888);
+		this.background.setTexture('menu_bar_hover');
+		this.text.setTint(0x888888);
 		this.soundRelease.play();
 	}
 
