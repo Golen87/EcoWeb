@@ -35,7 +35,9 @@ class LevelScene extends Phaser.Scene {
 		this.socket = new SocketButton(this, this.CX * 0.1, this.CY);
 	}
 
-	update(delta) {
+	update(time, deltaMs) {
+		let delta = deltaMs / 1000;
+
 		this.slider.update(delta);
 		this.socket.update(delta);
 

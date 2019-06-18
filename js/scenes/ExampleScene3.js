@@ -37,6 +37,6 @@ class ExampleScene3 extends Phaser.Scene {
 		}, this);
 	}
 
-	update(delta) {
+	update(time, delta) {
 	}
 }

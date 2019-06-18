@@ -47,7 +47,7 @@ class TitleScene extends Phaser.Scene {
 		new CheckBox(this, 550, 300+70*2, "test 3", false, (state) => {console.log(state);});
 	}
 
-	update(delta) {
+	update(time, delta) {
 	}
 
 

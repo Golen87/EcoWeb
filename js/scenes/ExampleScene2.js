@@ -28,7 +28,7 @@ class ExampleScene2 extends Phaser.Scene {
 		this.key_3 = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.THREE);
 	}
 
-	update(delta) {
+	update(time, delta) {
 		if (this.key_1.isDown) {
 			this.scene.start("ExampleScene1");
 		}

@@ -96,6 +96,6 @@ class PreloadScene extends Phaser.Scene {
 		this.scene.start("TitleScene");
 	}
 
-	update(delta) {
+	update(time, delta) {
 	}
 }

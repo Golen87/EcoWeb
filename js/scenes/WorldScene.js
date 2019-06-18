@@ -25,7 +25,7 @@ class WorldScene extends Phaser.Scene {
 		button.setOrigin(1);
 	}
 
-	update(delta) {
+	update(time, delta) {
 	}
 
 

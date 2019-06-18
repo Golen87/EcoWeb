@@ -84,7 +84,7 @@ class ExampleScene1 extends Phaser.Scene {
 		this.graphics.strokeCircle(200, 200, 50);
 	}
 
-	update(delta) {
+	update(time, delta) {
 		if (this.key_A.isDown) {
 			this.image.x -= 1;
 		}
