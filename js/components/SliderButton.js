@@ -21,7 +21,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 		this.onOut();
 
 		this.soundHover = scene.sound.add('hover_button');
-		this.soundHover.setVolume(0.2);
+		this.soundHover.setVolume(0.1);
 		this.soundPress = scene.sound.add('press_button');
 		this.soundPress.setVolume(1.0);
 		this.soundRelease = scene.sound.add('release_button');

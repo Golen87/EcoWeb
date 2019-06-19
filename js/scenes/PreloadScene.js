@@ -114,8 +114,8 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
-		this.scene.start("LevelScene");
-		//this.scene.start("TitleScene");
+		//this.scene.start("LevelScene");
+		this.scene.start("TitleScene");
 	}
 
 	update(time, delta) {
