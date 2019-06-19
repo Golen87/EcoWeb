@@ -11,6 +11,8 @@ class PreloadScene extends Phaser.Scene {
 
 		this.load.image('bg_title', 'assets/images/background/BgTitel.png');
 		this.load.image('bg_world', 'assets/images/background/BgVärld.png');
+		this.load.image('bg_1', 'assets/images/background/BG1.png');
+		this.load.image('bg_2', 'assets/images/background/BG2.png');
 
 
 		/* Menu */		
@@ -18,17 +20,26 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('menu_bar', 'assets/images/ui/menu/Bar.png');
 		this.load.image('menu_bar_hover', 'assets/images/ui/menu/BarMouseover.png');
 
+		this.load.image('pause_window', 'assets/images/ui/pause/Bas.png');
+		this.load.image('pause_button', 'assets/images/ui/pause/Knapp.png');
+		this.load.image('pause_button_hover', 'assets/images/ui/pause/KnappMouseover.png');
+
 
 		/* UI */
 		this.load.image('checkbox', 'assets/images/ui/checkbox/CheckBox.png');
 		this.load.image('checkmark', 'assets/images/ui/checkbox/Checkmark.png');
+
+		this.load.image('symbol_button', 'assets/images/ui/button/HändelseNod.png');
+
 		this.load.image('time_bar', 'assets/images/ui/time/TidsAxelBar.png');
 		this.load.image('time_background', 'assets/images/ui/time/TidsAxel.png');
 		this.load.image('time_button', 'assets/images/ui/time/Timglas.png');
 		this.load.image('time_button_arrows', 'assets/images/ui/time/TimglasMedPil.png');
+
 		this.load.image('socket_button', 'assets/images/ui/socket/button.png');
 		this.load.image('socket_socket', 'assets/images/ui/socket/socket.png');
 		this.load.image('socket_mask', 'assets/images/ui/socket/mask.png');
+
 		this.load.image('growth_slider', 'assets/images/ui/growth_slider/Matare.png');
 		this.load.image('growth_slider_arrow', 'assets/images/ui/growth_slider/Vippa.png');
 
@@ -44,10 +55,12 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('lo', 'assets/images/icons/Lo.png');
 		this.load.image('duvhök', 'assets/images/icons/Duvhök.png');
 		this.load.image('kattuggla', 'assets/images/icons/Kattuggla.png');
+		this.load.image('snok', 'assets/images/icons/Snok.png');
 
 		this.load.image('dovhjort', 'assets/images/icons/Dovhjort.png');
 		this.load.image('rådjur', 'assets/images/icons/Rådjur.png');
 		this.load.image('hare', 'assets/images/icons/Hare.png');
+		this.load.image('norvacka', 'assets/images/icons/Norvacka.png');
 
 		this.load.image('träd', 'assets/images/icons/Träd.png');
 		this.load.image('gräs', 'assets/images/icons/Gräs.png');

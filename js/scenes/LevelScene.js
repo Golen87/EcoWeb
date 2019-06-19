@@ -14,19 +14,32 @@ class LevelScene extends Phaser.Scene {
 			'dovhjort': [0.0, 0.5],
 			'radjur': [0.5192, 0.5],
 		};
+
+		this.pauseOptions = [
+			["Spela Vidare", function() {
+				this.pauseWindow.hide();
+			}],
+			["Inställningar", function() {
+				console.log("Inställningar");
+			}],
+			["Gå Till Meny", function() {
+				this.scene.start("WorldScene");
+			}],
+		];
 	}
 
 	create() {
 		let bg = this.add.image(this.CX, this.CY, 'bg_title');
-		bg.setScale(this.H / bg.height);
+		this.fitToScreen(bg);
 		this.title = this.add.text(20, 20, "Level", { font: "40px 'Crete Round'" });
 
-		let button = new TextButton(this, this.W-20, this.H-20, 'Back', {
+		let button = new TextButton(this, this.W-20, this.H-20, 'Tillbaka', {
 			font: "30px 'Crete Round'"
 		}, () => {
 			this.scene.start("WorldScene");
 		});
 		button.setOrigin(1, 1);
+		this.add.existing(button);
 
 		this.nodes = [];
 		for (let i = 0; i < web.species.length; i++) {
@@ -66,10 +79,19 @@ class LevelScene extends Phaser.Scene {
 			//break;
 		}
 
+		this.pauseWindow = new PauseWindow(this, this.CX, this.CY, this.pauseOptions);
+		this.pauseWindow.setDepth(1000);
+		this.pauseWindow.hide();
+		this.add.existing(this.pauseWindow);
 
-		//scene.events.on('postupdate', function(time, delta){
-		//    //
-		//}, scope);
+		this.input.keyboard.on('keyup-ESC', function(event) {
+			if (this.pauseWindow.active) {
+				this.pauseWindow.hide();
+			}
+			else {
+				this.pauseWindow.show();
+			}
+		}, this);
 	}
 
 	update(time, deltaMs) {
@@ -127,4 +149,8 @@ class LevelScene extends Phaser.Scene {
 	get H() { return this.cameras.main.displayHeight; }
 	get CX() { return this.cameras.main.centerX; }
 	get CY() { return this.cameras.main.centerY; }
+
+	fitToScreen(image) {
+		image.setScale(Math.max(this.W / image.width, this.H / image.height));
+	}
 }
