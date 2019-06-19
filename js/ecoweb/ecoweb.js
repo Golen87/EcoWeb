@@ -41,10 +41,11 @@ class EcoWeb {
 
 	getComponent(name) {
 		for (let i = 0; i < this.species.length; i++) {
-			if (name == this.species[i].name) {
+			if (lowercase(name) == lowercase(this.species[i].name)) {
 				return this.species[i];
 			}
 		}
+		console.error("Unknown component:", name);
 	}
 
 	build(species) {
@@ -112,13 +113,11 @@ class EcoWeb {
 	}
 
 	applyWiggle() {
-		/*
 		for (let i = 0; i < this.size; i++) {
 			for (let j = 0; j < this.size; j++) {
 				this.A[i][j] *= this.wiggle[i][j];
 			}
 		}
-		*/
 	}
 
 	solve(duration) {
@@ -298,19 +297,19 @@ function scenario_3 () {
 }
 
 function scenario_4 () {
-	//	var						name		pop		growth	self	color
-	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.1,	'#FF3D00');
+	//	var						name		pop		growth	self	image		color
+	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.1,	'räv',		'#FF3D00' );
 
-	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'#FFD54F');
-	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'#FFA726');
-	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'#FB8C00');
-	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'#FFF176');
+	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'hare',		'#FFD54F' );
+	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'rådjur',	'#FFA726' );
+	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'dovhjort',	'#FB8C00' );
+	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'missing',	'#FFF176' );
 
-	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'#536DFE');
-	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'#795548');
-	let gras	= new Plant( "Gräs",	1.0,	1.0,	-1.0,	'#66BB6A');
-	let orter	= new Plant( "Örter",	1.0,	1.0,	-1.0,	'#26A69A');
-	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'#AFB42B');
+	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE' );
+	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'träd',		'#795548' );
+	let gras	= new Plant( "Gräs",	1.0,	1.0,	-1.0,	'gräs',		'#66BB6A' );
+	let orter	= new Plant( "Örter",	1.0,	1.0,	-1.0,	'ört',		'#26A69A' );
+	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'missing',	'#AFB42B' );
 
 	// namn			ålder	mat		barn
 	// Dovhjort		14.0	3.5		1.2
@@ -361,7 +360,8 @@ function scenario_4 () {
 
 let web = new EcoWeb();
 
-window.onload = function() {
+//window.onload = function() {
+function initWeb() {
 	initChart();
 
 	web.setScenarios([

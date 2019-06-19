@@ -4,9 +4,10 @@
 // --- Carnevore
 
 class Organism {
-	constructor(name, startPopulation, growthRate, selfCompetition, color, type) {
+	constructor(name, startPopulation, growthRate, selfCompetition, image, color, type) {
 		this.name = name;
 		this.type = type;
+		this.image = image;
 		this.color = color;
 		this.startPopulation = startPopulation;
 		this.growthRate = growthRate;
