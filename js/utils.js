@@ -36,3 +36,18 @@ function normRange(target, buffer, decay) {
 	}
 	return CDF.bind(this, target);
 }
+
+
+/**
+ * Make string url friendly
+ */
+function lowercase(text) {
+	return text
+		.replace(/å/g, 'a')
+		.replace(/Å/g, 'a')
+		.replace(/ä/g, 'a')
+		.replace(/Ä/g, 'a')
+		.replace(/ö/g, 'o')
+		.replace(/Ö/g, 'o')
+		.toLowerCase();
+}

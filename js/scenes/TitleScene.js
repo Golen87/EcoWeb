@@ -33,9 +33,7 @@ class TitleScene extends Phaser.Scene {
 			const FUNC = this.options[i][1].bind(this);
 			//const LEFT_OFFSET = 30;
 
-			let menuButton = new MenuButton(this, LEFT, TOP, TEXT, {
-				font: "30px 'Crete Round'", fill: '#FFF'
-			}, FUNC);
+			let menuButton = new MenuButton(this, LEFT, TOP, TEXT, FUNC);
 		}
 
 		let line = this.add.image(LEFT, 0, 'menu_line');

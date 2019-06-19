@@ -22,7 +22,7 @@ class WorldScene extends Phaser.Scene {
 		}, () => {
 			this.scene.start("TitleScene");
 		});
-		button.setOrigin(1);
+		button.setOrigin(1, 1);
 	}
 
 	update(time, delta) {

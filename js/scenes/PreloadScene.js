@@ -4,6 +4,8 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	preload() {
+		initWeb();
+
 		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { font: "20px Courier" });
 		this.loading.setOrigin(0.5);
 
@@ -16,22 +18,42 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('menu_bar', 'assets/images/ui/menu/Bar.png');
 		this.load.image('menu_bar_hover', 'assets/images/ui/menu/BarMouseover.png');
 
+
 		/* UI */
 		this.load.image('checkbox', 'assets/images/ui/checkbox/CheckBox.png');
 		this.load.image('checkmark', 'assets/images/ui/checkbox/Checkmark.png');
 		this.load.image('time_bar', 'assets/images/ui/time/TidsAxelBar.png');
 		this.load.image('time_background', 'assets/images/ui/time/TidsAxel.png');
 		this.load.image('time_button', 'assets/images/ui/time/Timglas.png');
+		this.load.image('time_button_arrows', 'assets/images/ui/time/TimglasMedPil.png');
 		this.load.image('socket_button', 'assets/images/ui/socket/button.png');
 		this.load.image('socket_socket', 'assets/images/ui/socket/socket.png');
 		this.load.image('socket_mask', 'assets/images/ui/socket/mask.png');
+		this.load.image('growth_slider', 'assets/images/ui/growth_slider/Matare.png');
+		this.load.image('growth_slider_arrow', 'assets/images/ui/growth_slider/Vippa.png');
+
 
 		/* Nodes */
 		this.load.image('circle', 'assets/images/circle.png');
-		this.load.image('icon_dovhjort', 'assets/images/icons/Dovhjort.png');
-		this.load.image('icon_radjur', 'assets/images/icons/Radjur.png');
-		this.load.image('icon_rav', 'assets/images/icons/Rav.png');
-		this.load.image('icon_skogshare', 'assets/images/icons/SkogsHare.png');
+		this.load.image('pixel', 'assets/images/pixel.png');
+		this.load.image('arrow', 'assets/images/arrow.png');
+
+		this.load.image('missing', 'assets/images/icons/Missing.png');
+
+		this.load.image('räv', 'assets/images/icons/Räv.png');
+		this.load.image('lo', 'assets/images/icons/Lo.png');
+		this.load.image('duvhök', 'assets/images/icons/Duvhök.png');
+		this.load.image('kattuggla', 'assets/images/icons/Kattuggla.png');
+
+		this.load.image('dovhjort', 'assets/images/icons/Dovhjort.png');
+		this.load.image('rådjur', 'assets/images/icons/Rådjur.png');
+		this.load.image('hare', 'assets/images/icons/Hare.png');
+
+		this.load.image('träd', 'assets/images/icons/Träd.png');
+		this.load.image('gräs', 'assets/images/icons/Gräs.png');
+		this.load.image('ört', 'assets/images/icons/Ört.png');
+		this.load.image('blåbär', 'assets/images/icons/Blåbär.png');
+
 
 		/* Audio */
 		this.load.audio('hover_button', [ 'assets/audio/hover_button.ogg' ] );
@@ -92,8 +114,8 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
-		//this.scene.start("LevelScene");
-		this.scene.start("TitleScene");
+		this.scene.start("LevelScene");
+		//this.scene.start("TitleScene");
 	}
 
 	update(time, delta) {
