@@ -1,41 +1,37 @@
-class TextButton extends Phaser.GameObjects.Text {
+class TextButton extends Button {
 	constructor(scene, x, y, text, style, callback) {
 		super(scene, x, y, text, style);
 		this.callback = callback;
-		scene.add.existing(this);
 
-		this.setInteractive({ useHandCursor: true })
-			.on('pointerout', this.onOut.bind(this) )
-			.on('pointerover', this.onOver.bind(this) )
-			.on('pointerdown', this.onDown.bind(this) )
-			.on('pointerup', this.onUp.bind(this) );
-		this.onOut();
+		this.text = scene.add.text(0, 0, text, style);
+		this.add(this.text);
 
-		this.soundHover = scene.sound.add('hover_button');
-		this.soundHover.setVolume(0.2);
-		this.soundPress = scene.sound.add('press_button');
-		this.soundPress.setVolume(1.0);
-		this.soundRelease = scene.sound.add('release_button');
-		this.soundRelease.setVolume(1.0);
+		this.bindInteractive(this.text)
 	}
 
+
+	setOrigin(x, y) {
+		this.text.setOrigin(x, y);
+	}
+
+
 	onOut() {
-		this.setTint(0xBBBBBB);
+		super.onOut();
+		this.text.setTint(0xBBBBBB);
 	}
 
 	onOver() {
-		this.setTint(0xFFFFFF);
-		this.soundHover.play();
+		super.onOver();
+		this.text.setTint(0xFFFFFF);
 	}
 
 	onDown() {
-		this.setTint(0x888888);
-		this.soundRelease.play();
+		super.onDown();
+		this.text.setTint(0x888888);
 	}
 
-	onUp() {
+	onClick() {
+		this.text.setTint(0xFFFFFF);
 		this.callback();
-		this.onOver();
-		this.soundPress.play();
 	}
 }
