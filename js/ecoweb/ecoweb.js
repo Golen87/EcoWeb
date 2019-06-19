@@ -303,7 +303,7 @@ function scenario_4 () {
 	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'hare',		'#FFD54F' );
 	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'rådjur',	'#FFA726' );
 	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'dovhjort',	'#FB8C00' );
-	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'missing',	'#FFF176' );
+	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'norvacka',	'#FFF176' );
 
 	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE' );
 	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'träd',		'#795548' );

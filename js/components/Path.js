@@ -76,12 +76,6 @@ class Path extends Phaser.GameObjects.Container {
 
 	update(delta) {
 		this.drawBezier();
-		if (this.node1.isHover || this.node2.isHover) {
-			this.alphaEasing = Math.min(this.alphaEasing + this.alphaSpeed * delta, 1.0);
-		}
-		else {
-			this.alphaEasing = Math.max(this.alphaEasing - this.alphaSpeed * delta, 0.0);
-		}
-		this.alpha = Phaser.Math.Easing.Cubic.InOut(this.alphaEasing);
+		this.alpha = Math.max(this.node1.hoverAlpha, this.node2.hoverAlpha);
 	}
 }

@@ -66,8 +66,11 @@ class Node extends Phaser.GameObjects.Container {
 			.on( 'dragstart', this.onDragStart.bind(this) )
 			.on( 'drag', this.onDrag.bind(this) )
 			.on( 'dragend', this.onDragEnd.bind(this) );
-
 		this.onOut();
+
+		this.alphaEasing = 0;
+		this.alphaSpeed = 1 / 0.2;
+		this.hoverAlpha = 0;
 	}
 
 
@@ -147,5 +150,15 @@ class Node extends Phaser.GameObjects.Container {
 		let speed = 2.0;
 		this.x += (this.goalX - this.x) / speed;
 		this.y += (this.goalY - this.y) / speed;
+
+		if (this.isHover) {
+			this.alphaEasing = Math.min(this.alphaEasing + this.alphaSpeed * delta, 1.0);
+		}
+		else {
+			this.alphaEasing = Math.max(this.alphaEasing - this.alphaSpeed * delta, 0.0);
+		}
+		this.hoverAlpha = Phaser.Math.Easing.Cubic.InOut(this.alphaEasing);
+		this.slider.alpha = this.hoverAlpha;
+		this.arrow.alpha = this.hoverAlpha;
 	}
 }
