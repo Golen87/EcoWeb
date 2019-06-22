@@ -1,4 +1,4 @@
-class Node extends Phaser.GameObjects.Container {
+class Node extends Button {
 	constructor(scene, x, y, species) {
 		super(scene, x, y);
 		this.species = species;
@@ -9,8 +9,7 @@ class Node extends Phaser.GameObjects.Container {
 		this.size = 100;
 		this.goalX  = x;
 		this.goalY  = y;
-		this.isHover = false;
-		this.isHeld = false;
+		this.selected = false;
 
 		this.circle = scene.add.image(0, 0, 'circle');
 		this.circle.setScale((this.size+30) / this.circle.height);
@@ -58,15 +57,7 @@ class Node extends Phaser.GameObjects.Container {
 		//let mask = shape.createGeometryMask();
 		//this.image.setMask(mask);
 
-		this.image.setInteractive({ useHandCursor: true, draggable: true })
-			.on( 'pointerout', this.onOut.bind(this) )
-			.on( 'pointerover', this.onOver.bind(this) )
-			.on( 'pointerdown', this.onDown.bind(this) )
-			.on( 'pointerup', this.onUp.bind(this) )
-			.on( 'dragstart', this.onDragStart.bind(this) )
-			.on( 'drag', this.onDrag.bind(this) )
-			.on( 'dragend', this.onDragEnd.bind(this) );
-		this.onOut();
+		this.bindInteractive(this.circle);
 
 		this.alphaEasing = 0;
 		this.alphaSpeed = 1 / 0.2;
@@ -109,29 +100,33 @@ class Node extends Phaser.GameObjects.Container {
 
 
 	onOut() {
-		this.isHover = false;
+		super.onOut();
 		this.setScale(1.00 * this.getScale());
 		this.image.setTint(0xDDDDDD);
 	}
 
 	onOver() {
-		this.isHover = true;
+		super.onOver();
 		this.setScale(1.05 * this.getScale());
 		this.image.setTint(0xFFFFFF);
 	}
 
 	onDown() {
+		super.onDown();
 		this.setScale(0.95 * this.getScale());
 		this.image.setTint(0xBBBBBB);
 	}
 
-	onUp() {
-		this.onOver();
+	onClick() {
+		this.selected = !this.selected;
+		this.circle.setTint(this.selected ? 0xffffff : 0xd6e3d1);
+
+		this.setScale(1.00 * this.getScale());
+		this.image.setTint(0xDDDDDD);
 	}
 
 
 	onDragStart(pointer, dragX, dragY) {
-		this.isHeld = true;
 		this.offsetX = this.x;
 		this.offsetY = this.y;
 	}
@@ -142,7 +137,6 @@ class Node extends Phaser.GameObjects.Container {
 	}
 
 	onDragEnd(pointer, dragX, dragY, dropped) {
-		this.isHeld = false;
 	}
 
 
@@ -151,7 +145,7 @@ class Node extends Phaser.GameObjects.Container {
 		this.x += (this.goalX - this.x) / speed;
 		this.y += (this.goalY - this.y) / speed;
 
-		if (this.isHover) {
+		if (this.hover || this.selected) {
 			this.alphaEasing = Math.min(this.alphaEasing + this.alphaSpeed * delta, 1.0);
 		}
 		else {

@@ -75,6 +75,9 @@ class PreloadScene extends Phaser.Scene {
 		this.load.audio('ui_box_open', [ 'assets/audio/ui_box_open.ogg' ] );
 		this.load.audio('ui_menu_close', [ 'assets/audio/ui_menu_close.ogg' ] );
 		this.load.audio('ui_menu_open', [ 'assets/audio/ui_menu_open.ogg' ] );
+		this.load.audio('ui_dnd_click', [ 'assets/audio/ui_dnd_click.ogg' ] );
+		this.load.audio('ui_dnd_grab', [ 'assets/audio/ui_dnd_grab.ogg' ] );
+		this.load.audio('ui_dnd_drop', [ 'assets/audio/ui_dnd_drop.ogg' ] );
 
 		//this.load.image('älg', 'assets/images/icons/Älg.png');
 		//this.load.image('blåbär', 'assets/images/icons/Blåbär.png');

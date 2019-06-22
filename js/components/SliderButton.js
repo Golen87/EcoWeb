@@ -19,13 +19,13 @@ class SliderButton extends Phaser.GameObjects.Image {
 			.on('drag', this.onDrag )
 			.on('dragend', this.onDragEnd );
 		this.onOut();
-
-		this.soundHover = scene.sound.add('hover_button');
-		this.soundHover.setVolume(0.1);
-		this.soundPress = scene.sound.add('press_button');
-		this.soundPress.setVolume(1.0);
-		this.soundRelease = scene.sound.add('release_button');
-		this.soundRelease.setVolume(1.0);
+		
+		this.soundDrag = scene.sound.add('ui_dnd_grab');
+		this.soundDrag.setVolume(1.0);
+		this.soundDrop = scene.sound.add('ui_dnd_drop');
+		this.soundDrop.setVolume(1.0);
+		this.soundSnap = scene.sound.add('ui_dnd_click');
+		this.soundSnap.setVolume(0.6);
 	}
 
 
@@ -64,7 +64,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 
 	onDragStart(pointer, dragX, dragY) {
 		this.isHeld = true;
-		this.soundPress.play();
+		this.soundDrag.play();
 	}
 
 	onDrag(pointer, dragX, dragY) {
@@ -75,7 +75,8 @@ class SliderButton extends Phaser.GameObjects.Image {
 			this.value = nearest;
 
 			if (this.latestNearest != nearest) {
-				this.soundHover.play();
+				this.soundSnap.rate = 0.9 + 0.2 * this.value;
+				this.soundSnap.play();
 			}
 			this.latestNearest = nearest;
 		}
@@ -86,7 +87,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 
 	onDragEnd(pointer, dragX, dragY, dropped) {
 		this.isHeld = false;
-		this.soundRelease.play();
+		this.soundDrop.play();
 	}
 
 

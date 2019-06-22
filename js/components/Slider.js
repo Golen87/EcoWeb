@@ -3,8 +3,8 @@ class Slider extends Phaser.GameObjects.Container {
 		super(scene, x, y);
 		scene.add.existing(this);
 
-		this.stepSize = 120;
-		this.stepMax = 4;
+		this.stepSize = 60;
+		this.stepMax = 8;
 
 		this.background = scene.add.image(0, 0, "time_background");
 		this.background.setScale(this.stepSize * (this.stepMax) / this.background.width);
