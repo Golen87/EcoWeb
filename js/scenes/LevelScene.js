@@ -61,10 +61,13 @@ class LevelScene extends Phaser.Scene {
 			//updateChart();
 		}
 
-		let timeBar = this.add.image(0, this.H, 'time_bar');
-		timeBar.setScale(0.75*this.W / timeBar.width);
-		timeBar.setOrigin(0, 1);
+		this.infoBox = new InfoBox(this, 0, 0);
+		this.infoBox.setDepth(2);
+		this.add.existing(this.infoBox);
+
 		this.slider = new Slider(this, 0.35*this.W, this.H - 40);
+		this.slider.setDepth(2);
+		this.add.existing(this.slider);
 
 
 		this.paths = [];

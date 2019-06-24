@@ -43,6 +43,10 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('growth_slider', 'assets/images/ui/growth_slider/Matare.png');
 		this.load.image('growth_slider_arrow', 'assets/images/ui/growth_slider/Vippa.png');
 
+		this.load.image('info_background', 'assets/images/ui/info_background.png');
+		this.load.image('info_scale', 'assets/images/ui/info_scale.png');
+		this.load.image('info_marker', 'assets/images/ui/info_marker.png');
+
 
 		/* Nodes */
 		this.load.image('circle', 'assets/images/circle.png');
