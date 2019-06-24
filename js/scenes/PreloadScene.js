@@ -61,11 +61,19 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('rådjur', 'assets/images/icons/Rådjur.png');
 		this.load.image('hare', 'assets/images/icons/Hare.png');
 		this.load.image('norvacka', 'assets/images/icons/Norvacka.png');
+		this.load.image('koltrast', 'assets/images/icons/Koltrast.png');
+		this.load.image('vanliggroda', 'assets/images/icons/VanligGroda.png');
+
+		this.load.image('daggmask', 'assets/images/icons/Daggmask.png');
+		this.load.image('skalbagge', 'assets/images/icons/Skalbagge.png');
+		this.load.image('trädlevandeinsekt', 'assets/images/icons/TrädlevandeInsekt.png');
 
 		this.load.image('träd', 'assets/images/icons/Träd.png');
 		this.load.image('gräs', 'assets/images/icons/Gräs.png');
 		this.load.image('ört', 'assets/images/icons/Ört.png');
 		this.load.image('blåbär', 'assets/images/icons/Blåbär.png');
+		this.load.image('svamp', 'assets/images/icons/Svamp.png');
+		this.load.image('detrius', 'assets/images/icons/Detrius.png');
 
 
 		/* Audio */
@@ -78,22 +86,6 @@ class PreloadScene extends Phaser.Scene {
 		this.load.audio('ui_dnd_click', [ 'assets/audio/ui_dnd_click_test.ogg' ] );
 		this.load.audio('ui_dnd_grab', [ 'assets/audio/ui_dnd_grab.ogg' ] );
 		this.load.audio('ui_dnd_drop', [ 'assets/audio/ui_dnd_drop.ogg' ] );
-
-		//this.load.image('älg', 'assets/images/icons/Älg.png');
-		//this.load.image('blåbär', 'assets/images/icons/Blåbär.png');
-		//this.load.image('fiskgjuse_lås', 'assets/images/icons/Fiskgjuse_Lås.png');
-		//this.load.image('fiskgjuse', 'assets/images/icons/Fiskgjuse.png');
-		//this.load.image('gräs', 'assets/images/icons/Gräs.png');
-		//this.load.image('näckros', 'assets/images/icons/Näckros.png');
-		//this.load.image('örter', 'assets/images/icons/Örter.png');
-		//this.load.image('rådjur', 'assets/images/icons/Rådjur.png');
-		//this.load.image('räv', 'assets/images/icons/Räv.png');
-		//this.load.image('skogshare', 'assets/images/icons/Skogshare.png');
-		//this.load.image('svamp', 'assets/images/icons/Svamp.png');
-		//this.load.image('träd', 'assets/images/icons/Träd.png');
-		//this.load.image('trollflugelarv_lås', 'assets/images/icons/Trollflugelarv_Lås.png');
-		//this.load.image('trollflugelarv', 'assets/images/icons/Trollflugelarv.png');
-		//this.load.image('varg', 'assets/images/icons/Varg.png');
 
 		//this.load.image('energilinje', 'assets/images/ui/EnergiLinje.png');
 		//this.load.image('energipil', 'assets/images/ui/EnergiPil.png');

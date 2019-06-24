@@ -8,10 +8,11 @@ class WorldScene extends Phaser.Scene {
 		this.fitToScreen(bg);
 		this.title = this.add.text(20, 20, "World", { font: "40px 'Crete Round'" });
 
-		for (let i = 0; i < 3; i++) {
+		for (let i = 0; i < web.scenarios.length; i++) {
 			let y = 140 + i * 90;
 
 			this.button = new PauseButton(this, this.CX, y, 'Level ' + (i+1), () => {
+				web.startScenario(i);
 				this.scene.start("LevelScene");
 			});
 			this.add.existing(this.button);

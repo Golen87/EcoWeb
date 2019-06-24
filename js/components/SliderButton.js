@@ -75,7 +75,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 			this.value = nearest;
 
 			if (this.latestNearest != nearest) {
-				this.soundSnap.rate = 0.9 + 0.2 * this.value;
+				this.soundSnap.rate = 0.96 + 0.08 * this.value;
 				this.soundSnap.play();
 			}
 			this.latestNearest = nearest;

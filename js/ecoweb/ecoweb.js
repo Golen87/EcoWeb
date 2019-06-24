@@ -234,11 +234,11 @@ class EcoWeb {
 
 function scenario_1 () {
 	//	var						name		pop		growth	self	color
-	let grass	= new Organism( "Grass",	1.0,	1.00,	-1.0,	'#8BC34A' );
-	let berry	= new Organism( "Berry",	1.0,	1.00,	-1.0,	'#4CAF50' );
-	let rabbit	= new Organism( "Rabbit",	0.1,	-0.01,	-0.1,	'#2196F3' );
-	let deer	= new Organism( "Deer",		0.1,	-0.01,	-0.1,	'#3F51B5' );
-	let fox		= new Organism( "Fox",		0.1,	-0.01,	-0.1,	'#F44336' );
+	let grass	= new Organism( "Grass",	1.0,	1.00,	-1.0,	'gräs',		'#8BC34A' );
+	let berry	= new Organism( "Berry",	1.0,	1.00,	-1.0,	'blåbär',	'#4CAF50' );
+	let rabbit	= new Organism( "Rabbit",	0.1,	-0.01,	-0.1,	'hare',		'#2196F3' );
+	let deer	= new Organism( "Deer",		0.1,	-0.01,	-0.1,	'rådjur',	'#3F51B5' );
+	let fox		= new Organism( "Fox",		0.1,	-0.01,	-0.1,	'räv',		'#F44336' );
 
 	addRelationship( rabbit,	0.1,	grass,	-1.0 );
 	addRelationship( rabbit,	0.1,	berry,	-1.0 );
@@ -251,13 +251,13 @@ function scenario_1 () {
 
 function scenario_2 () {
 	//	var						name		pop		growth	self	color
-	let blabar	= new Organism( "Blåbär",	1.0,	1.0,	-1.0,	'#536DFE');
-	let orter	= new Organism( "Örter",	1.0,	1.0,	-1.0,	'#26A69A');
-	let gras	= new Organism( "Gräs",		1.0,	1.0,	-1.0,	'#66BB6A');
-	let svamp	= new Organism( "Svamp",	1.0,	1.0,	-1.0,	'#AFB42B');
-	let hare	= new Organism( "Hare",		0.1,	-0.01,	-0.1,	'#FFD54F');
-	let radjur	= new Organism( "Rådjur",	0.1,	-0.05,	-0.1,	'#FFA726');
-	let rav		= new Organism( "Räv",		0.1,	-0.05,	-0.1,	'#FF3D00');
+	let blabar	= new Organism( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE');
+	let orter	= new Organism( "Örter",	1.0,	1.0,	-1.0,	'ört',		'#26A69A');
+	let gras	= new Organism( "Gräs",		1.0,	1.0,	-1.0,	'gräs',		'#66BB6A');
+	let svamp	= new Organism( "Svamp",	1.0,	1.0,	-1.0,	'svamp',	'#AFB42B');
+	let hare	= new Organism( "Hare",		0.1,	-0.01,	-0.1,	'hare',		'#FFD54F');
+	let radjur	= new Organism( "Rådjur",	0.1,	-0.05,	-0.1,	'rådjur',	'#FFA726');
+	let rav		= new Organism( "Räv",		0.1,	-0.05,	-0.1,	'räv',		'#FF3D00');
 
 	const S = 1/40;
 	const M = 2/40;
@@ -281,10 +281,10 @@ function scenario_2 () {
 
 function scenario_3 () {
 	//	var						name			pop		growth	self	color
-	let sur		= new Organism(	"Sur växt",		1.0,	1.0,	-1.0,	'#FF3D00',	"plant" );
-	let normal	= new Organism(	"Normal växt",	1.0,	1.0,	-1.0,	'#66BB6A',	"plant" );
-	let basisk	= new Organism(	"Basisk växt",	1.0,	1.0,	-1.0,	'#536DFE',	"plant" );
-	let ph		= new Organism(	"PH värde",		0.01,	0.1,	-0.1,	'#9E9E9E',	"component" );
+	let sur		= new Organism(	"Sur växt",		1.0,	1.0,	-1.0,	'gräs',		'#FF3D00',	"plant" );
+	let normal	= new Organism(	"Normal växt",	1.0,	1.0,	-1.0,	'gräs',		'#66BB6A',	"plant" );
+	let basisk	= new Organism(	"Basisk växt",	1.0,	1.0,	-1.0,	'gräs',		'#536DFE',	"plant" );
+	let ph		= new Organism(	"PH värde",		0.01,	0.1,	-0.1,	'missing',	'#9E9E9E',	"component" );
 
 	// target value, healthy range, decay range
 	sur.requires	( ph, normRange(0.4, 0.1, 0.5) );
@@ -303,13 +303,13 @@ function scenario_4 () {
 	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'hare',		'#FFD54F' );
 	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'rådjur',	'#FFA726' );
 	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'dovhjort',	'#FB8C00' );
-	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'norvacka',	'#FFF176' );
+	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'koltrast',	'#FFF176' );
 
 	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE' );
 	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'träd',		'#795548' );
 	let gras	= new Plant( "Gräs",	1.0,	1.0,	-1.0,	'gräs',		'#66BB6A' );
 	let orter	= new Plant( "Örter",	1.0,	1.0,	-1.0,	'ört',		'#26A69A' );
-	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'missing',	'#AFB42B' );
+	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'svamp',	'#AFB42B' );
 
 	// namn			ålder	mat		barn
 	// Dovhjort		14.0	3.5		1.2
@@ -370,7 +370,6 @@ function initWeb() {
 		scenario_2,
 		scenario_3,
 	]);
-	web.startScenario(0);
 	//web.build(scenario_4());
 	//web.initWiggle();
 	//web.solve(100);

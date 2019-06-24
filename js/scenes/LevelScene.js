@@ -45,7 +45,9 @@ class LevelScene extends Phaser.Scene {
 		for (let i = 0; i < web.species.length; i++) {
 		//for (let i = 0; i < 3; i++) {
 			let p = this.positions[lowercase(web.species[i].name)];
-			//let p = [Phaser.Math.RND.realInRange(0, 1), Phaser.Math.RND.realInRange(0, 1)];
+			if (!p) {
+				p = [Phaser.Math.RND.realInRange(0, 1), Phaser.Math.RND.realInRange(0, 1)];
+			}
 
 			//let x = this.CX + (i-(web.species.length-1)/2) * 50;
 			//let y = this.CY;
