@@ -35,11 +35,12 @@ class Node extends Button {
 		this.add(this.image);
 
 		this.slider = scene.add.image(0, 0, 'growth_slider');
-		this.slider.setScale(this.circle.scaleX * 320/779);
-		this.slider.x += 61 * this.slider.scaleX;
-		this.slider.y += -325 * this.slider.scaleY;
+		this.slider.setScale(this.circle.scaleY * 320/779);
+		this.slider.x += -325 * this.slider.scaleX;
+		this.slider.y -= 61 * this.slider.scaleY;
+		//this.slider.setAngle(-90);
 		this.add(this.slider);
-		this.sendToBack(this.slider);
+		//this.sendToBack(this.slider);
 
 		this.arrow = scene.add.image(0, 0, 'growth_slider_arrow');
 		this.arrow.setScale(0.2 * this.size / this.arrow.height);
@@ -83,8 +84,8 @@ class Node extends Button {
 
 
 	getScale() {
-		let smooth = 0.5 + Math.atan(3 * (0.5 + 0.5*this.population + this.wiggle - 0.5)) / Math.PI;
-		return 0.4 + 0.9 * smooth;
+		let smooth = 0.5 + Math.atan(6 * (0.5 + 0.5 * this.population - 0.5)) / Math.PI + this.wiggle;
+		return 0.3 + 0.9 * smooth;
 	}
 
 	updateArrow() {
@@ -92,7 +93,7 @@ class Node extends Button {
 		let smooth = this.population;
 		// TODO: Inverse the easing for a set goal
 		//let smooth = Phaser.Math.Easing.Sine.InOut(this.population);
-		let angle = -Math.PI/2 - sliderAngle + 2 * sliderAngle * smooth;
+		let angle = -Math.PI - sliderAngle + 2 * sliderAngle * smooth;
 		let radius = this.circle.width * this.circle.scaleX * (0.52 + 0.2 * smooth);
 
 		var vector = new Phaser.Math.Vector2();
@@ -109,13 +110,20 @@ class Node extends Button {
 		this.setScale(this.getScale());
 		this.updateArrow(pop);
 
-		let diff = Phaser.Math.Clamp(Math.abs(1 - 1.99*this.population), 0, 1);
-		let index = Math.floor(diff * this.spectrum.length);
+		let diff = Phaser.Math.Clamp(Math.abs(1 - 2*this.population), 0, 1);
+		diff = 0.1 + 0.9 * diff; // Due to green being +-0.5
+		let index = Phaser.Math.Clamp(Math.floor(diff * this.spectrum.length), 0, this.spectrum.length-1);
+		let rest = diff * this.spectrum.length - index;
 
-		//let color = Phaser.Display.Color.Interpolate.ColorWithColor(this.spectrum[index], this.spectrum[index+1], 1, 0.5);
+		//let color = Phaser.Display.Color.Interpolate.ColorWithColor(this.spectrum[index], this.spectrum[index+1], 1, rest);
+		//color = Phaser.Display.Color.ObjectToColor(color);
 		let color = this.spectrum[index];
+
 		color.s = 1;
 		this.innerCircle.setTint(color.color);
+		color.s = 0.1;
+		color.v = 0.8;
+		this.innerCircle2.setTint(color.color);
 	}
 
 

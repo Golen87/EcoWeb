@@ -283,8 +283,14 @@ class EcoWeb {
 		let maxX = this.result.x[index+1];
 		let minY = this.result.y[index][speciesIndex];
 		let maxY = this.result.y[index+1][speciesIndex];
-		let slope = (maxY - minY) / (maxX - minX);
-		return minY + slope * (pos - minX);
+
+		if (minX == maxX || minY == maxY) {
+			return minY;
+		}
+		else {
+			let slope = (maxY - minY) / (maxX - minX);
+			return minY + slope * (pos - minX);
+		}
 	}
 }
 
@@ -428,6 +434,7 @@ function initWeb() {
 		scenario_3,
 	]);
 	web.startScenario(0);
+	web.stabilize();
 	//web.build(scenario_4());
 	//web.initWiggle();
 	//web.solve(100);

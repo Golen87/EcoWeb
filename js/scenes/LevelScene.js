@@ -116,7 +116,7 @@ class LevelScene extends Phaser.Scene {
 
 		this.slider.update(delta);
 
-		const SCALE = 0.1;
+		const SCALE = 0.05;
 		for (let i = 0; i < this.nodes.length; i++) {
 			let a = this.nodes[i];
 			let aPos = new Phaser.Math.Vector2(a.x, a.y);
@@ -136,7 +136,7 @@ class LevelScene extends Phaser.Scene {
 						web.species[i].diet[web.species[j].name] || 0,
 						web.species[j].diet[web.species[i].name] || 0
 					);
-					let target = 300 - diet * (200);
+					let target = 300 - diet * (200) -200+400 * this.nodes[i].population;
 
 					let diff = aPos.clone()
 					diff.subtract(bPos);
@@ -149,10 +149,11 @@ class LevelScene extends Phaser.Scene {
 		}
 
 		for (let i = 0; i < this.nodes.length; i++) {
-			let s = 0.02 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
+			let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
+			//let p = this.slider.value;
 			this.nodes[i].setPopulation(web.getValueAt(i, this.slider.value * web.time), s);
-			//this.nodes[i].x += this.nodes[i].force.x;
-			//this.nodes[i].y += this.nodes[i].force.y;
+			this.nodes[i].x += this.nodes[i].force.x;
+			this.nodes[i].y += this.nodes[i].force.y;
 			this.nodes[i].update(delta);
 		}
 
