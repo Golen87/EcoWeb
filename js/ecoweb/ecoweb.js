@@ -34,7 +34,8 @@ class EcoWeb {
 
 		web.build(this.scenarios[i]());
 		web.initWiggle();
-		web.solve(this.maxTime);
+		web.stabilize();
+		//web.solve(this.maxTime);
 		updateChart();
 
 		if (!this.vue) {
@@ -434,7 +435,6 @@ function initWeb() {
 		scenario_3,
 	]);
 	web.startScenario(0);
-	web.stabilize();
 	//web.build(scenario_4());
 	//web.initWiggle();
 	//web.solve(100);
