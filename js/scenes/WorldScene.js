@@ -6,7 +6,6 @@ class WorldScene extends Phaser.Scene {
 	create() {
 		let bg = this.add.image(this.CX, this.CY, 'bg_2');
 		this.fitToScreen(bg);
-		this.title = this.add.text(20, 20, "World", { font: "40px 'Crete Round'" });
 
 		for (let i = 0; i < web.scenarios.length; i++) {
 			let y = 140 + i * 90;

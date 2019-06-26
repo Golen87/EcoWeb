@@ -24,17 +24,28 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('pause_button', 'assets/images/ui/pause/Knapp.png');
 		this.load.image('pause_button_hover', 'assets/images/ui/pause/KnappMouseover.png');
 
+		this.load.image('event_background', 'assets/images/ui/event/EventBG.png');
+		this.load.image('event_divider_top', 'assets/images/ui/event/Divider_Top.png');
+		this.load.image('event_divider', 'assets/images/ui/event/Divider.png');
+		this.load.image('event_type_plant', 'assets/images/ui/event/VäxtIkon.png');
+		this.load.image('event_type_animal', 'assets/images/ui/event/DjurIkon.png');
+		this.load.image('event_type_build', 'assets/images/ui/event/ByggIkon.png');
+		this.load.image('event_type_chemistry', 'assets/images/ui/event/KemiIkon.png');
+
 
 		/* UI */
 		this.load.image('checkbox', 'assets/images/ui/checkbox/CheckBox.png');
 		this.load.image('checkmark', 'assets/images/ui/checkbox/Checkmark.png');
 
 		this.load.image('symbol_button', 'assets/images/ui/button/HändelseNod.png');
+		this.load.image('symbol_menu', 'assets/images/ui/button/MenyKnapp.png');
 
 		this.load.image('time_bar', 'assets/images/ui/time/TidsAxelBar.png');
 		this.load.image('time_background', 'assets/images/ui/time/TidsAxel.png');
-		this.load.image('time_button', 'assets/images/ui/time/Timglas.png');
-		this.load.image('time_button_arrows', 'assets/images/ui/time/TimglasMedPil.png');
+		this.load.image('time_button', 'assets/images/ui/time/TimglasMedPil.png');
+
+		this.load.image('event_add', 'assets/images/ui/Markor.png');
+		this.load.image('symbol_plus', 'assets/images/ui/plus.png');
 
 		this.load.image('socket_button', 'assets/images/ui/socket/button.png');
 		this.load.image('socket_socket', 'assets/images/ui/socket/socket.png');
@@ -104,8 +115,8 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
-		//this.scene.start("LevelScene");
-		this.scene.start("TitleScene");
+		this.scene.start("LevelScene");
+		//this.scene.start("TitleScene");
 	}
 
 	update(time, delta) {

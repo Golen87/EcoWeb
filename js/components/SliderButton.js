@@ -1,6 +1,9 @@
 class SliderButton extends Phaser.GameObjects.Image {
-	constructor(scene, x, y, stepSize, stepMax) {
-		super(scene, x, y, 'time_button');
+	constructor(scene, offsetX, offsetY, size, stepSize, stepMax) {
+		super(scene, offsetX, offsetY, 'time_button');
+		this.offsetX = offsetX;
+		this.offsetY = offsetY;
+		this.size = size;
 
 		this.stepSize = stepSize;
 		this.stepMax = stepMax;
@@ -20,6 +23,8 @@ class SliderButton extends Phaser.GameObjects.Image {
 			.on('dragend', this.onDragEnd );
 		this.onOut();
 		
+		this.soundHover = scene.sound.add('hover_button');
+		this.soundHover.setVolume(0.1);
 		this.soundDrag = scene.sound.add('ui_dnd_grab');
 		this.soundDrag.setVolume(1.0);
 		this.soundDrop = scene.sound.add('ui_dnd_drop');
@@ -30,12 +35,12 @@ class SliderButton extends Phaser.GameObjects.Image {
 
 
 	get scale() {
-		return 60 / this.height;
+		return this.size / this.height;
 	}
 
 	set value(x) {
 		this._value = Phaser.Math.Clamp(x, 0, this.stepMax);
-		this.x = (this.value - this.stepMax/2) * this.stepSize;
+		this.x = this.offsetX + (this.value - this.stepMax/2) * this.stepSize;
 	}
 
 	get value() {
@@ -51,6 +56,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 	onOver() {
 		this.setScale(1.05 * this.scale);
 		this.setTint(0xFFFFFF);
+		this.soundHover.play();
 	}
 
 	onDown() {
@@ -68,7 +74,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 	}
 
 	onDrag(pointer, dragX, dragY) {
-		this.value = dragX / this.stepSize + this.stepMax/2;
+		this.value = (dragX-this.offsetX) / this.stepSize + this.stepMax/2;
 
 		let nearest = Math.round(this.value);
 		if (Math.abs(this.value - nearest) < 1/6) {
@@ -100,11 +106,11 @@ class SliderButton extends Phaser.GameObjects.Image {
 		if (this.softValue != this.value) {
 			let speed = (this.isHeld ? 2 : 5);
 			this.softValue += (this.value - this.softValue) / speed;
-			if (Math.abs(this.softValue - this.value) < 0.01)
+			if (Math.abs(this.softValue - this.value) < 0.005)
 				this.softValue = this.value;
 		}
 
-		this.x = (this.softValue - this.stepMax/2) * this.stepSize;
+		this.x = this.offsetX + (this.softValue - this.stepMax/2) * this.stepSize;
 	}
 
 }

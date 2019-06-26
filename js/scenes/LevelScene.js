@@ -29,17 +29,52 @@ class LevelScene extends Phaser.Scene {
 	}
 
 	create() {
+		//this.shader = this.game.renderer.addPipeline('Grayscale', new GrayscalePipeline(this.game));
+		//this.shader.setFloat1('tx', this.input.x);
+		//this.shader.setFloat1('ty', this.input.y);
+		//this.shader.setFloat1('r', 100);
+		//this.cameras.main.setRenderToTexture(this.shader);
+
 		let bg = this.add.image(this.CX, this.CY, 'bg_title');
 		this.fitToScreen(bg);
-		this.title = this.add.text(20, 20, "Level", { font: "40px 'Crete Round'" });
 
-		let button = new TextButton(this, this.W-20, this.H-20, 'Tillbaka', {
-			font: "30px 'Crete Round'"
-		}, () => {
-			this.scene.start("WorldScene");
+		this.infoBox = new InfoBox(this, 0, 0, 0.3 * this.W);
+		this.infoBox.setDepth(2);
+		this.add.existing(this.infoBox);
+
+		this.slider = new Slider(this, 0, this.H, 0.8 * this.W);
+		this.slider.setDepth(2);
+		this.add.existing(this.slider);
+
+		const size = this.slider.background.height * this.slider.background.scaleY;
+		this.back = new SymbolButton(this, this.W - size/2, this.H - size/2, 0.8 * size, () => {
+			this.pauseWindow.show();
 		});
-		button.setOrigin(1, 1);
-		this.add.existing(button);
+		this.add.existing(this.back);
+
+		this.pauseWindow = new PauseWindow(this, this.CX, this.CY, this.pauseOptions);
+		this.pauseWindow.setDepth(1000);
+		this.pauseWindow.hide();
+		this.add.existing(this.pauseWindow);
+
+		this.eventWindow = new EventWindow(this, this.CX, this.CY);
+		this.eventWindow.setDepth(1000);
+		this.eventWindow.hide();
+		this.add.existing(this.eventWindow);
+
+
+		this.input.keyboard.on('keyup-ESC', function(event) {
+			if (this.eventWindow.active) {
+				this.eventWindow.hide();
+			}
+			else if (this.pauseWindow.active) {
+				this.pauseWindow.hide();
+			}
+			else {
+				this.pauseWindow.show();
+			}
+		}, this);
+
 
 		this.nodes = [];
 		for (let i = 0; i < web.species.length; i++) {
@@ -61,14 +96,6 @@ class LevelScene extends Phaser.Scene {
 			//updateChart();
 		}
 
-		this.infoBox = new InfoBox(this, 0, 0);
-		this.infoBox.setDepth(2);
-		this.add.existing(this.infoBox);
-
-		this.slider = new Slider(this, 0.35*this.W, this.H - 40);
-		this.slider.setDepth(2);
-		this.add.existing(this.slider);
-
 
 		this.paths = [];
 		for (let i = 0; i < this.nodes.length; i++) {
@@ -81,22 +108,7 @@ class LevelScene extends Phaser.Scene {
 					}
 				}
 			}
-			//break;
 		}
-
-		this.pauseWindow = new PauseWindow(this, this.CX, this.CY, this.pauseOptions);
-		this.pauseWindow.setDepth(1000);
-		this.pauseWindow.hide();
-		this.add.existing(this.pauseWindow);
-
-		this.input.keyboard.on('keyup-ESC', function(event) {
-			if (this.pauseWindow.active) {
-				this.pauseWindow.hide();
-			}
-			else {
-				this.pauseWindow.show();
-			}
-		}, this);
 	}
 
 	update(time, deltaMs) {
@@ -147,6 +159,8 @@ class LevelScene extends Phaser.Scene {
 		for (let i = 0; i < this.paths.length; i++) {
 			this.paths[i].update(delta);
 		}
+		//this.shader.setFloat1('tx', this.input.x / this.game.config.width);
+		//this.shader.setFloat1('ty', this.input.y / this.game.config.height);
 	}
 
 

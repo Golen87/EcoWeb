@@ -1,8 +1,8 @@
 class InfoBox extends Phaser.GameObjects.Container {
-	constructor(scene, x, y) {
+	constructor(scene, x, y, width) {
 		super(scene, x, y);
 
-		const WIDTH = 250;
+		this.width = width;
 		this.values = [
 			"Datum",
 			"Temp.",
@@ -12,24 +12,27 @@ class InfoBox extends Phaser.GameObjects.Container {
 
 		this.background = scene.add.image(0, 0, "info_background");
 		this.background.setOrigin(0, 0);
-		this.background.setScale(WIDTH / this.background.width);
+		this.background.setScale(this.width / this.background.width);
 		this.add(this.background);
 
 		for (let i = 0; i < this.values.length; i++) {
 			const LEFT = 0;
-			const OFFSET = 0.25 * WIDTH;
-			const TOP = 20 + 30 * i;
+			const OFFSET = 0.25 * this.width;
+			const HEIGHT = (this.background.height-36) * this.background.scaleY;
+			const TOP = (0.2 + 0.6 * i / (this.values.length - 1)) * HEIGHT;
 
-			this.text = scene.add.text(LEFT + 5, TOP, this.values[i], { font: "15px 'Crete Round'" });
+			this.text = scene.add.text(LEFT + 5, TOP, this.values[i], { fontSize: 15 + "px", fontFamily: "Crete Round" });
 			this.text.setOrigin(0.0, 0.5);
+			//this.text.setFontSize(16);
 			this.add(this.text);
 
 			let scale = scene.add.image(LEFT + OFFSET, TOP, "info_scale");
-			scale.setScale(0.65 * WIDTH / scale.width);
+			scale.setScale(0.65 * this.width / scale.width);
+			scale.scaleY *= 0.8;
 			scale.setOrigin(0.0, 0.5);
 			this.add(scale);
 
-			let marker = scene.add.image(LEFT + OFFSET + 0.65/2 * WIDTH, TOP, "info_marker");
+			let marker = scene.add.image(LEFT + OFFSET + 0.65/2 * this.width, TOP, "info_marker");
 			marker.setScale(1.4 * scale.height * scale.scaleY / marker.height);
 			marker.setOrigin(0.0, 0.5);
 			this.add(marker);

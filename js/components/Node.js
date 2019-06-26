@@ -6,20 +6,29 @@ class Node extends Button {
 
 		this.population = 0.5;
 		this.wiggle = 0;
-		this.size = 100;
+		this.size = scene.W / 8;
 		this.goalX  = x;
 		this.goalY  = y;
 		this.selected = false;
 
+		this.WHITE = 0xe3e3d1;
+		this.BLACK = 0x332d24;
+
+		const THICKNESS = 1.1;
 		this.circle = scene.add.image(0, 0, 'circle');
-		this.circle.setScale((this.size+30) / this.circle.height);
-		this.circle.setTint(0xd6e3d1);
+		this.circle.setScale((THICKNESS * this.size) / this.circle.height);
+		this.circle.setTint(this.BLACK);
 		this.add(this.circle);
 
 		this.innerCircle = scene.add.image(0, 0, 'circle');
 		this.innerCircle.setScale(this.size / this.innerCircle.height);
 		this.add(this.innerCircle);
-		this.innerCircle.setTint(0xa9bfa1);
+		this.innerCircle.setTint(this.BLACK);
+
+		this.innerCircle2 = scene.add.image(0, 0, 'circle');
+		this.innerCircle2.setScale(0.9 * this.size / this.innerCircle2.height);
+		this.add(this.innerCircle2);
+		this.innerCircle2.setTint(0xa9bfa1);
 
 		this.image = scene.add.image(0, 0, this.species.image);
 		this.image.setScale(this.size / Math.max(this.image.width, this.image.height));
@@ -62,12 +71,20 @@ class Node extends Button {
 		this.alphaEasing = 0;
 		this.alphaSpeed = 1 / 0.2;
 		this.hoverAlpha = 0;
+
+		this.spectrum = [
+			Phaser.Display.Color.ValueToColor(0x518040), // Green
+			Phaser.Display.Color.ValueToColor(0x92A537), // Lime
+			Phaser.Display.Color.ValueToColor(0xBEB630), // Yellow
+			Phaser.Display.Color.ValueToColor(0xCC9F2C), // Orange
+			Phaser.Display.Color.ValueToColor(0xCC6D29), // Red
+		];
 	}
 
 
 	getScale() {
-		let smooth = 0.5 + Math.atan(3 * (this.population + this.wiggle - 0.5)) / Math.PI;
-		return 0.4 + 0.8 * smooth;
+		let smooth = 0.5 + Math.atan(3 * (0.5 + 0.5*this.population + this.wiggle - 0.5)) / Math.PI;
+		return 0.4 + 0.9 * smooth;
 	}
 
 	updateArrow() {
@@ -76,7 +93,7 @@ class Node extends Button {
 		// TODO: Inverse the easing for a set goal
 		//let smooth = Phaser.Math.Easing.Sine.InOut(this.population);
 		let angle = -Math.PI/2 - sliderAngle + 2 * sliderAngle * smooth;
-		let radius = this.size * (0.74 + 0.2 * smooth);
+		let radius = this.circle.width * this.circle.scaleX * (0.52 + 0.2 * smooth);
 
 		var vector = new Phaser.Math.Vector2();
 		vector.setToPolar(angle, radius);
@@ -91,6 +108,14 @@ class Node extends Button {
 		this.wiggle = wiggle;
 		this.setScale(this.getScale());
 		this.updateArrow(pop);
+
+		let diff = Phaser.Math.Clamp(Math.abs(1 - 1.99*this.population), 0, 1);
+		let index = Math.floor(diff * this.spectrum.length);
+
+		//let color = Phaser.Display.Color.Interpolate.ColorWithColor(this.spectrum[index], this.spectrum[index+1], 1, 0.5);
+		let color = this.spectrum[index];
+		color.s = 1;
+		this.innerCircle.setTint(color.color);
 	}
 
 
@@ -119,7 +144,7 @@ class Node extends Button {
 
 	onClick() {
 		this.selected = !this.selected;
-		this.circle.setTint(this.selected ? 0xffffff : 0xd6e3d1);
+		this.circle.setTint(this.selected ? this.WHITE : this.BLACK);
 
 		this.setScale(1.00 * this.getScale());
 		this.image.setTint(0xDDDDDD);
