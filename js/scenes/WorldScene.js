@@ -12,6 +12,7 @@ class WorldScene extends Phaser.Scene {
 
 			this.button = new PauseButton(this, this.CX, y, 'Level ' + (i+1), () => {
 				web.startScenario(i);
+				this.soundSwoosh.play();
 				this.scene.start("LevelScene");
 			});
 			this.add.existing(this.button);
@@ -20,10 +21,14 @@ class WorldScene extends Phaser.Scene {
 		let button = new TextButton(this, this.cameras.main.displayWidth-20, this.cameras.main.displayHeight-20, 'Tillbaka', {
 			font: "30px 'Crete Round'"
 		}, () => {
+			this.soundSwoosh.play();
 			this.scene.start("TitleScene");
 		});
 		button.setOrigin(1, 1);
 		this.add.existing(button);
+
+		this.soundSwoosh = this.sound.add('ui_menu_swoosh');
+		this.soundSwoosh.setVolume(1.0);
 	}
 
 	update(time, delta) {

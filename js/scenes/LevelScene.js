@@ -23,6 +23,7 @@ class LevelScene extends Phaser.Scene {
 				console.log("Inställningar");
 			}],
 			["Gå Till Meny", function() {
+				this.soundSwoosh.play();
 				this.scene.start("WorldScene");
 			}],
 		];
@@ -109,6 +110,10 @@ class LevelScene extends Phaser.Scene {
 				}
 			}
 		}
+
+
+		this.soundSwoosh = this.sound.add('ui_menu_swoosh');
+		this.soundSwoosh.setVolume(1.0);
 	}
 
 	update(time, deltaMs) {
