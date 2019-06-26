@@ -90,31 +90,9 @@ class PreloadScene extends Phaser.Scene {
 		this.load.audio('ui_dnd_click', [ 'assets/audio/ui_dnd_click.ogg' ] );
 		this.load.audio('ui_dnd_grab', [ 'assets/audio/ui_dnd_grab.ogg' ] );
 		this.load.audio('ui_dnd_drop', [ 'assets/audio/ui_dnd_drop.ogg' ] );
+		this.load.audio('ui_menu_swoosh', [ 'assets/audio/ui_menu_swoosh.ogg' ] );
 
-		//this.load.image('energilinje', 'assets/images/ui/EnergiLinje.png');
-		//this.load.image('energipil', 'assets/images/ui/EnergiPil.png');
-		//this.load.image('händelse_bar', 'assets/images/ui/Händelse_Bar.png');
-		//this.load.image('händelsenodflyttbar', 'assets/images/ui/HändelseNodFlyttbar.png');
-		//this.load.image('händelsenod', 'assets/images/ui/HändelseNod.png');
-		//this.load.image('händelsenodtom', 'assets/images/ui/HändelseNodTom.png');
-		//this.load.image('ikon', 'assets/images/ui/Ikon.png');
-		//this.load.image('infobox', 'assets/images/ui/Infobox.png');
-		//this.load.image('menyknapp', 'assets/images/ui/MenyKnapp.png');
-		//this.load.image('questbox', 'assets/images/ui/QuestBox.png');
-		//this.load.image('skala_infobox', 'assets/images/ui/Skala_InfoBox.png');
-		//this.load.image('slider_infobox', 'assets/images/ui/Slider_InfoBox.png');
-		//this.load.image('tidsaxel_bar', 'assets/images/ui/Tidsaxel_Bar.png');
-		//this.load.image('tidsaxel', 'assets/images/ui/TidsAxel.png');
-		//this.load.image('timmblas', 'assets/images/ui/Timmblas.png');
-		//this.load.image('tomnod', 'assets/images/ui/TomNod.png');
-		//this.load.image('tomtiddaxelnod', 'assets/images/ui/TomTiddaxelNod.png');
-
-		//this.load.image('ui_symbol', 'assets/images/UI_Symbol.png');
-		//this.load.image('full', 'assets/images/Radjur.png');
-
-		//this.load.image('cat', 'assets/images/cat.jpeg');
-		//this.load.image('image', 'assets/images/image.png');
-		//this.load.image('items', 'assets/images/items.png');
+		this.load.audio('ambience_main_menu', [ 'assets/audio/ambience_main_menu.ogg' ] );
 
 
 		this.load.on('progress', this.onLoadProgress, this);

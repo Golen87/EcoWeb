@@ -5,9 +5,11 @@ class TitleScene extends Phaser.Scene {
 		this.options = [
 			["Nytt Spel", function() {
 				this.scene.start("WorldScene");
+				this.soundSwoosh.play();
 			}],
 			["Fortsätt", function() {
 				this.scene.start("WorldScene");
+				this.soundSwoosh.play();
 			}],
 			["Inställningar", function() {
 				console.log("Inställningar");
@@ -47,6 +49,12 @@ class TitleScene extends Phaser.Scene {
 		this.add.existing(box);
 		box = new CheckBox(this, LEFT+450, 300+70*2, "test 3", false, (state) => {console.log(state);});
 		this.add.existing(box);
+
+		this.soundSwoosh = this.sound.add('ui_menu_swoosh');
+		this.soundSwoosh.setVolume(1.0);
+		this.soundAmbience = this.sound.add('ambience_main_menu');
+		this.soundAmbience.setVolume(0.4);
+		this.soundAmbience.play();
 	}
 
 	update(time, delta) {
