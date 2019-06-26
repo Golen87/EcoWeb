@@ -4,6 +4,7 @@ class EcoWeb {
 		this.size = 4;
 		// Current time step of simulation
 		this.time = 0;
+		this.maxTime = 120;
 		// Initial population densities
 		this.startPop = [];
 		// Size of the population at a given time
@@ -20,6 +21,8 @@ class EcoWeb {
 		};
 
 		this.scenarios = [];
+		this.events = [];
+		this.activeEvents = [];
 	}
 
 	setScenarios(scenarios) {
@@ -27,9 +30,11 @@ class EcoWeb {
 	}
 
 	startScenario(i) {
+		this.activeEvents = [];
+
 		web.build(this.scenarios[i]());
 		web.initWiggle();
-		web.solve(100);
+		web.solve(this.maxTime);
 		updateChart();
 
 		if (!this.vue) {
@@ -87,8 +92,27 @@ class EcoWeb {
 				}
 			}
 		}
-		
+
+		this.events = [
+			new Event("Förgifta Rävar", function() {
+				this.A[0][0] -= 0.5;
+				console.log("Apply event: Fox poison");
+			}.bind(this)),
+
+			new Event("Plantera Rävar", function() {
+				this.population[0] += 0.5;
+				console.log("Apply event: Adding more foxes");
+			}.bind(this)),
+		];
+
 		this.reset();
+	}
+
+	refresh() {
+		web.build(this.species);
+		web.applyWiggle();
+		web.solve(this.maxTime);
+		updateChart();
 	}
 
 	reset() {
@@ -113,14 +137,47 @@ class EcoWeb {
 	}
 
 	applyWiggle() {
-		for (let i = 0; i < this.size; i++) {
-			for (let j = 0; j < this.size; j++) {
-				this.A[i][j] *= this.wiggle[i][j];
+		//for (let i = 0; i < this.size; i++) {
+		//	for (let j = 0; j < this.size; j++) {
+		//		this.A[i][j] *= this.wiggle[i][j];
+		//	}
+		//}
+	}
+
+	setEvent(time, event) {
+		for (var i = this.activeEvents.length - 1; i >= 0; i--) {
+			if (this.activeEvents[i].time == time) {
+				this.activeEvents.splice(i, 1);
 			}
 		}
+		if (event) {
+			this.activeEvents.push(new ActiveEvent(time, event));
+		}
+
+		this.refresh();
+	}
+
+	applyEvent(event) {
+		event.callback();
 	}
 
 	solve(duration) {
+		this.activeEvents.sort((a,b) => (a.time > b.time) ? 1 : -1);
+
+		for (var i = 0; i < this.activeEvents.length; i++) {
+			if (this.activeEvents[i].time >= this.time) {
+				this.solveSection(this.activeEvents[i].time - this.time);
+				this.applyEvent(this.activeEvents[i].event);
+			}
+			else {
+				console.warn("Event out of scope at", this.activeEvents[i].time);
+			}
+		}
+		this.solveSection(duration - this.time);
+	}
+
+	solveSection(duration) {
+		console.log("Solving", this.time, "-", (this.time+duration));
 		// Lotka-Volterra equation (classical model for predator-prey interaction)
 		let f = function(t, pop) {
 			// Calculate interactions for diet
@@ -185,7 +242,7 @@ class EcoWeb {
 		let start = this.time;
 		let end = start + duration;
 		let sol = numeric.dopri(start, end, this.population, f.bind(this), 1e-6, 2000);
-		this.population = sol.y[sol.y.length-1];
+		this.population = [...sol.y[sol.y.length-1]]; // Copy
 		this.time = end;
 
 		this.result.x.push(...sol.x);
@@ -370,6 +427,7 @@ function initWeb() {
 		scenario_2,
 		scenario_3,
 	]);
+	web.startScenario(0);
 	//web.build(scenario_4());
 	//web.initWiggle();
 	//web.solve(100);

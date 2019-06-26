@@ -35,13 +35,11 @@ function createGraphTools() {
 			},
 			updateDuration(event) {
 				this.duration = parseFloat(event.target.value);
+				web.maxTime = this.duration;
 				this.updateGraph();
 			},
 			updateGraph() {
-				web.build(this.species);
-				web.applyWiggle();
-				web.solve(this.duration);
-				updateChart();
+				web.refresh();
 			},
 			toggleShow(event, s) {
 				s.show = !s.show;
