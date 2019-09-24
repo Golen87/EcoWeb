@@ -41,6 +41,8 @@
 
 		<script src="js/ecoweb/organism.js"></script>
 		<script src="js/ecoweb/event.js"></script>
+		<script src="js/ecoweb/nodeData.js"></script>
+		<script src="js/ecoweb/database.js"></script>
 		<script src="js/ecoweb/ecoweb.js"></script>
 
 		<script src="js/components/Button.js"></script>
@@ -82,6 +84,211 @@
 		<div style="font-family:'Crete Round', sans-serif; position:absolute; left:-1000px; visibility:hidden;">.</div>
 
 		<div id="game"></div>
+
+		<div class="container card-body bg-light mx-auto justify-content-center">
+			<div id="databaseEditor" class="row" v-show="show" v-cloak>
+				<div class="col-12">
+					<h2 class="text-left">Database</h2>
+					<hr>
+				</div>
+
+				<div class="col d-flex justify-content-start">
+					<input type="file" id="importJsonInput" hidden/>
+					<input type="button" class="btn btn-warning mr-1" value="Import JSON" v-on:click="importFile()">
+					<input type="button" class="btn btn-warning" value="Export JSON" v-on:click="exportFile()">
+				</div>
+
+				<div class="col d-flex justify-content-end">
+					<input type="button" class="btn btn-primary mr-1" v-bind:value="'Nodes (' + list.length + ')'" v-on:click="openNodes()">
+					<input type="button" class="btn btn-primary mr-1" value="Events" v-on:click="openEvents()" disabled>
+					<input type="button" class="btn btn-primary" value="Scenarios" v-on:click="openScenarios()" disabled>
+				</div>
+			</div>
+
+			<div id="nodeList" class="row no-gutters" v-show="show" v-cloak>
+				<div class="col-12">
+					<h2 class="text-left">Nodes</h2>
+				</div>
+
+				<table class="table">
+					<thead>
+						<tr>
+							<td scope="col" class="text-muted d-none d-sm-table-cell"></td>
+							<td scope="col" class="text-muted">Name</td>
+							<td scope="col" class="text-muted d-none d-md-table-cell">Id</td>
+							<td scope="col" class="text-muted d-none d-lg-table-cell">Type</td>
+							<td scope="col"></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="s in list">
+							<td scope="row" class="align-middle d-none d-sm-table-cell">
+								<img
+									v-bind:src="getImagesrc(s.image)"
+									class="img-thumbnail p-0 rounded-circle"
+									style="border: none; height: 40px;"
+									v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + s.color }">
+							</td>
+							<th class="align-middle">{{ s.name }}</th>
+							<td class="align-middle d-none d-md-table-cell">{{ s.id }}</td>
+							<td class="align-middle d-none d-lg-table-cell">{{ s.type }}</td>
+							<td class="align-middle" style="width: 1%; white-space: nowrap;">
+								<input type="button" class="btn btn-secondary" value="Edit" v-on:click="editNode(s)">
+								<input type="button" class="btn btn-secondary" value="Copy" v-on:click="copyNode(s)">
+								<input type="button" class="btn btn-danger" value="Delete" v-on:click="deleteNode(s)">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+				<hr class="col-12">
+				<div class="col-12 d-flex justify-content-end" style="">
+					<input type="button" class="btn btn-secondary mr-1" value="Back" v-on:click="back()">
+					<input type="button" class="btn btn-primary mr-1" value="Add node" v-on:click="addNode()">
+				</div>
+			</div>
+
+			<form id="nodeEditor" class="" v-show="show" v-cloak v-on:submit="save" action="#" method="post">
+				<div class="row justify-content-center">
+					<div class="col-md-9 col-lg-8 col-xl-6">
+
+						<!-- name -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Name</label>
+							<div class="col-sm-8">
+								<input v-model="node.name" type="text" class="form-control" required>
+							</div>
+						</div>
+
+						<!-- image -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Image</label>
+							<div class="col-sm-8">
+								<select v-model="node.image" class="form-control" required>
+									<option v-for="option in node_images" v-bind:value="option.value">{{ option.path }}</option>
+								</select>
+							</div>
+						</div>
+
+						<!-- color -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Color</label>
+							<div class="col-sm-8">
+								<input v-model="node.color" type="color" class="form-control" required>
+							</div>
+						</div>
+
+						<hr>
+
+						<!-- type -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Type</label>
+							<div class="col-sm-8">
+								<select v-model="node.type" class="form-control" required>
+									<option v-for="option in node_types" v-bind:value="option.value">{{ option.text }}</option>
+								</select>
+							</div>
+						</div>
+
+						<div v-if="node.type == 'animal'">
+
+							<!-- size -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Size</label>
+								<div class="col-sm-8">
+									<select v-model="node.animal.size" class="form-control" required>
+										<option v-for="option in animal_sizes" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- food -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Food</label>
+								<div class="col-sm-8">
+									<select v-model="node.animal.food" class="form-control" required>
+										<option v-for="option in animal_foods" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- consumption -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Consumption</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.consumption" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">kg / day</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- age -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Age</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.age" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">years</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- offspring -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Offspring</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.offspring" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">/ year</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- diet -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label"><strike>Diet</strike></label>
+								<div class="col-sm-8">
+									<select v-model="node.animal.diet" class="form-control" disabled>
+										<option></option>
+									</select>
+								</div>
+							</div>
+
+						</div>
+
+						<div v-if="node.type == 'abiotic'">
+
+							<!-- size -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Category</label>
+								<div class="col-sm-8">
+									<select v-model="node.abiotic.category" class="form-control" required>
+										<option v-for="option in abiotic_types" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class="col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
+						<img
+							v-bind:src="imagesrc"
+							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
+							style="border: none"
+							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }">
+					</div>
+				</div>
+
+				<div class="row no-gutters d-flex justify-content-end">
+					<hr class="col-12">
+					<input type="button" class="btn btn-secondary mr-1" value="Cancel" v-on:click="cancel()">
+					<input type="submit" class="btn btn-primary" value="Save">
+				</div>
+			</form>
+		</div>
 
 		<div class="d-flex flex-wrap justify-content-center p-2" style="background: rgba(0,0,255,0.0);">
 

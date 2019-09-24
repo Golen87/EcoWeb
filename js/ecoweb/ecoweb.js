@@ -438,4 +438,6 @@ function initWeb() {
 	//web.build(scenario_4());
 	//web.initWiggle();
 	//web.solve(100);
+
+	let database = new Database();
 }
