@@ -23,7 +23,6 @@ const NODE_IMAGES = [
 	{ value: "trädlevandeinsekt",	path: "assets/images/icons/TrädlevandeInsekt.png" },
 	{ value: "träd",				path: "assets/images/icons/Träd.png" },
 	{ value: "gräs",				path: "assets/images/icons/Gräs.png" },
-	{ value: "gräs2",				path: "assets/images/icons/Gräs2.png" },
 	{ value: "ört",					path: "assets/images/icons/Ört.png" },
 	{ value: "blåbär",				path: "assets/images/icons/Blåbär.png" },
 	{ value: "svamp",				path: "assets/images/icons/Svamp.png" },

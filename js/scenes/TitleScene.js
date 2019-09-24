@@ -43,12 +43,12 @@ class TitleScene extends Phaser.Scene {
 		line.setScale(this.H / line.height);
 		line.setOrigin(1, 0);
 
-		let box = new CheckBox(this, LEFT+450, 300+70*0, "test 1", false, (state) => {console.log(state);});
-		this.add.existing(box);
-		box = new CheckBox(this, LEFT+450, 300+70*1, "test 2", false, (state) => {console.log(state);});
-		this.add.existing(box);
-		box = new CheckBox(this, LEFT+450, 300+70*2, "test 3", false, (state) => {console.log(state);});
-		this.add.existing(box);
+		//let box = new CheckBox(this, LEFT+450, 300+70*0, "test 1", false, (state) => {console.log(state);});
+		//this.add.existing(box);
+		//box = new CheckBox(this, LEFT+450, 300+70*1, "test 2", false, (state) => {console.log(state);});
+		//this.add.existing(box);
+		//box = new CheckBox(this, LEFT+450, 300+70*2, "test 3", false, (state) => {console.log(state);});
+		//this.add.existing(box);
 
 		this.soundSwoosh = this.sound.add('ui_menu_swoosh');
 		this.soundSwoosh.setVolume(1.0);
