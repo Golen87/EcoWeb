@@ -2,20 +2,11 @@ class EventWindow extends Phaser.GameObjects.Container {
 	constructor(scene, x, y) {
 		super(scene, x, y);
 
-		let options = [
-			["Plantera träd", function() {
-				console.log("haha");
-			}],
-			["Skjut rävar", function() {
-				console.log("haha");
-			}],
-			["Inför lodjur", function() {
-				console.log("haha");
-			}],
-		];
+		this.selectedMarker = null;
+		this.selectedEvent = null;
 
-		const HEIGHT = 420;
-		const SEP = 90;
+		const HEIGHT = 550;
+
 
 		this.graphics = scene.add.graphics();
 		this.add(this.graphics);
@@ -26,36 +17,88 @@ class EventWindow extends Phaser.GameObjects.Container {
 			.on('pointerdown', this.onOutsideDown.bind(this))
 			.on('pointerup', this.onOutsideUp.bind(this));
 
-		this.background = scene.add.sprite(0, 0, 'pause_window');
+		this.background = scene.add.sprite(0, 0, 'event_background');
 		this.background.setScale(HEIGHT / this.background.height);
 		this.background.setInteractive();
 		this.add(this.background);
 
-		this.text = scene.add.text(0, (-options.length/2) * SEP, "Välj Handling", {
-			font: "40px 'Crete Round'", fill: '#FFF'
-		});
-		this.text.setOrigin(0.5, 0.5);
-		this.add(this.text);
+		let categories = ['event_type_plant', 'event_type_animal', 'event_type_build', 'event_type_chemistry'];
+		this.tabs = [];
+		for (let i = 0; i < categories.length; i++) {
+			//-1830/4000
+			const SEP = 150;
+			const LEFT = -2000/4000 * this.background.width * this.background.scaleX + (i+1) * SEP;
+			const TOP = -1330/3000 * this.background.height * this.background.scaleY;
+
+			this.tabs[i] = new SymbolButton(scene, LEFT-SEP/2, TOP, categories[i], 90, ()=>{console.log("click");});
+			this.tabs[i].setScale(0.5);
+			this.add(this.tabs[i]);
+
+			let divider = scene.add.sprite(LEFT, TOP, 'event_divider_top');
+			divider.setScale(325*this.background.scaleY / divider.height);
+			this.add(divider);
+			//'event_divider'
+		}
+
+		const FUNC = (button) => {
+			for (let i = 0; i < this.buttons.length; i++) {
+				this.buttons[i].setSelected(false);
+
+				if (this.buttons[i] == button) {
+					this.buttons[i].setSelected(true);
+					this.selectEvent(i);
+				}
+			}
+		};
 
 		this.buttons = [];
-		let events = web.events;
-		for (let i = 0; i < events.length; i++) {
-			const TOP = (1 + i - events.length/2) * SEP;
-			const TEXT = events[i].name;
-			const FUNC = () => {
-				this.selectedMarker.setEvent(events[i]);
-				this.hide();
-			};
+		this.events = web.events;
+		for (let i = 0; i < this.events.length; i++) {
+			const SEP = 50;
+			const LEFT = -1330/4000 * this.background.width * this.background.scaleX;
+			//const TOP = (1 + i - this.events.length/2) * SEP;
+			//const TOP = -1330/3000 * this.background.height * this.background.scaleY;
+			const TOP = -980/3000 * this.background.height * this.background.scaleY + i * SEP;
+			const TEXT = this.events[i].name;
 
-			this.buttons[i] = new PauseButton(scene, 0, TOP, TEXT, FUNC);
+			this.buttons[i] = new EventWindowButton(scene, LEFT, TOP, TEXT, FUNC);
+			this.buttons[i].setScale(0.5);
 			this.add(this.buttons[i]);
 		}
 
-		//x =  this.background.scaleX * 0.44 * this.background.width;
-		//y = -this.background.scaleY * 0.44 * this.background.height;
-		//this.close = new SymbolButton(scene, x, y, null, ()=>{console.log("click");});
-		//this.close.setScale(250 / this.close.image.height);
-		//this.add(this.close);
+		this.title = scene.add.text(this.toX(1341+100), this.toY(347+100), "<name>", {
+			font: "40px 'Crete Round'", fill: '#FFF'
+		});
+		this.title.setOrigin(0, 0);
+		this.add(this.title);
+
+		this.desc = scene.add.text(this.toX(1341+100), this.toY(347+100)+60, "<description>", {
+			font: "20px 'Crete Round'", fill: '#FFF', wordWrap: { width: 2400 * this.background.scaleX }
+		});
+		this.desc.setOrigin(0, 0);
+		this.add(this.desc);
+
+		this.apply = new PauseButton(scene, this.toX(2668), this.toY(2745), "Aktivera", ()=>{
+			if (this.selectedMarker && this.selectedEvent) {
+				this.selectedMarker.setEvent(this.selectedEvent);
+			}
+			else {
+				console.warn("Selected marker or event missing.");
+			}
+			this.hide();
+		});
+		this.apply.setScale(0.5);
+		this.add(this.apply);
+
+		this.selectEvent(0);
+	}
+
+	toX(x) {
+		return (x - 0.5 * this.background.width) * this.background.scaleX;
+	}
+
+	toY(y) {
+		return (y - 0.5 * this.background.height) * this.background.scaleY;
 	}
 
 	show(caller) {
@@ -78,5 +121,12 @@ class EventWindow extends Phaser.GameObjects.Container {
 			this.hold = false;
 			this.hide();
 		}
+	}
+
+	selectEvent(index) {
+		this.selectedEvent = this.events[index];
+		this.buttons[index].setSelected(true);
+		this.title.setText(this.selectedEvent.name);
+		this.desc.setText(this.selectedEvent.desc);
 	}
 }

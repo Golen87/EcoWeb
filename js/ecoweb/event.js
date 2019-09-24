@@ -1,6 +1,7 @@
 class Event {
-	constructor(name, callback) {
+	constructor(name, desc, callback) {
 		this.name = name;
+		this.desc = desc;
 		this.callback = callback;
 
 		this.enabled = true;

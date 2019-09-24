@@ -48,7 +48,7 @@ class LevelScene extends Phaser.Scene {
 		this.add.existing(this.slider);
 
 		const size = this.slider.background.height * this.slider.background.scaleY;
-		this.back = new SymbolButton(this, this.W - size/2, this.H - size/2, 0.8 * size, () => {
+		this.back = new SymbolButton(this, this.W - size/2, this.H - size/2, 'symbol_menu', 0.8 * size, () => {
 			this.pauseWindow.show();
 		});
 		this.add.existing(this.back);

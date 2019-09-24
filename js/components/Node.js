@@ -84,8 +84,8 @@ class Node extends Button {
 
 
 	getScale() {
-		let smooth = 0.5 + Math.atan(6 * (0.5 + 0.5 * this.population - 0.5)) / Math.PI + this.wiggle;
-		return 0.3 + 0.9 * smooth;
+		let smooth = 0.5 + Math.atan(6 * (this.population - 0.5)) / Math.PI + this.wiggle;
+		return 0.2 + 1.1 * smooth;
 	}
 
 	updateArrow() {

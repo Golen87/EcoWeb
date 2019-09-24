@@ -1,10 +1,11 @@
 class SymbolButton extends Button {
-	constructor(scene, x, y, size, callback) {
+	constructor(scene, x, y, image, size, callback) {
 		super(scene, x, y);
 		this.callback = callback;
 		this.size = size;
 
-		this.image = scene.add.sprite(0, 0, 'symbol_menu');
+		// 'symbol_menu'
+		this.image = scene.add.sprite(0, 0, image);
 		this.image.setScale(this.size / this.image.height);
 		this.add(this.image);
 
