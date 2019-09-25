@@ -32,7 +32,7 @@ class InfoBox extends Phaser.GameObjects.Container {
 			scale.setOrigin(0.0, 0.5);
 			this.add(scale);
 
-			let marker = scene.add.image(LEFT + OFFSET + 0.65/2 * this.width, TOP, "info_marker");
+			let marker = scene.add.image(LEFT + OFFSET + (0.75+randReal(-0.25, 0.25))/2 * this.width, TOP, "info_marker");
 			marker.setScale(1.4 * scale.height * scale.scaleY / marker.height);
 			marker.setOrigin(0.0, 0.5);
 			this.add(marker);

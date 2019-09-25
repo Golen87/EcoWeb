@@ -35,7 +35,7 @@ class EcoWeb {
 		web.build(this.scenarios[i]());
 		web.initWiggle();
 		web.stabilize();
-		//web.solve(this.maxTime);
+		web.solve(this.maxTime);
 		updateChart();
 
 		if (!this.vue) {
@@ -123,7 +123,9 @@ class EcoWeb {
 				`Man kan skicka ut jägare för att jaga räv, man kan jaga dem med ett drev hundar, lura dem nära med åtel och sedan skjuta dem, skicka in hundar i deras gryt, eller sätta ut fällor.,
 				\nMinskar man rävpopulationen på detta vis så gynnar man mest smådjur så som skogsharar och koltrastar.`,
 				function() {
-					//this.population[0] += 0.5;
+					this.A[0][0] -= 0.2;
+					this.A[1][1] += 0.05;
+					console.log("Apply event: Fox hunting");
 			}.bind(this)),
 
 			new Event("Plantera Skog",
@@ -137,6 +139,7 @@ class EcoWeb {
 				`Man kan hugga ned hela skogen och på så vis bli av med alla träd.,
 				\nMånga djur mår dåligt av att skogen försvinner så som dovhjort, rådjur, harar, rävar, och koltrastar. Även växter kan skadas av att skogen försvinner, blåbär tillexempel är beroende av skogen för sin överlevnad, samt många svamparter.`,
 				function() {
+					this.A[6][6] -= 1.0;
 					//this.population[0] += 0.5;
 			}.bind(this)),
 		];
@@ -418,7 +421,7 @@ function scenario_4 () {
 	// Räv			3.5		1.0		4.0
 
 	rodrav.setDiet(
-		hare,		1.0,
+		hare,		0.6,
 		blabar,		0.6,
 		svamp,		0.4,
 		dovhjort,	0.2,
@@ -451,7 +454,10 @@ function scenario_4 () {
 	);
 
 	addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
-	addEqualCompetition([blabar, trad, gras, orter, svamp], -0.05);
+	addEqualCompetition([blabar, gras, orter], -0.05);
+
+	blabar.requires(trad, normRange(0.7, 0.2, 0.4));
+	svamp.requires(trad, normRange(0.7, 0.3, 0.5));
 
 	return [rodrav, hare, radjur, dovhjort, koltrast, blabar, trad, gras, orter, svamp];
 }
@@ -469,7 +475,8 @@ function initWeb() {
 		scenario_2,
 		scenario_3,
 	]);
-	web.startScenario(0);
+	//web.startScenario(0);
+
 	//web.build(scenario_4());
 	//web.initWiggle();
 	//web.solve(100);

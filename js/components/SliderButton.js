@@ -77,7 +77,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 		this.value = (dragX-this.offsetX) / this.stepSize + this.stepMax/2;
 
 		let nearest = Math.round(this.value);
-		if (Math.abs(this.value - nearest) < 1/6) {
+		if (Math.abs(this.value - nearest) < 1/12) {
 			this.value = nearest;
 
 			if (this.latestNearest != nearest) {

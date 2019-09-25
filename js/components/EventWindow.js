@@ -32,6 +32,7 @@ class EventWindow extends Phaser.GameObjects.Container {
 
 			this.tabs[i] = new SymbolButton(scene, LEFT-SEP/2, TOP, categories[i], 90, ()=>{console.log("click");});
 			this.tabs[i].setScale(0.5);
+			this.tabs[i].setAlpha(0.2);
 			this.add(this.tabs[i]);
 
 			let divider = scene.add.sprite(LEFT, TOP, 'event_divider_top');
@@ -76,6 +77,7 @@ class EventWindow extends Phaser.GameObjects.Container {
 			font: "20px 'Crete Round'", fill: '#FFF', wordWrap: { width: 2400 * this.background.scaleX }
 		});
 		this.desc.setOrigin(0, 0);
+		this.desc.setAlpha(0.6);
 		this.add(this.desc);
 
 		this.apply = new PauseButton(scene, this.toX(2668), this.toY(2745), "Aktivera", ()=>{
