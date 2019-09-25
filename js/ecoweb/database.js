@@ -68,7 +68,7 @@ class Database {
 	}
 
 
-	// Organisms
+	// Nodes
 
 	newNode() {
 		return {
@@ -81,6 +81,7 @@ class Database {
 				"size": null,
 				"food": null,
 				"consumption": 1.0,
+				"weight": 1.0,
 				"age": 1.0,
 				"offspring": 1.0,
 				"diet": {}
@@ -93,7 +94,8 @@ class Database {
 			},
 			"abiotic": {
 				"category": null
-			}
+			},
+			"notes": null
 		};
 	}
 

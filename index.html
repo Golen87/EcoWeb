@@ -82,11 +82,18 @@
 	</head>
 
 	<body>
+		<!-- Font preloading for Phaser -->
 		<div style="font-family:'Crete Round', sans-serif; position:absolute; left:-1000px; visibility:hidden;">.</div>
 
+
+		<!-- Game canvas -->
 		<div id="game"></div>
 
+
+		<!-- Database editor -->
 		<div class="container card-body bg-light mx-auto justify-content-center">
+
+			<!-- Main menu -->
 			<div id="databaseEditor" class="row" v-show="show" v-cloak>
 				<div class="col-12">
 					<h2 class="text-left">Database</h2>
@@ -106,6 +113,7 @@
 				</div>
 			</div>
 
+			<!-- Node list -->
 			<div id="nodeList" class="row no-gutters" v-show="show" v-cloak>
 				<div class="col-12">
 					<h2 class="text-left">Nodes</h2>
@@ -149,11 +157,14 @@
 				</div>
 			</div>
 
+			<!-- Node editor -->
 			<form id="nodeEditor" class="" v-show="show" v-cloak v-on:submit="save" action="#" method="post">
+				<!-- Node input section -->
 				<div class="row justify-content-center">
+					<!-- Input fields -->
 					<div class="col-md-9 col-lg-8 col-xl-6">
 
-						<!-- name -->
+						<!-- Name -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
 							<div class="col-sm-8">
@@ -161,7 +172,7 @@
 							</div>
 						</div>
 
-						<!-- image -->
+						<!-- Image -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Image</label>
 							<div class="col-sm-8">
@@ -171,7 +182,7 @@
 							</div>
 						</div>
 
-						<!-- color -->
+						<!-- Color -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Color</label>
 							<div class="col-sm-8">
@@ -181,7 +192,7 @@
 
 						<hr>
 
-						<!-- type -->
+						<!-- Type -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Type</label>
 							<div class="col-sm-8">
@@ -191,9 +202,10 @@
 							</div>
 						</div>
 
+						<!-- Animal parameters -->
 						<div v-if="node.type == 'animal'">
 
-							<!-- size -->
+							<!-- Size -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Size</label>
 								<div class="col-sm-8">
@@ -203,7 +215,7 @@
 								</div>
 							</div>
 
-							<!-- food -->
+							<!-- Food -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Food</label>
 								<div class="col-sm-8">
@@ -213,7 +225,7 @@
 								</div>
 							</div>
 
-							<!-- consumption -->
+							<!-- Consumption -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Consumption</label>
 								<div class="col-sm-8 input-group">
@@ -224,7 +236,18 @@
 								</div>
 							</div>
 
-							<!-- age -->
+							<!-- Weight -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Weight</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.weight" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">kg</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Age -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Age</label>
 								<div class="col-sm-8 input-group">
@@ -235,7 +258,7 @@
 								</div>
 							</div>
 
-							<!-- offspring -->
+							<!-- Offspring -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Offspring</label>
 								<div class="col-sm-8 input-group">
@@ -246,7 +269,7 @@
 								</div>
 							</div>
 
-							<!-- diet -->
+							<!-- Diet -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label"><strike>Diet</strike></label>
 								<div class="col-sm-8">
@@ -255,12 +278,12 @@
 									</select>
 								</div>
 							</div>
-
 						</div>
 
+						<!-- Abiotic parameters -->
 						<div v-if="node.type == 'abiotic'">
 
-							<!-- size -->
+							<!-- Size -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Category</label>
 								<div class="col-sm-8">
@@ -269,11 +292,21 @@
 									</select>
 								</div>
 							</div>
+						</div>
 
+						<hr>
+
+						<!-- Notes -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Notes</label>
+							<div class="col-sm-8">
+								<textarea v-model="node.notes" class="form-control" rows="3"></textarea>
+							</div>
 						</div>
 
 					</div>
 
+					<!-- Node image -->
 					<div class="col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
 						<img
 							v-bind:src="imagesrc"
@@ -283,6 +316,7 @@
 					</div>
 				</div>
 
+				<!-- Save/Back buttons -->
 				<div class="row no-gutters d-flex justify-content-end">
 					<hr class="col-12">
 					<input type="button" class="btn btn-secondary mr-1" value="Cancel" v-on:click="cancel()">
@@ -291,6 +325,8 @@
 			</form>
 		</div>
 
+
+		<!-- Graph -->
 		<div class="d-flex flex-wrap justify-content-center p-2" style="background: rgba(0,0,255,0.0);">
 
 			<div class="" style="flex-grow: 1; flex-basis: 0; min-width: 600px;">
