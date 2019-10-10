@@ -104,8 +104,10 @@ function createDatabaseTools(database) {
 				});
 			},
 			exportFile: function () {
+				let filename = "ecoweb-{0}.json".format(getDateAsString());
+
 				$("<a />", {
-					"download": "ecoweb.json",
+					"download": filename,
 					"href" : "data:application/json," + encodeURIComponent(database.exportJSON())
 				}).appendTo("body")
 				.click(function() {
