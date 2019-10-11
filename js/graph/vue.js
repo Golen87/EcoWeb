@@ -150,7 +150,7 @@ function createDatabaseTools(database) {
 			},
 			deleteNode: function (node) {
 				database.deleteNode(node.id);
-				database.saveCookies();
+				database.save();
 			},
 			addNode: function () {
 				this.show = false;
@@ -182,7 +182,7 @@ function createDatabaseTools(database) {
 		methods: {
 			open: function (node) {
 				this.original = node;
-				this.node = { ...node };
+				this.node = JSON.parse(JSON.stringify(node));
 				this.show = true;
 			},
 			save: function (e) {
@@ -190,7 +190,7 @@ function createDatabaseTools(database) {
 
 				let newNode = JSON.parse(JSON.stringify(this.node));
 				database.addNode(newNode);
-				database.saveCookies();
+				database.save();
 
 				this.cancel();
 			},

@@ -7,7 +7,7 @@ class Database {
 		this.scenarios = [];
 		this.extra = [];
 
-		this.loadCookies();
+		this.load();
 
 		createDatabaseTools(this);
 	}
@@ -34,7 +34,7 @@ class Database {
 			this.updateUniqueId();
 		}
 
-		this.saveCookies();
+		this.save();
 	}
 
 	exportJSON() {
@@ -47,12 +47,18 @@ class Database {
 		return JSON.stringify(data);
 	}
 
-	loadCookies() {
-		this.importJSON(readCookie("database"));
+	load() {
+		let localdata = localStorage.getItem("database");
+		if (localdata) {
+			this.importJSON(localdata);
+		}
+		else {
+			this.importJSON(defaultDatabase);
+		}
 	}
 
-	saveCookies() {
-		createCookie("database", this.exportJSON());
+	save() {
+		localStorage.setItem("database", this.exportJSON());
 	}
 
 	getUniqueId() {
