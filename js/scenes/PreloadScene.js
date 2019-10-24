@@ -60,35 +60,35 @@ class PreloadScene extends Phaser.Scene {
 
 
 		/* Nodes */
-		this.load.image('circle', 'assets/images/circle.png');
+		this.load.image('circle', 'assets/images/circle_128.png');
 		this.load.image('pixel', 'assets/images/pixel.png');
 		this.load.image('arrow', 'assets/images/arrow.png');
 
-		this.load.image('missing', 'assets/images/icons/Missing.png');
+		this.load.image('missing', 'assets/images/icons/Missing_128.png');
 
-		this.load.image('räv', 'assets/images/icons/Räv.png');
-		this.load.image('lo', 'assets/images/icons/Lo.png');
-		this.load.image('duvhök', 'assets/images/icons/Duvhök.png');
-		this.load.image('kattuggla', 'assets/images/icons/Kattuggla.png');
-		this.load.image('snok', 'assets/images/icons/Snok.png');
+		this.load.image('räv', 'assets/images/icons/Räv_128.png');
+		this.load.image('lo', 'assets/images/icons/Lo_128.png');
+		this.load.image('duvhök', 'assets/images/icons/Duvhök_128.png');
+		this.load.image('kattuggla', 'assets/images/icons/Kattuggla_128.png');
+		this.load.image('snok', 'assets/images/icons/Snok_128.png');
 
-		this.load.image('dovhjort', 'assets/images/icons/Dovhjort.png');
-		this.load.image('rådjur', 'assets/images/icons/Rådjur.png');
-		this.load.image('hare', 'assets/images/icons/Hare.png');
-		this.load.image('norvacka', 'assets/images/icons/Norvacka.png');
-		this.load.image('koltrast', 'assets/images/icons/Koltrast.png');
-		this.load.image('vanliggroda', 'assets/images/icons/VanligGroda.png');
+		this.load.image('dovhjort', 'assets/images/icons/Dovhjort_128.png');
+		this.load.image('rådjur', 'assets/images/icons/Rådjur_128.png');
+		this.load.image('hare', 'assets/images/icons/Hare_128.png');
+		this.load.image('norvacka', 'assets/images/icons/Norvacka_128.png');
+		this.load.image('koltrast', 'assets/images/icons/Koltrast_128.png');
+		this.load.image('vanliggroda', 'assets/images/icons/VanligGroda_128.png');
 
-		this.load.image('daggmask', 'assets/images/icons/Daggmask.png');
-		this.load.image('skalbagge', 'assets/images/icons/Skalbagge.png');
-		this.load.image('trädlevandeinsekt', 'assets/images/icons/TrädlevandeInsekt.png');
+		this.load.image('daggmask', 'assets/images/icons/Daggmask_128.png');
+		this.load.image('skalbagge', 'assets/images/icons/Skalbagge_128.png');
+		this.load.image('trädlevandeinsekt', 'assets/images/icons/TrädlevandeInsekt_128.png');
 
-		this.load.image('träd', 'assets/images/icons/Träd.png');
-		this.load.image('gräs', 'assets/images/icons/Gräs.png');
-		this.load.image('ört', 'assets/images/icons/Ört.png');
-		this.load.image('blåbär', 'assets/images/icons/Blåbär.png');
-		this.load.image('svamp', 'assets/images/icons/Svamp.png');
-		this.load.image('detrius', 'assets/images/icons/Detrius.png');
+		this.load.image('träd', 'assets/images/icons/Träd_128.png');
+		this.load.image('gräs', 'assets/images/icons/Gräs_128.png');
+		this.load.image('ört', 'assets/images/icons/Ört_128.png');
+		this.load.image('blåbär', 'assets/images/icons/Blåbär_128.png');
+		this.load.image('svamp', 'assets/images/icons/Svamp_128.png');
+		this.load.image('detrius', 'assets/images/icons/Detrius_128.png');
 
 
 		/* Audio */
