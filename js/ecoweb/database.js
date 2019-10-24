@@ -5,7 +5,7 @@ class Database {
 		this.nodes = [];
 		this.events = [];
 		this.scenarios = [];
-		this.extra = [];
+		this.tags = [];
 
 		this.load();
 
@@ -15,36 +15,49 @@ class Database {
 
 	// Data management
 
-	copyList(a, b) {
-		a.splice(0, a.length);
-		for (var i = 0; i < b.length; i++) {
-			a.push(b[i]);
-		}
-	}
-
 	importJSON(json) {
 		let data = JSON.parse(json);
 
 		if (data) {
-			this.copyList(this.nodes, data[0]);
-			this.copyList(this.events, data[1]);
-			this.copyList(this.scenarios, data[2]);
-			this.copyList(this.extra, data[3]);
+
+			if (!("version" in data)) {
+				if (Array.isArray(data)) {
+					data["nodes"] = data[0];
+				}
+				else {
+					console.error("Malformed JSON:", data);
+					return;
+				}
+			}
+
+			this.loadNodes(data["nodes"]);
+			this.loadTags(data["tags"]);
+			//this.copyList(this.events, data["events"]);
+			//this.copyList(this.scenarios, data["scenarios"]);
+			//this.copyList(this.tags, data["tags"]);
+
+			//for (var i = 0; i < this.nodes.length; i++) {
+			//	if (!Array.isArray(this.nodes[i].relations)) {
+			//		this.nodes[i].relations = [];
+			//	}
+			//}
 
 			this.updateUniqueId();
 		}
 
+		this.nodes.sort(this.nodeCompare);
 		this.save();
 	}
 
-	exportJSON() {
-		let data = [
-			this.nodes,
-			this.events,
-			this.scenarios,
-			this.extra
-		];
-		return JSON.stringify(data);
+	exportJSON(prettyprint=false) {
+		let data = {
+			"version": 1,
+			"nodes": this.nodes,
+			"events": this.events,
+			"scenarios": this.scenarios,
+			"tags": this.tags,
+		};
+		return JSON.stringify(data, null, prettyprint ? "\t" : null);
 	}
 
 	load() {
@@ -101,13 +114,22 @@ class Database {
 			"abiotic": {
 				"category": null
 			},
-			"notes": null
+			"notes": null,
+			"relations": []
 		};
+	}
+
+	loadNodes(list) {
+		this.nodes.splice(0, this.nodes.length);
+		for (var i = 0; i < list.length; i++) {
+			this.nodes.push(list[i]);
+		}
 	}
 
 	addNode(node) {
 		this.deleteNode(node.id);
 		this.nodes.push(node);
+		this.nodes.sort(this.nodeCompare);
 	}
 
 	getNodeById(id) {
@@ -133,6 +155,91 @@ class Database {
 			if (this.nodes[i].id == id) {
 				this.nodes.splice(i, 1);
 			}
+		}
+	}
+
+	nodeCompare(a, b) {
+		if (a.type != b.type) {
+			if (NODE_TYPES_VALUES.indexOf(a.type) < NODE_TYPES_VALUES.indexOf(b.type)) {
+				return -1;
+			}
+			if (NODE_TYPES_VALUES.indexOf(a.type) > NODE_TYPES_VALUES.indexOf(b.type)) {
+				return 1;
+			}
+		}
+		if (a.type == "animal") {
+			if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) < ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
+				return -1;
+			}
+			if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) > ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
+				return 1;
+			}
+			if (a.animal.weight > b.animal.weight) {
+				return -1;
+			}
+			if (a.animal.weight < b.animal.weight) {
+				return 1;
+			}
+		}
+		if (a.name < b.name) {
+			return -1;
+		}
+		if (a.name > b.name) {
+			return 1;
+		}
+		return 0;
+	}
+
+	addRelation(node) {
+		node.relations.push({
+			//"type": "",
+			"node_id": "", // id
+			//"category": "",
+			"interaction": "",
+			"preference": 100,
+		});
+	}
+
+	deleteRelation(node, index) {
+		node.relations.splice(index, 1);
+	}
+
+	getIncomingRelations(id) {
+		let results = [];
+
+		for (var i = 0; i < this.nodes.length; i++) {
+			if (this.nodes[i].id != id) {
+
+				let relations = this.nodes[i].relations;
+				if (relations) {
+					for (var j = 0; j < relations.length; j++) {
+						if (id == relations[j].node_id) {
+							results.push({
+								"node": this.nodes[i],
+								"relation": relations[j],
+							});
+						}
+					}
+				}
+			}
+		}
+		
+		return results;
+	}
+
+
+	// Tags
+
+	setTags(list) {
+		this.tags.splice(0, this.tags.length);
+		for (var i = 0; i < list.length; i++) {
+			this.tags.push(list[i]);
+		}
+	}
+
+	loadTags(list) {
+		if (list) {
+			this.setTags(list);
 		}
 	}
 }

@@ -51,3 +51,28 @@ const ABIOTIC_TYPES = [
 	{ value: "culture",		text: "Cultural services" },
 	{ value: "harmful",		text: "I'm in this picture and I don't like it" },
 ];
+
+const RELATION_TYPES = [
+	{ value: "node",		text: "Node" },
+	{ value: "category",	text: "Category" },
+];
+
+const RELATION_INTERACTIONS = [
+	{ value: "mutualism",		text: "(+,+) Mutualism" },
+	{ value: "commensalism",	text: "(+,o) Commensalism" },
+	{ value: "predation",		text: "(+,−) Predation" },
+	{ value: "herbivory",		text: "(+,−) Herbivory" },
+	{ value: "parasitism",		text: "(+,−) Parasitism" },
+	{ value: "amensalism",		text: "(o,−) Amensalism" },
+	{ value: "competition",		text: "(−,−) Competition" },
+	{ value: "neutralism",		text: "(o,o) Neutralism" },
+];
+
+
+const NODE_TYPES_VALUES = NODE_TYPES.map((x) => {return x.value;});
+const NODE_IMAGES_VALUES = NODE_IMAGES.map((x) => {return x.value;});
+const ANIMAL_FOODS_VALUES = ANIMAL_FOODS.map((x) => {return x.value;});
+const ANIMAL_SIZES_VALUES = ANIMAL_SIZES.map((x) => {return x.value;});
+const ABIOTIC_TYPES_VALUES = ABIOTIC_TYPES.map((x) => {return x.value;});
+const RELATION_TYPES_VALUES = RELATION_TYPES.map((x) => {return x.value;});
+const RELATION_INTERACTIONS_VALUES = RELATION_INTERACTIONS.map((x) => {return x.value;});

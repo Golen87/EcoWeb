@@ -1,4 +1,3 @@
-
 function createGraphTools() {
 	return new Vue({
 		el: '#graphTools',
@@ -67,7 +66,10 @@ function createDatabaseTools(database) {
 		computed: {
 			nodeCount: function () {
 				return database.nodes.length;
-			}
+			},
+			allData: function () {
+				return database.exportJSON(true);
+			},
 		},
 		methods: {
 			open: function () {
@@ -108,7 +110,7 @@ function createDatabaseTools(database) {
 
 				$("<a />", {
 					"download": filename,
-					"href" : "data:application/json," + encodeURIComponent(database.exportJSON())
+					"href" : "data:application/json," + encodeURIComponent(database.exportJSON(true))
 				}).appendTo("body")
 				.click(function() {
 					$(this).remove()
@@ -156,6 +158,10 @@ function createDatabaseTools(database) {
 				this.show = false;
 				nodeEditor.open(database.newNode());
 			},
+			editTags: function () {
+				this.show = false;
+				tagEditor.open();
+			},
 		},
 	});
 
@@ -163,21 +169,30 @@ function createDatabaseTools(database) {
 		el: '#nodeEditor',
 		data: {
 			show: false,
+			tab: 1,
 			node: database.newNode(),
-			node_types: NODE_TYPES,
-			animal_foods: ANIMAL_FOODS,
-			animal_sizes: ANIMAL_SIZES,
-			node_images: NODE_IMAGES,
-			abiotic_types: ABIOTIC_TYPES,
+			test: []
 		},
 		computed: {
+			incoming_relations: function () {
+				return database.getIncomingRelations(this.node.id);
+			},
 			imagesrc: function () {
 				for (var i = NODE_IMAGES.length - 1; i >= 0; i--) {
 					if (this.node.image == NODE_IMAGES[i].value) {
 						return NODE_IMAGES[i].path;
 					}
 				}
-			}
+			},
+			all_nodes: function () { return database.nodes; },
+			all_tags: function () { return database.tags; },
+			node_types: function () { return NODE_TYPES; },
+			animal_foods: function () { return ANIMAL_FOODS; },
+			animal_sizes: function () { return ANIMAL_SIZES; },
+			node_images: function () { return NODE_IMAGES; },
+			abiotic_types: function () { return ABIOTIC_TYPES; },
+			relation_types: function () { return RELATION_TYPES; },
+			relation_interactions: function () { return RELATION_INTERACTIONS; },
 		},
 		methods: {
 			open: function (node) {
@@ -198,6 +213,66 @@ function createDatabaseTools(database) {
 				this.show = false;
 				nodeList.open();
 			},
+			setTab: function (tab) {
+				var $myForm = $('#nodeEditor');
+				if(! $myForm[0].checkValidity()) {
+				  $myForm.find(':submit').click();
+				}
+				else {
+					this.tab = tab;
+				}
+			},
+			addRelation: function () {
+				database.addRelation(this.node);
+			},
+			deleteRelation: function (index) {
+				database.deleteRelation(this.node, index);
+			},
+			getImagesrc: function (image) {
+				for (var i = NODE_IMAGES.length - 1; i >= 0; i--) {
+					if (image == NODE_IMAGES[i].value) {
+						return NODE_IMAGES[i].path;
+					}
+				}
+			},
 		},
 	});
+
+	let tagEditor = new Vue({
+		el: '#tagEditor',
+		data: {
+			show: false,
+			tags: ''
+		},
+		computed: {
+		},
+		methods: {
+			open: function () {
+				this.tags = database.tags.join('\n');
+				this.show = true;
+			},
+			save: function (e) {
+				e.preventDefault();
+
+				database.setTags(this.tags.split('\n'));
+				database.save();
+
+				this.cancel();
+			},
+			cancel: function () {
+				this.show = false;
+				nodeList.open();
+			},
+		},
+	});
+
+	initNodeChart();
+	//databaseEditor.openNodes();
+	//nodeList.editTags();
+	//nodeList.editNode(nodeList.list[0]);
+	//nodeEditor.setTab(2);
 }
+
+$(document).ready(function() {
+	$('.my-select').selectpicker();
+});

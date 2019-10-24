@@ -1,10 +1,11 @@
 class Path extends Phaser.GameObjects.Container {
-	constructor(scene, node1, node2) {
+	constructor(scene, node1, node2, amount) {
 		super(scene, 0, 0);
 		scene.add.existing(this);
 
 		this.node1 = node1;
 		this.node2 = node2;
+		this.amount = Phaser.Math.Easing.Sine.Out(amount);
 
 		this.middle = new Phaser.Math.Vector2(
 			(node1.x + node2.x) / 2,
@@ -31,13 +32,13 @@ class Path extends Phaser.GameObjects.Container {
 
 
 		this.dotsNumber = 4;
-		const d = 1000;
+		const d = 1500 - 1200 * amount;
 		this.dots = [];
 
 		for (let i = 0; i < this.dotsNumber; i++) {
 			this.dots[i] = scene.add.image(0, 0, "arrow");
 			this.add(this.dots[i]);
-			this.dots[i].setScale(0.2);
+			this.dots[i].setScale(this.getWidth() * 2 / 59); // 0.2
 			let tweenObject = {
 				val: (i+1) / this.dotsNumber
 			}
@@ -56,26 +57,31 @@ class Path extends Phaser.GameObjects.Container {
 				}
 			});
 		}
+	}
 
-		this.alphaEasing = 0;
-		this.alphaSpeed = 1 / 0.2;
+	getWidth() {
+		return (2 + 6 * this.amount) * this.alphaValue;
 	}
 
 	drawBezier() {
 		this.graphics.clear();
 
-		this.graphics.lineStyle(4, 0xffffff);
+		this.graphics.lineStyle(this.getWidth(), 0xffffff);
 		this.curve.draw(this.graphics);
 
-		this.graphics.lineStyle(6, 0xff0000);
-		this.graphics.strokeCircle(this.node1.x, this.node1.y, 12);
+		this.graphics.lineStyle(6, 0xffffff);
+		this.graphics.strokeCircle(this.node1.x, this.node1.y, 6);
 
-		this.graphics.lineStyle(6, 0x00ff00);
+		this.graphics.lineStyle(6, 0xffffff);
 		this.graphics.strokeCircle(this.node2.x, this.node2.y, 6);
 	}
 
 	update(delta) {
 		this.drawBezier();
-		this.alpha = Math.max(this.node1.hoverAlpha, this.node2.hoverAlpha);
+		this.alphaValue = Math.max(this.node1.hoverAlpha, this.node2.hoverAlpha);
+		for (let i = 0; i < this.dotsNumber; i++) {
+			this.dots[i].setScale(this.getWidth() * 2 / 59); // 0.2
+		}
+		this.setAlpha(this.alphaValue);
 	}
 }

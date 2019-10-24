@@ -6,6 +6,7 @@ class LevelScene extends Phaser.Scene {
 			'blabar': [0.7276, 1.0],
 			'trad': [0.4808, 1.0],
 			'rodrav': [0.6571, 0.0],
+			'lo': [0.3971, 0.0],
 			'hare': [0.2724, 0.5],
 			'gras': [0.25, 1.0],
 			'koltrast': [0.7981, 0.5],
@@ -104,7 +105,7 @@ class LevelScene extends Phaser.Scene {
 				if (i != j) {
 					let diet = web.species[i].diet[web.species[j].name];
 					if (diet) {
-						let path = new Path(this, this.nodes[i], this.nodes[j]);
+						let path = new Path(this, this.nodes[i], this.nodes[j], diet);
 						this.paths.push(path);
 					}
 				}

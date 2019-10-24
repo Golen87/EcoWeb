@@ -12,9 +12,10 @@ class Node extends Button {
 		this.selected = false;
 
 		this.WHITE = 0xe3e3d1;
-		this.BLACK = 0x332d24;
+		//this.BLACK = 0x332d24;
+		this.BLACK = 0x474741;
 
-		const THICKNESS = 1.1;
+		const THICKNESS = 1.08;
 		this.circle = scene.add.image(0, 0, 'circle');
 		this.circle.setScale((THICKNESS * this.size) / this.circle.height);
 		this.circle.setTint(this.BLACK);
@@ -26,9 +27,12 @@ class Node extends Button {
 		this.innerCircle.setTint(this.BLACK);
 
 		this.innerCircle2 = scene.add.image(0, 0, 'circle');
-		this.innerCircle2.setScale(0.9 * this.size / this.innerCircle2.height);
+		this.innerCircle2.setScale(0.95 * this.size / this.innerCircle2.height);
 		this.add(this.innerCircle2);
 		this.innerCircle2.setTint(0xa9bfa1);
+		this.circle.setAlpha(0.5);
+		this.innerCircle.setAlpha(0.4);
+		this.innerCircle2.setAlpha(0.7);
 
 		this.image = scene.add.image(0, 0, this.species.image);
 		this.image.setScale(this.size / Math.max(this.image.width, this.image.height));
@@ -39,12 +43,12 @@ class Node extends Button {
 		this.slider.x += -325 * this.slider.scaleX;
 		this.slider.y -= 61 * this.slider.scaleY;
 		//this.slider.setAngle(-90);
-		this.add(this.slider);
+		//this.add(this.slider);
 		//this.sendToBack(this.slider);
 
 		this.arrow = scene.add.image(0, 0, 'growth_slider_arrow');
 		this.arrow.setScale(0.2 * this.size / this.arrow.height);
-		this.add(this.arrow);
+		//this.add(this.arrow);
 		let tweenObject = {
 			val: 0
 		}
@@ -70,7 +74,7 @@ class Node extends Button {
 		this.bindInteractive(this.circle);
 
 		this.alphaEasing = 0;
-		this.alphaSpeed = 1 / 0.2;
+		this.alphaSpeed = 1 / 0.3;
 		this.hoverAlpha = 0;
 
 		this.spectrum = [
@@ -84,8 +88,9 @@ class Node extends Button {
 
 
 	getScale() {
-		let smooth = 0.5 + Math.atan(6 * (this.population - 0.5)) / Math.PI + this.wiggle;
-		return 0.2 + 1.1 * smooth;
+		let w = (this.population > DEATH_THRESHOLD);
+		let smooth = 0.5 + Math.atan(4 * (this.population - 0.5)) / Math.PI + w * this.wiggle;
+		return (0.3 + 1.0 * smooth) * (1+w)/2;
 	}
 
 	updateArrow() {
@@ -118,12 +123,23 @@ class Node extends Button {
 		//let color = Phaser.Display.Color.Interpolate.ColorWithColor(this.spectrum[index], this.spectrum[index+1], 1, rest);
 		//color = Phaser.Display.Color.ObjectToColor(color);
 		let color = this.spectrum[index];
+		if (this.population <= DEATH_THRESHOLD) {
+			this.image.setAlpha(0.5);
 
-		color.s = 1;
-		this.innerCircle.setTint(color.color);
-		color.s = 0.1;
-		color.v = 0.8;
-		this.innerCircle2.setTint(color.color);
+			color = Phaser.Display.Color.ValueToColor(0x777777);
+			this.innerCircle.setTint(color.color);
+			color.v = 0.8;
+			this.innerCircle2.setTint(color.color);
+		}
+		else {
+			this.image.setAlpha(1.0);
+
+			color.s = 0.8;
+			this.innerCircle.setTint(color.color);
+			color.s = 0.0;
+			color.v = 1.0;
+			this.innerCircle2.setTint(color.color);
+		}
 	}
 
 
@@ -135,7 +151,7 @@ class Node extends Button {
 	onOut() {
 		super.onOut();
 		this.setScale(1.00 * this.getScale());
-		this.image.setTint(0xDDDDDD);
+		this.image.setTint(0xEEEEEE);
 	}
 
 	onOver() {
@@ -147,15 +163,14 @@ class Node extends Button {
 	onDown() {
 		super.onDown();
 		this.setScale(0.95 * this.getScale());
-		this.image.setTint(0xBBBBBB);
+		this.image.setTint(0xDDDDDD);
 	}
 
 	onClick() {
 		this.selected = !this.selected;
 		this.circle.setTint(this.selected ? this.WHITE : this.BLACK);
 
-		this.setScale(1.00 * this.getScale());
-		this.image.setTint(0xDDDDDD);
+		this.onOver();
 	}
 
 
@@ -178,11 +193,14 @@ class Node extends Button {
 		this.x += (this.goalX - this.x) / speed;
 		this.y += (this.goalY - this.y) / speed;
 
-		if (this.hover || this.selected) {
+		if (this.hover) {
 			this.alphaEasing = Math.min(this.alphaEasing + this.alphaSpeed * delta, 1.0);
 		}
+		else if (this.selected) {
+			this.alphaEasing = Math.max(this.alphaEasing - this.alphaSpeed * delta, 0.6);
+		}
 		else {
-			this.alphaEasing = Math.max(this.alphaEasing - this.alphaSpeed * delta, 0.0);
+			this.alphaEasing = Math.max(this.alphaEasing - this.alphaSpeed * delta, 0.42);
 		}
 		this.hoverAlpha = Phaser.Math.Easing.Cubic.InOut(this.alphaEasing);
 		this.slider.alpha = this.hoverAlpha;
