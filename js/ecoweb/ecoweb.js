@@ -4,7 +4,7 @@ class EcoWeb {
 		this.size = 4;
 		// Current time step of simulation
 		this.time = 0;
-		this.maxTime = 120;
+		this.maxTime = 200;
 		// Initial population densities
 		this.startPop = [];
 		// Size of the population at a given time
@@ -45,13 +45,17 @@ class EcoWeb {
 		this.vue.scenarios = this.scenarios;
 	}
 
-	getComponent(name) {
+	getSpeciesIndex(name) {
 		for (let i = 0; i < this.species.length; i++) {
 			if (lowercase(name) == lowercase(this.species[i].name)) {
-				return this.species[i];
+				return i;
 			}
 		}
 		console.error("Unknown component:", name);
+	}
+
+	getComponent(name) {
+		this.species[this.getSpeciesIndex(name)];
 	}
 
 	build(species) {
@@ -86,7 +90,7 @@ class EcoWeb {
 					let p = species[j];
 
 					if (s.relationship[p.name])
-						this.A[i][j] = s.relationship[p.name];
+						this.A[i][j] = s.relationship[p.name] * s.getFoodAmount();
 
 					if (s.requirements[p.name] != null)
 						this.B[i][j] = s.requirements[p.name];
@@ -95,52 +99,56 @@ class EcoWeb {
 		}
 
 		this.events = [
-			//new Event("Förgifta Rävar", function() {
-			//	this.A[0][0] -= 0.5;
-			//	console.log("Apply event: Fox poison");
-			//}.bind(this)),
-
-			//new Event("Plantera Rävar", function() {
-			//	this.population[0] += 0.5;
-			//	console.log("Apply event: Adding more foxes");
-			//}.bind(this)),
-
-			new Event("Stödmata",
+			new Event("Stödmata", "detrius",
 				`Stödmatar man så ser man till så att hjortdjuren i ett område får extra mat över vintern så att färre dör på grund av svält.
 				\nDet är vanligt att man gör detta så att man kan skjuta fler av dem under jaktsäsongen utan att det blir för få individer i ett område.`,
 				function() {
-					//this.population[0] += 0.5;
+					console.log("Apply event:", "Stödmata");
+					let d = this.getSpeciesIndex("Dovhjort");
+					let r = this.getSpeciesIndex("Rådjur");
+					this.r[d] /= 1.5; // Öka growth rate
+					this.r[r] /= 1.5; // Öka growth rate
 			}.bind(this)),
 
-			new Event("Plantera Lo",
-				`Planterar man in lodjur i ett område så kommer de att börja jaga de andra djuren i det. Lodjur är en hyperkarnivor vilket betyder att deras diet är mestadels kött och de kan inte överleva på en växtbaserad diet.,
-				\nLodjuren gillar främst att jaga stora hovdjur så som dovhjort och rådjur. De äter också mycket skogsharar och koltrastar, och kan även ta sig en räv ibland.`,
-				function() {
-					//this.population[0] += 0.5;
-			}.bind(this)),
-
-			new Event("Jaga Räv",
-				`Man kan skicka ut jägare för att jaga räv, man kan jaga dem med ett drev hundar, lura dem nära med åtel och sedan skjuta dem, skicka in hundar i deras gryt, eller sätta ut fällor.,
-				\nMinskar man rävpopulationen på detta vis så gynnar man mest smådjur så som skogsharar och koltrastar.`,
-				function() {
-					this.A[0][0] -= 0.2;
-					this.A[1][1] += 0.05;
-					console.log("Apply event: Fox hunting");
-			}.bind(this)),
-
-			new Event("Plantera Skog",
-				`Man kan plantera träd och på så vis få en större areal av landskapet att bli skog.,
+			new Event("Plantera skog", "träd",
+				`Man kan plantera träd och på så vis få en större areal av landskapet att bli skog.
 				\nMånga djur gynnas av skogen så som harar och rådjur, men även svampar och växter så som blåbär kan också gynnas av att det blir mer skog i landskapet.`,
 				function() {
-					//this.population[0] += 0.5;
+					console.log("Apply event:", "Plantera skog");
+					let t = this.getSpeciesIndex("Träd");
+					this.population[t] += 0.25;
 			}.bind(this)),
 
-			new Event("Skövla Skog",
-				`Man kan hugga ned hela skogen och på så vis bli av med alla träd.,
+			new Event("Avverka skog", "träd",
+				`Man kan hugga ned hela skogen och på så vis bli av med alla träd.
 				\nMånga djur mår dåligt av att skogen försvinner så som dovhjort, rådjur, harar, rävar, och koltrastar. Även växter kan skadas av att skogen försvinner, blåbär tillexempel är beroende av skogen för sin överlevnad, samt många svamparter.`,
 				function() {
-					this.A[6][6] -= 1.0;
-					//this.population[0] += 0.5;
+					console.log("Apply event:", "Avverka skog");
+					let t = this.getSpeciesIndex("Träd");
+					this.population[t] *= 0.0;
+			}.bind(this)),
+
+			new Event("Plantera in lodjur", "lo",
+				`Planterar man in lodjur i ett område så kommer de att börja jaga de andra djuren i området. Lodjur är en hyperkarnivor vilket betyder att deras diet är mestadels kött och de kan inte överleva på en växtbaserad diet.
+				\nLodjuren gillar främst att jaga stora hovdjur så som dovhjort och rådjur. De äter också mycket skogsharar och koltrastar, och kan även ta sig en räv ibland.`,
+				function() {
+					console.log("Apply event:", "Plantera in lodjur");
+					let l = this.getSpeciesIndex("Lo");
+					let d = this.getSpeciesIndex("Dovhjort");
+					let r = this.getSpeciesIndex("Rådjur");
+					this.population[l] += 0.1; // Lägg till lo
+					this.A[r][d] = 0; // Ta bort rådjurs-dovhjorts straff
+			}.bind(this)),
+
+			new Event("Jaga räv", "räv",
+				`Man kan skicka ut jägare för att jaga räv, man kan jaga dem med ett drev hundar, lura dem nära med åtel och sedan skjuta dem, skicka in hundar i deras gryt, eller sätta ut fällor.
+				\nMinskar man rävpopulationen på detta vis så gynnar man mest smådjur så som skogsharar och koltrastar.`,
+				function() {
+					console.log("Apply event:", "Jaga räv");
+					let r = this.getSpeciesIndex("Rödräv");
+					console.log(this.r[r]);
+					this.r[r] *= 2;
+					console.log(this.r[r]);
 			}.bind(this)),
 		];
 
@@ -240,8 +248,10 @@ class EcoWeb {
 				}
 				if (total > 0) {
 					for (let j = 0; j < pop.length; j++) {
-						matrix[i][j] +=  0.3 * eating[j] / total; // Predator
-						matrix[j][i] += -1.0 * eating[j] / total; // Prey
+						//let sigmoid_eating = eating[j] / total;
+						let sigmoid_eating = Phaser.Math.Easing.Cubic.InOut(eating[j] / total);
+						matrix[i][j] += 0.3 * sigmoid_eating; // Predator
+						matrix[j][i] += -1.0 * sigmoid_eating; // Prey
 						//console.log(s.name, 'eats', this.species[j].name, this.A[i][j], this.A[j][i]);
 					}
 				}
@@ -272,7 +282,12 @@ class EcoWeb {
 				//let I = pop[i] * this.K[i];
 				let I = this.K[i];
 
-				dPopList[i] = pop[i] * ( this.r[i] + sum ) / I;
+				if (pop[i] < DEATH_THRESHOLD || pop[i] > 100) {
+					dPopList[i] = 0;
+				}
+				else {
+					dPopList[i] = pop[i] * ( this.r[i] + sum ) / I;
+				}
 			}
 			return dPopList;
 		}
@@ -291,7 +306,7 @@ class EcoWeb {
 	stabilize() {
 		this.build(this.species);
 		this.applyWiggle();
-		this.solve(1000);
+		this.solve(200);
 		for (let i = 0; i < this.size; i++) {
 			this.species[i].startPopulation = this.result.y[this.result.y.length-1][i];
 		}
@@ -400,15 +415,16 @@ function scenario_3 () {
 
 function scenario_4 () {
 	//	var						name		pop		growth	self	image		color
-	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.1,	'räv',		'#FF3D00' );
+	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.01,	'räv',		'#FF3D00' );
+	let lo		= new Carnivore( "Lo",		0.0,	-0.05,	-0.01,	'lo',		'#FF7D00' );
 
-	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.1,	'hare',		'#FFD54F' );
-	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.1,	'rådjur',	'#FFA726' );
-	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.1,	'dovhjort',	'#FB8C00' );
-	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.1,	'koltrast',	'#FFF176' );
+	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.01,	'hare',		'#FFD54F' );
+	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.01,	'rådjur',	'#FFA726' );
+	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.01,	'dovhjort',	'#FB8C00' );
+	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.01,	'koltrast',	'#FFF176' );
 
 	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE' );
-	let trad	= new Plant( "Träd",	1.0,	1.0,	-1.0,	'träd',		'#795548' );
+	let trad	= new Plant( "Träd",	1.0,	0.1,	-0.01,	'träd',		'#795548' );
 	let gras	= new Plant( "Gräs",	1.0,	1.0,	-1.0,	'gräs',		'#66BB6A' );
 	let orter	= new Plant( "Örter",	1.0,	1.0,	-1.0,	'ört',		'#26A69A' );
 	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'svamp',	'#AFB42B' );
@@ -421,18 +437,24 @@ function scenario_4 () {
 	// Räv			3.5		1.0		4.0
 
 	rodrav.setDiet(
-		hare,		0.6,
-		blabar,		0.6,
-		svamp,		0.4,
+		hare,		0.5,
+		blabar,		0.4,
+		svamp,		0.2,
 		dovhjort,	0.2,
 		radjur,		0.2,
+		koltrast,	0.6,
+	);
+	lo.setDiet(
+		hare,		0.1,
+		dovhjort,	0.9,
+		radjur,		0.4,
 		koltrast,	0.2,
 	);
 	dovhjort.setDiet(
-		trad,	1.0,
+		trad,	0.5,
 		orter,	0.6,
 		blabar,	0.4,
-		gras,	0.2,
+		gras,	0.5,
 	);
 	radjur.setDiet(
 		orter,	1.0,
@@ -453,17 +475,30 @@ function scenario_4 () {
 		svamp,	0.6,
 	);
 
-	addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
-	addEqualCompetition([blabar, gras, orter], -0.05);
+	//addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
+	//addEqualCompetition([blabar, gras, orter], -0.05);
+
+	addRelationship( dovhjort,	0.0,	radjur,	-0.05 );
 
 	blabar.requires(trad, normRange(0.7, 0.2, 0.4));
 	svamp.requires(trad, normRange(0.7, 0.3, 0.5));
 
-	return [rodrav, hare, radjur, dovhjort, koltrast, blabar, trad, gras, orter, svamp];
+	return [rodrav, lo, hare, radjur, dovhjort, koltrast, blabar, trad, gras, orter, svamp];
 }
+
+// TVÅ NYA SCENARIER
+// Kattuggla – skogssork – hasselbuskar
+// Problem: Under förra vintern låg snön djup under en lång tid. Det innebar att kattugglepopulationen minskade kraftigt. Du vill återigen ha fler kattugglor i din skog. Hur kan du få dess population att öka?
+// Lösning: Genom att öppna upp kring hasselsnåren (buskar) så kan du öka antalet hasselnötter som bildas. Skogssorken är kattugglans huvudföda och skogssorkens huvudföda är hasselnötter. Fler hasselnötter kommer att ge fler kattugglor. 
+
+// Räv – dovhjort – träd
+// Problem: För några år sen planterade du ett fint bestånd aspar i skogen.  Under senare år har antalet dovhjortar ökat kraftigt och de äter på de små asparna och gör så de dör. Hur kan du få populationen dovhjort att minska?
+// Lösning: Du har ett fint bergigt parti i din skog som skulle passa för lodjur. En orienteringsklubb brukar springa mycket där och därför slår sig inte lodjuren ner där. Du erbjuder föreningen en annan (bättre!) plats att träna och då kn lodjuren flytta in. Lodjuren äter mycket dovhjort och på så sätt gåt deras population ner och asparna kan återhämta sig. 
+
 
 
 let web = new EcoWeb();
+const DEATH_THRESHOLD = 1E-3;
 
 //window.onload = function() {
 function initWeb() {

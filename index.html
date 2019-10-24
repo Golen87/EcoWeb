@@ -91,242 +91,6 @@
 		<div id="game"></div>
 
 
-		<!-- Database editor -->
-		<div class="container card-body bg-light mx-auto justify-content-center">
-
-			<!-- Main menu -->
-			<div id="databaseEditor" class="row" v-show="show" v-cloak>
-				<div class="col-12">
-					<h2 class="text-left">Database</h2>
-					<hr>
-				</div>
-
-				<div class="col d-flex justify-content-start">
-					<input type="file" id="importJsonInput" hidden/>
-					<input type="button" class="btn btn-warning mr-1" value="Import JSON" v-on:click="importFile()">
-					<input type="button" class="btn btn-warning" value="Export JSON" v-on:click="exportFile()">
-				</div>
-
-				<div class="col d-flex justify-content-end">
-					<input type="button" class="btn btn-primary mr-1" v-bind:value="'Nodes (' + list.length + ')'" v-on:click="openNodes()">
-					<input type="button" class="btn btn-primary mr-1" value="Events" v-on:click="openEvents()" disabled>
-					<input type="button" class="btn btn-primary" value="Scenarios" v-on:click="openScenarios()" disabled>
-				</div>
-			</div>
-
-			<!-- Node list -->
-			<div id="nodeList" class="row no-gutters" v-show="show" v-cloak>
-				<div class="col-12">
-					<h2 class="text-left">Nodes</h2>
-				</div>
-
-				<table class="table">
-					<thead>
-						<tr>
-							<td scope="col" class="text-muted d-none d-sm-table-cell"></td>
-							<td scope="col" class="text-muted">Name</td>
-							<td scope="col" class="text-muted d-none d-md-table-cell">Id</td>
-							<td scope="col" class="text-muted d-none d-lg-table-cell">Type</td>
-							<td scope="col"></td>
-						</tr>
-					</thead>
-					<tbody>
-						<tr v-for="s in list">
-							<td scope="row" class="align-middle d-none d-sm-table-cell">
-								<img
-									v-bind:src="getImagesrc(s.image)"
-									class="img-thumbnail p-0 rounded-circle"
-									style="border: none; height: 40px;"
-									v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + s.color }">
-							</td>
-							<th class="align-middle">{{ s.name }}</th>
-							<td class="align-middle d-none d-md-table-cell">{{ s.id }}</td>
-							<td class="align-middle d-none d-lg-table-cell">{{ s.type }}</td>
-							<td class="align-middle" style="width: 1%; white-space: nowrap;">
-								<input type="button" class="btn btn-secondary" value="Edit" v-on:click="editNode(s)">
-								<input type="button" class="btn btn-secondary" value="Copy" v-on:click="copyNode(s)">
-								<input type="button" class="btn btn-danger" value="Delete" v-on:click="deleteNode(s)">
-							</td>
-						</tr>
-					</tbody>
-				</table>
-
-				<hr class="col-12">
-				<div class="col-12 d-flex justify-content-end" style="">
-					<input type="button" class="btn btn-secondary mr-1" value="Back" v-on:click="back()">
-					<input type="button" class="btn btn-primary mr-1" value="Add node" v-on:click="addNode()">
-				</div>
-			</div>
-
-			<!-- Node editor -->
-			<form id="nodeEditor" class="" v-show="show" v-cloak v-on:submit="save" action="#" method="post">
-				<!-- Node input section -->
-				<div class="row justify-content-center">
-					<!-- Input fields -->
-					<div class="col-md-9 col-lg-8 col-xl-6">
-
-						<!-- Name -->
-						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Name</label>
-							<div class="col-sm-8">
-								<input v-model="node.name" type="text" class="form-control" required>
-							</div>
-						</div>
-
-						<!-- Image -->
-						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Image</label>
-							<div class="col-sm-8">
-								<select v-model="node.image" class="form-control" required>
-									<option v-for="option in node_images" v-bind:value="option.value">{{ option.path }}</option>
-								</select>
-							</div>
-						</div>
-
-						<!-- Color -->
-						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Color</label>
-							<div class="col-sm-8">
-								<input v-model="node.color" type="color" class="form-control" required>
-							</div>
-						</div>
-
-						<hr>
-
-						<!-- Type -->
-						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Type</label>
-							<div class="col-sm-8">
-								<select v-model="node.type" class="form-control" required>
-									<option v-for="option in node_types" v-bind:value="option.value">{{ option.text }}</option>
-								</select>
-							</div>
-						</div>
-
-						<!-- Animal parameters -->
-						<div v-if="node.type == 'animal'">
-
-							<!-- Size -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Size</label>
-								<div class="col-sm-8">
-									<select v-model="node.animal.size" class="form-control" required>
-										<option v-for="option in animal_sizes" v-bind:value="option.value">{{ option.text }}</option>
-									</select>
-								</div>
-							</div>
-
-							<!-- Food -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Food</label>
-								<div class="col-sm-8">
-									<select v-model="node.animal.food" class="form-control" required>
-										<option v-for="option in animal_foods" v-bind:value="option.value">{{ option.text }}</option>
-									</select>
-								</div>
-							</div>
-
-							<!-- Consumption -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Consumption</label>
-								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.consumption" type="number" class="form-control" step="0.01" required>
-									<div class="input-group-append">
-										<span class="input-group-text" id="basic-addon2">kg / day</span>
-									</div>
-								</div>
-							</div>
-
-							<!-- Weight -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Weight</label>
-								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.weight" type="number" class="form-control" step="0.01" required>
-									<div class="input-group-append">
-										<span class="input-group-text" id="basic-addon2">kg</span>
-									</div>
-								</div>
-							</div>
-
-							<!-- Age -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Age</label>
-								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.age" type="number" class="form-control" step="0.01" required>
-									<div class="input-group-append">
-										<span class="input-group-text" id="basic-addon2">years</span>
-									</div>
-								</div>
-							</div>
-
-							<!-- Offspring -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Offspring</label>
-								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.offspring" type="number" class="form-control" step="0.01" required>
-									<div class="input-group-append">
-										<span class="input-group-text" id="basic-addon2">/ year</span>
-									</div>
-								</div>
-							</div>
-
-							<!-- Diet -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label"><strike>Diet</strike></label>
-								<div class="col-sm-8">
-									<select v-model="node.animal.diet" class="form-control" disabled>
-										<option></option>
-									</select>
-								</div>
-							</div>
-						</div>
-
-						<!-- Abiotic parameters -->
-						<div v-if="node.type == 'abiotic'">
-
-							<!-- Size -->
-							<div class="form-group row">
-								<label class="col-sm-4 col-form-label">Category</label>
-								<div class="col-sm-8">
-									<select v-model="node.abiotic.category" class="form-control" required>
-										<option v-for="option in abiotic_types" v-bind:value="option.value">{{ option.text }}</option>
-									</select>
-								</div>
-							</div>
-						</div>
-
-						<hr>
-
-						<!-- Notes -->
-						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Notes</label>
-							<div class="col-sm-8">
-								<textarea v-model="node.notes" class="form-control" rows="3"></textarea>
-							</div>
-						</div>
-
-					</div>
-
-					<!-- Node image -->
-					<div class="col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
-						<img
-							v-bind:src="imagesrc"
-							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
-							style="border: none"
-							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }">
-					</div>
-				</div>
-
-				<!-- Save/Back buttons -->
-				<div class="row no-gutters d-flex justify-content-end">
-					<hr class="col-12">
-					<input type="button" class="btn btn-secondary mr-1" value="Cancel" v-on:click="cancel()">
-					<input type="submit" class="btn btn-primary" value="Save">
-				</div>
-			</form>
-		</div>
-
-
 		<!-- Graph -->
 		<div class="d-flex flex-wrap justify-content-center p-2" style="background: rgba(0,0,255,0.0);">
 
@@ -483,6 +247,385 @@
 
 			</div>
 
+		</div>
+
+
+		<!-- Database editor -->
+		<div class="container card-body bg-light mx-auto justify-content-center" style="height: 800px;">
+
+			<!-- Main menu -->
+			<div id="databaseEditor" class="editor-container" v-show="show" v-cloak>
+				<h2 class="text-left">Database</h2>
+				<hr class="mt-0">
+
+				<!--textarea class="form-control" style="height: 100%;">{{allData}}</textarea-->
+
+				<div class="d-flex justify-content-end">
+					<input type="button" class="btn btn-primary mr-1" v-bind:value="'Nodes (' + list.length + ')'" v-on:click="openNodes()">
+					<input type="button" class="btn btn-primary mr-1" value="Events" v-on:click="openEvents()" disabled>
+					<input type="button" class="btn btn-primary" value="Scenarios" v-on:click="openScenarios()" disabled>
+				</div>
+
+				<div class="d-flex justify-content-start">
+					<input type="file" id="importJsonInput" hidden/>
+					<input type="button" class="btn btn-warning mr-1" value="Import JSON" v-on:click="importFile()">
+					<input type="button" class="btn btn-warning" value="Export JSON" v-on:click="exportFile()">
+				</div>
+
+			</div>
+
+			<!-- Node list -->
+			<div id="nodeList" class="editor-container" v-show="show" v-cloak>
+				<h2 class="text-left">Nodes</h2>
+
+				<div class="editor-full-list">
+					<table class="table">
+						<thead>
+							<tr>
+								<td scope="col" class="text-muted d-none d-sm-table-cell"></td>
+								<td scope="col" class="text-muted">Name</td>
+								<!--td scope="col" class="text-muted d-none d-md-table-cell">Id</td-->
+								<td scope="col" class="text-muted d-none d-lg-table-cell">Type</td>
+								<td scope="col"></td>
+							</tr>
+						</thead>
+						<tbody>
+							<tr v-for="s in list">
+								<td scope="row" class="align-middle d-none d-sm-table-cell">
+									<img
+										v-bind:src="getImagesrc(s.image)"
+										class="img-thumbnail p-0 rounded-circle"
+										style="border: none; height: 40px;"
+										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + s.color }"
+										v-bind:title="s.name">
+								</td>
+								<th class="align-middle">{{ s.name }}</th>
+								<!--td class="align-middle d-none d-md-table-cell">{{ s.id }}</td-->
+								<td class="align-middle d-none d-lg-table-cell">{{ s.type }}</td>
+								<td class="align-middle" style="width: 1%; white-space: nowrap;">
+									<input type="button" class="btn btn-secondary" value="Edit" v-on:click="editNode(s)">
+									<input type="button" class="btn btn-secondary" value="Copy" v-on:click="copyNode(s)">
+									<input type="button" class="btn btn-danger" value="Delete" v-on:click="deleteNode(s)">
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<hr>
+				<div class="d-flex justify-content-between">
+					<input type="button" class="btn btn-warning" value="Edit tags" v-on:click="editTags()">
+					<div>
+						<input type="button" class="btn btn-secondary mr-1" value="Back" v-on:click="back()">
+						<input type="button" class="btn btn-primary" value="Add node" v-on:click="addNode()">
+					</div>
+				</div>
+			</div>
+
+			<!-- Node editor -->
+			<form id="nodeEditor" class="editor-container" v-show="show" v-cloak v-on:submit="save" action="#" method="post">
+
+				<div class="d-flex">
+					<!-- Tab navigation -->
+					<ul class="nav nav-tabs w-100 justify-content-between">
+						<h2 class="text-left mb-0">{{ node.name }}</h2>
+
+						<div class="d-flex">
+							<li class="nav-item">
+								<input type="button" class="tab-button nav-link" v-bind:class="{ active: tab == 1 }" v-on:click="setTab(1)" value="Info">
+							</li>
+							<li class="nav-item">
+								<input type="button" class="tab-button nav-link" v-bind:class="{ active: tab == 2 }" v-on:click="setTab(2)" value="Relations">
+							</li>
+						</div>
+					</ul>
+				</div>
+
+				<hr class="mt-0">
+
+				<!-- Node input section -->
+				<!-- Info tab -->
+				<div v-show="tab == 1" class="input-section">
+
+					<!-- Input fields -->
+					<div class="input-fields col-md-9 col-lg-8 col-xl-6">
+
+						<!-- Name -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Name</label>
+							<div class="col-sm-8">
+								<input v-model="node.name" type="text" class="form-control" required>
+							</div>
+						</div>
+
+						<!-- Image -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Image</label>
+							<div class="col-sm-8">
+								<select v-model="node.image" class="form-control" required>
+									<option v-for="option in node_images" v-bind:value="option.value">{{ option.path }}</option>
+								</select>
+							</div>
+						</div>
+
+						<!-- Color -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Color</label>
+							<div class="col-sm-8">
+								<input v-model="node.color" type="color" class="form-control" required>
+							</div>
+						</div>
+
+						<hr>
+
+						<!-- Type -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Type</label>
+							<div class="col-sm-8">
+								<select v-model="node.type" class="form-control" required>
+									<option v-for="option in node_types" v-bind:value="option.value">{{ option.text }}</option>
+								</select>
+							</div>
+						</div>
+
+						<!-- Animal parameters -->
+						<div v-if="node.type == 'animal'">
+
+							<!-- Size -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Size</label>
+								<div class="col-sm-8">
+									<select v-model="node.animal.size" class="form-control" required>
+										<option v-for="option in animal_sizes" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- Food -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Food</label>
+								<div class="col-sm-8">
+									<select v-model="node.animal.food" class="form-control" required>
+										<option v-for="option in animal_foods" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- Consumption -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Consumption</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.consumption" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">kg / day</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Weight -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Weight</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.weight" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">kg</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Age -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Age</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.age" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">years</span>
+									</div>
+								</div>
+							</div>
+
+							<!-- Offspring -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Offspring</label>
+								<div class="col-sm-8 input-group">
+									<input v-model="node.animal.offspring" type="number" class="form-control" step="0.01" required>
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">/ year</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Abiotic parameters -->
+						<div v-if="node.type == 'abiotic'">
+
+							<!-- Size -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Category</label>
+								<div class="col-sm-8">
+									<select v-model="node.abiotic.category" class="form-control" required>
+										<option v-for="option in abiotic_types" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+						</div>
+
+						<hr>
+
+						<!-- Notes -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Notes</label>
+							<div class="col-sm-8">
+								<textarea v-model="node.notes" class="form-control" rows="3"></textarea>
+							</div>
+						</div>
+
+					</div>
+
+					<!-- Node image -->
+					<div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
+						<img
+							v-bind:src="imagesrc"
+							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
+							style="border: none"
+							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }"
+							v-bind:title="node.name">
+					</div>
+				</div>
+
+				<!-- Diet tab -->
+				<div v-show="tab == 2" class="input-section">
+					<!-- Relation list -->
+					<div class="input-fields col-md-9 col-lg-8 col-xl-6">
+
+						<!-- Relation -->
+						<div class="card bg-light mb-1" v-for="(relation, index) in node.relations">
+							<div class="card-body">
+
+								<!-- Other node -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Other node</label>
+									<div class="col-sm-8">
+										<select v-model="relation.node_id" class="form-control" required>
+											<option value="" disabled hidden>Select a node...</option>
+											<optgroup label="Nodes">
+											<option v-for="option in all_nodes" v-bind:value="option.id">{{ option.name }}</option>
+											<option disabled>──────────</option>
+											<optgroup label="Tags">
+											<option v-for="option in all_tags" v-bind:value="option" :disabled="option == ''">{{ option }}</option>
+										</select>
+									</div>
+								</div>
+
+								<!-- Interaction -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Interaction</label>
+									<div class="col-sm-8">
+										<select v-model="relation.interaction" class="form-control" required>
+											<option value="" disabled hidden>Select interaction</option>
+											<option v-for="option in relation_interactions" v-bind:value="option.value">{{ option.text }}</option>
+										</select>
+									</div>
+								</div>
+
+								<!--div v-if="interaction.node_id.type == 'animal'"-->
+
+								<!-- Benefit -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Preference</label>
+									<div class="col-sm-8 input-group">
+										<input v-model="relation.preference" type="number" class="form-control" step="0.01" required>
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">~12%</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Delete button -->
+								<input type="button" class="corner-close-button btn btn-danger" value="&#10005;" v-on:click="deleteRelation(index)">
+
+							</div>
+						</div>
+
+						<div class="row no-gutters d-flex justify-content-end">
+							<hr class="col-12">
+							<input type="button" class="btn btn-primary" value="Add relation" v-on:click="addRelation()">
+						</div>
+
+					</div>
+
+					<!-- Relation chart -->
+					<div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
+						<!--img
+							v-bind:src="imagesrc"
+							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
+							style="border: none"
+							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }"
+							v-bind:title="node.name"-->
+						<canvas id="nodeChart" height="300"></canvas><!--347-->
+
+						<hr>
+
+						<!-- Incoming relations -->
+						<div class="card bg-light mb-1">
+							<div class="card-body">
+								<h4>Affected by</h4>
+								<p v-if="incoming_relations.length == 0">None</p>
+								<div v-for="r in incoming_relations">
+									{{ r.relation.interaction }} by
+									<img
+										v-bind:src="getImagesrc(r.node.image)"
+										class="img-thumbnail p-0 rounded-circle"
+										style="border: none; height: 40px;"
+										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + r.node.color }"
+										v-bind:title="r.node.name">
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Save/Back buttons -->
+				<div class="row no-gutters d-flex justify-content-end">
+					<hr class="col-12">
+					<input type="button" class="btn btn-secondary mr-1" value="Cancel" v-on:click="cancel()">
+					<input type="submit" class="btn btn-primary" value="Save">
+				</div>
+			</form>
+
+			<!-- Tag editor -->
+			<form id="tagEditor" class="editor-container" v-show="show" v-cloak v-on:submit="save" action="#" method="post">
+				<h2 class="text-left">Tags</h2>
+				<hr class="mt-0">
+
+				<!-- Tag list field -->
+				<div class="input-section">
+
+					<!-- Tag list -->
+					<div class="input-fields col-md-9 col-lg-8 col-xl-6">
+
+						<textarea v-model="tags" class="form-control" style="height: 100%; resize: none;"></textarea>
+
+					</div>
+
+					<!-- Something -->
+					<div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
+						<!-- Something -->
+						<div class="card bg-light mb-1">
+							<div class="card-body">
+								<h4>Something</h4>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Save/Back buttons -->
+				<div class="row no-gutters d-flex justify-content-end">
+					<hr class="col-12">
+					<input type="button" class="btn btn-secondary mr-1" value="Cancel" v-on:click="cancel()">
+					<input type="submit" class="btn btn-primary" value="Save">
+				</div>
+			</form>
 		</div>
 
 	</body>

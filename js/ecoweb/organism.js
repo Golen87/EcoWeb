@@ -26,6 +26,10 @@ class Organism {
 		this.show = false;
 	}
 
+	getFoodAmount() {
+		return 1.0;
+	}
+
 	getGrowthRate() {
 		let max = this.growthRate;
 		for (var name in this.requirements) {
@@ -77,9 +81,21 @@ class Organism {
 	//predation/parasitism
 }
 
-class Carnivore extends Organism {}
-class Herbivore extends Organism {}
-class Plant extends Organism {}
+class Carnivore extends Organism {
+	getFoodAmount() {
+		return 1.0;
+	}
+}
+class Herbivore extends Organism {
+	getFoodAmount() {
+		return 1.0;
+	}
+}
+class Plant extends Organism {
+	getFoodAmount() {
+		return 1.0;
+	}
+}
 
 
 

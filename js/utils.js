@@ -30,11 +30,13 @@ function pnorm(x, mean, sigma)
 // @buffer	Range from the target value, 0% penalty
 // @decay	Width of slope from 0% to 100% penalty
 function normRange(target, buffer, decay) {
-	function CDF(target, value) {
+	function CDF(value) {
 		let x = value - target;
+		if (Math.abs(x) > buffer + decay)
+			return 1;
 		return 1 - (pnorm(x, -decay/2-buffer, decay/4) - pnorm(x, decay/2+buffer, decay/4));
 	}
-	return CDF.bind(this, target);
+	return CDF.bind(this);
 }
 
 

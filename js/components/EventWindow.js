@@ -80,6 +80,10 @@ class EventWindow extends Phaser.GameObjects.Container {
 		this.desc.setAlpha(0.6);
 		this.add(this.desc);
 
+		this.image = scene.add.image(this.toX(3760), this.toY(347+200), "circle");
+		this.image.setScale(0.5 * this.image.width * this.image.scaleX / this.image.width);
+		this.add(this.image);
+
 		this.apply = new PauseButton(scene, this.toX(2668), this.toY(2745), "Aktivera", ()=>{
 			if (this.selectedMarker && this.selectedEvent) {
 				this.selectedMarker.setEvent(this.selectedEvent);
@@ -130,5 +134,6 @@ class EventWindow extends Phaser.GameObjects.Container {
 		this.buttons[index].setSelected(true);
 		this.title.setText(this.selectedEvent.name);
 		this.desc.setText(this.selectedEvent.desc);
+		this.image.setTexture(this.selectedEvent.icon);
 	}
 }

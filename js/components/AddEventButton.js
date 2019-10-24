@@ -10,7 +10,7 @@ class AddEventButton extends Button {
 
 		const OFFSET = 0.43 * this.image.height * this.image.scaleY;
 		this.symbol = scene.add.image(0, -OFFSET, "symbol_plus");
-		this.symbol.setScale(0.7 * this.image.width * this.image.scaleX / this.symbol.width);
+		this.symbol.setScale(0.68 * this.image.width * this.image.scaleX / this.symbol.width);
 		this.add(this.symbol);
 
 		this.event = null;
@@ -53,11 +53,13 @@ class AddEventButton extends Button {
 		this.event = event;
 
 		if (this.event == null) {
-			this.symbol.setVisible(true);
+			this.symbol.setTexture("symbol_plus");
+			this.symbol.setTint(0xFFFFFF);
 			this.setScale(0.75);
 		}
 		else {
-			this.symbol.setVisible(false);
+			this.symbol.setTexture(event.icon);
+			//this.symbol.setTint(0);
 			this.setScale(1.0);
 		}
 
