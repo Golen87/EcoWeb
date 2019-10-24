@@ -54,7 +54,7 @@ class TitleScene extends Phaser.Scene {
 		this.soundSwoosh.setVolume(1.0);
 		this.soundAmbience = this.sound.add('ambience_main_menu');
 		this.soundAmbience.setVolume(0.1);
-		this.soundAmbience.play();
+		//this.soundAmbience.play();
 	}
 
 	update(time, delta) {
