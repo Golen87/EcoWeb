@@ -13,6 +13,7 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('bg_world', 'assets/images/background/BgVärld.png');
 		this.load.image('bg_1', 'assets/images/background/BG1.png');
 		this.load.image('bg_2', 'assets/images/background/BG2.png');
+		this.load.image('bg_3', 'assets/images/background/BG3.png');
 
 
 		/* Menu */		

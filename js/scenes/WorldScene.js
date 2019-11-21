@@ -4,7 +4,7 @@ class WorldScene extends Phaser.Scene {
 	}
 
 	create() {
-		let bg = this.add.image(this.CX, this.CY, 'bg_2');
+		let bg = this.add.image(this.CX, this.CY, 'bg_3');
 		this.fitToScreen(bg);
 
 		for (let i = 0; i < web.scenarios.length; i++) {

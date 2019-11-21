@@ -37,7 +37,7 @@ class LevelScene extends Phaser.Scene {
 		//this.shader.setFloat1('r', 100);
 		//this.cameras.main.setRenderToTexture(this.shader);
 
-		let bg = this.add.image(this.CX, this.CY, 'bg_title');
+		let bg = this.add.image(this.CX, this.CY, 'bg_2');
 		this.fitToScreen(bg);
 
 		this.infoBox = new InfoBox(this, 0, 0, 0.3 * this.W);
