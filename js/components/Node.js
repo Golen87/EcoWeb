@@ -38,32 +38,6 @@ class Node extends Button {
 		this.image.setScale(this.size / Math.max(this.image.width, this.image.height));
 		this.add(this.image);
 
-		this.slider = scene.add.image(0, 0, 'growth_slider');
-		this.slider.setScale(this.circle.scaleY * 320/779);
-		this.slider.x += -325 * this.slider.scaleX;
-		this.slider.y -= 61 * this.slider.scaleY;
-		//this.slider.setAngle(-90);
-		//this.add(this.slider);
-		//this.sendToBack(this.slider);
-
-		this.arrow = scene.add.image(0, 0, 'growth_slider_arrow');
-		this.arrow.setScale(0.2 * this.size / this.arrow.height);
-		//this.add(this.arrow);
-		let tweenObject = {
-			val: 0
-		}
-		scene.tweens.add({
-			targets: tweenObject,
-			val: 1,
-			duration: 3000,
-			repeat: -1,
-			yoyo: true,
-			//ease: "Sine.easeInOut",
-			callbackScope: this,
-			onUpdate: function(tween, target) {
-				this.updateArrow(target.val);
-			}
-		});
 
 		let shape = scene.make.graphics({ fillStyle: { color: 0x000000 }, add: false });
 		let circle = new Phaser.Geom.Circle(0, 0, this.size*0.4);
@@ -93,59 +67,48 @@ class Node extends Button {
 		return (0.3 + 1.0 * smooth) * (1+w)/2;
 	}
 
-	updateArrow() {
-		const sliderAngle = Phaser.Math.DegToRad(54.5);
-		let smooth = this.population;
-		// TODO: Inverse the easing for a set goal
-		//let smooth = Phaser.Math.Easing.Sine.InOut(this.population);
-		let angle = -Math.PI - sliderAngle + 2 * sliderAngle * smooth;
-		let radius = this.circle.width * this.circle.scaleX * (0.52 + 0.2 * smooth);
-
-		var vector = new Phaser.Math.Vector2();
-		vector.setToPolar(angle, radius);
-
-		this.arrow.x = vector.x;
-		this.arrow.y = vector.y*0.97;
-		this.arrow.angle = Phaser.Math.RadToDeg(vector.angle()) + 90;
+	setPopulation(pop, immediate=false) {
+		this.population = pop;
+		if (immediate) {
+			this.aliveEasing = this.isAlive();
+			this.aliveValue = this.isAlive();
+		}
 	}
 
-	setPopulation(pop, wiggle) {
-		this.population = pop;
+	setWiggle(wiggle) {
 		this.wiggle = wiggle;
-		this.setScale(this.getScale());
-		this.updateArrow(pop);
+	}
 
-		let diff = Phaser.Math.Clamp(Math.abs(1 - 2*this.population), 0, 1);
-		diff = 0.1 + 0.9 * diff; // Due to green being +-0.5
-		let index = Phaser.Math.Clamp(Math.floor(diff * this.spectrum.length), 0, this.spectrum.length-1);
-		let rest = diff * this.spectrum.length - index;
+	isAlive() {
+		return (this.population > DEATH_THRESHOLD);
+	}
+
+
+	updateScale() {
+		this.setScale(this.getScale());
+		//this.updateArrow(pop);
+
+		//let diff = Phaser.Math.Clamp(Math.abs(1 - 2*this.population), 0, 1);
+		//diff = 0.1 + 0.9 * diff; // Due to green being +-0.5
+		//let index = Phaser.Math.Clamp(Math.floor(diff * this.spectrum.length), 0, this.spectrum.length-1);
+		//let rest = diff * this.spectrum.length - index;
 
 		//let color = Phaser.Display.Color.Interpolate.ColorWithColor(this.spectrum[index], this.spectrum[index+1], 1, rest);
 		//color = Phaser.Display.Color.ObjectToColor(color);
-		let color = this.spectrum[index];
-		if (this.population <= DEATH_THRESHOLD) {
-			this.image.setAlpha(0.5);
+		//let color = this.spectrum[index];
+			this.image.setAlpha(0.5 + 0.5*this.aliveValue);
 
-			color = Phaser.Display.Color.ValueToColor(0x777777);
-			this.innerCircle.setTint(color.color);
-			color.v = 0.8;
-			this.innerCircle2.setTint(color.color);
-		}
-		else {
-			this.image.setAlpha(1.0);
-
-			color.s = 0.8;
-			this.innerCircle.setTint(color.color);
-			color.s = 0.0;
-			color.v = 1.0;
-			this.innerCircle2.setTint(color.color);
-		}
+			//color = Phaser.Display.Color.ValueToColor(0x777777);
+			//this.innerCircle.setTint(color.color);
+			//color.v = 0.8;
+			//this.innerCircle2.setTint(color.color);
+		//else
+			//color.s = 0.8;
+			//this.innerCircle.setTint(color.color);
+			//color.s = 0.0;
+			//color.v = 1.0;
+			//this.innerCircle2.setTint(color.color);
 	}
-
-
-	//update(delta) {
-	//	...
-	//}
 
 
 	onOut() {
@@ -189,6 +152,8 @@ class Node extends Button {
 
 
 	update(delta) {
+		this.updateScale();
+
 		let speed = 2.0;
 		this.x += (this.goalX - this.x) / speed;
 		this.y += (this.goalY - this.y) / speed;

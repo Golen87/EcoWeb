@@ -98,6 +98,9 @@ class LevelScene extends Phaser.Scene {
 			//updateChart();
 		}
 
+		this.slider.on('onChange', this.updateNodePopulation, this);
+		this.updateNodePopulation(true);
+
 
 		this.paths = [];
 		for (let i = 0; i < this.nodes.length; i++) {
@@ -154,10 +157,10 @@ class LevelScene extends Phaser.Scene {
 			}
 		}
 
-		for (let i = 0; i < this.nodes.length; i++) {
+		for (var i = this.nodes.length - 1; i >= 0; i--) {
 			let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
-			//let p = this.slider.value;
-			this.nodes[i].setPopulation(web.getValueAt(i, this.slider.value * web.time), s);
+			this.nodes[i].setWiggle(s);
+
 			//this.nodes[i].x += this.nodes[i].force.x;
 			//this.nodes[i].y += this.nodes[i].force.y;
 			this.nodes[i].update(delta);
@@ -168,6 +171,13 @@ class LevelScene extends Phaser.Scene {
 		}
 		//this.shader.setFloat1('tx', this.input.x / this.game.config.width);
 		//this.shader.setFloat1('ty', this.input.y / this.game.config.height);
+	}
+
+	updateNodePopulation(immediate=false) {
+		for (var i = this.nodes.length - 1; i >= 0; i--) {
+			let pop = web.getValueAt(i, this.slider.value * web.time);
+			this.nodes[i].setPopulation(pop, immediate);
+		}
 	}
 
 

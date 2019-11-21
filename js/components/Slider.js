@@ -35,6 +35,7 @@ class Slider extends Phaser.GameObjects.Container {
 					timeStamp
 				);
 				this.add(eventButton);
+				eventButton.on('onEventChange', this.onEventChange, this);
 			}
 		}
 
@@ -45,6 +46,14 @@ class Slider extends Phaser.GameObjects.Container {
 
 	update(delta) {
 		this.button.update(delta);
+		if (this.prevValue != this.value) {
+			this.emit('onChange');
+		}
+		this.prevValue = this.value;
+	}
+
+	onEventChange() {
+		this.emit('onChange');
 	}
 
 

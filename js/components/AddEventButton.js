@@ -64,5 +64,6 @@ class AddEventButton extends Button {
 		}
 
 		web.setEvent(this.timeStamp, this.event);
+		this.emit('onEventChange');
 	}
 }
