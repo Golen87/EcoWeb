@@ -224,6 +224,9 @@ class EcoWeb {
 	}
 
 	solveSection(duration) {
+		if (duration == 0)
+			return;
+
 		console.log("Solving", this.time, "-", (this.time+duration));
 		// Lotka-Volterra equation (classical model for predator-prey interaction)
 		let f = function(t, pop) {
@@ -298,6 +301,11 @@ class EcoWeb {
 		let sol = numeric.dopri(start, end, this.population, f.bind(this), 1e-6, 2000);
 		this.population = [...sol.y[sol.y.length-1]]; // Copy
 		this.time = end;
+
+		if (sol.x[0] == this.result.x[this.result.x.length-1]) {
+			this.result.x.pop();
+			this.result.y.pop();
+		}
 
 		this.result.x.push(...sol.x);
 		this.result.y.push(...sol.y);
