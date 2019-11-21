@@ -166,9 +166,10 @@ class LevelScene extends Phaser.Scene {
 			this.nodes[i].update(delta);
 		}
 
-		for (let i = 0; i < this.paths.length; i++) {
-			this.paths[i].update(delta);
+		for (var i = this.paths.length - 1; i >= 0; i--) {
+			this.paths[i].update(time, delta);
 		}
+
 		//this.shader.setFloat1('tx', this.input.x / this.game.config.width);
 		//this.shader.setFloat1('ty', this.input.y / this.game.config.height);
 	}

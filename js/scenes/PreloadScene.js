@@ -63,7 +63,7 @@ class PreloadScene extends Phaser.Scene {
 		/* Nodes */
 		this.load.image('circle', 'assets/images/circle_128.png');
 		this.load.image('pixel', 'assets/images/pixel.png');
-		this.load.image('arrow', 'assets/images/arrow.png');
+		this.load.image('dot', 'assets/images/dot.png');
 
 		this.load.image('missing', 'assets/images/icons/Missing_128.png');
 
