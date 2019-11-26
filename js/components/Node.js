@@ -73,7 +73,8 @@ class Node extends Button {
 	getScale() {
 		let w = this.aliveValue;
 		let smooth = 0.5 + Math.atan(4 * (this.populationValue - 0.5)) / Math.PI + w * this.wiggle;
-		let value = (0.3 + 1.0 * smooth) * (1+w)/2 + 0.1 * this.selectFactor;
+		//let value = (0.3 + 1.0 * smooth) * (1+w)/2 + 0.1 * this.selectFactor;
+		let value = (0.3 + 1.0 * smooth) * w + 0.1 * this.selectFactor;
 		return value;
 	}
 
