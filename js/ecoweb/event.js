@@ -1,4 +1,4 @@
-class Event {
+class BaseEvent {
 	constructor(name, icon, desc, callback) {
 		this.name = name;
 		this.icon = icon;

@@ -99,7 +99,7 @@ class EcoWeb {
 		}
 
 		this.events = [
-			new Event("Stödmata", "detrius",
+			new BaseEvent("Stödmata", "detrius",
 				`Stödmatar man så ser man till så att hjortdjuren i ett område får extra mat över vintern så att färre dör på grund av svält.
 				\nDet är vanligt att man gör detta så att man kan skjuta fler av dem under jaktsäsongen utan att det blir för få individer i ett område.`,
 				function() {
@@ -110,7 +110,7 @@ class EcoWeb {
 					this.r[r] /= 1.5; // Öka growth rate
 			}.bind(this)),
 
-			new Event("Plantera skog", "träd",
+			new BaseEvent("Plantera skog", "träd",
 				`Man kan plantera träd och på så vis få en större areal av landskapet att bli skog.
 				\nMånga djur gynnas av skogen så som harar och rådjur, men även svampar och växter så som blåbär kan också gynnas av att det blir mer skog i landskapet.`,
 				function() {
@@ -119,7 +119,7 @@ class EcoWeb {
 					this.population[t] += 0.25;
 			}.bind(this)),
 
-			new Event("Avverka skog", "träd",
+			new BaseEvent("Avverka skog", "träd",
 				`Man kan hugga ned hela skogen och på så vis bli av med alla träd.
 				\nMånga djur mår dåligt av att skogen försvinner så som dovhjort, rådjur, harar, rävar, och koltrastar. Även växter kan skadas av att skogen försvinner, blåbär tillexempel är beroende av skogen för sin överlevnad, samt många svamparter.`,
 				function() {
@@ -128,7 +128,7 @@ class EcoWeb {
 					this.population[t] *= 0.0;
 			}.bind(this)),
 
-			new Event("Plantera in lodjur", "lo",
+			new BaseEvent("Plantera in lodjur", "lo",
 				`Planterar man in lodjur i ett område så kommer de att börja jaga de andra djuren i området. Lodjur är en hyperkarnivor vilket betyder att deras diet är mestadels kött och de kan inte överleva på en växtbaserad diet.
 				\nLodjuren gillar främst att jaga stora hovdjur så som dovhjort och rådjur. De äter också mycket skogsharar och koltrastar, och kan även ta sig en räv ibland.`,
 				function() {
@@ -140,7 +140,7 @@ class EcoWeb {
 					this.A[r][d] = 0; // Ta bort rådjurs-dovhjorts straff
 			}.bind(this)),
 
-			new Event("Jaga räv", "räv",
+			new BaseEvent("Jaga räv", "räv",
 				`Man kan skicka ut jägare för att jaga räv, man kan jaga dem med ett drev hundar, lura dem nära med åtel och sedan skjuta dem, skicka in hundar i deras gryt, eller sätta ut fällor.
 				\nMinskar man rävpopulationen på detta vis så gynnar man mest smådjur så som skogsharar och koltrastar.`,
 				function() {
