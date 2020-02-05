@@ -110,22 +110,24 @@ class Database {
 	loadNodes(list) {
 		this.nodes.splice(0, this.nodes.length);
 
-		for (const data of list) {
-			let node = this.newNode();
-			transferObject(data, node);
+		if (list && Array.isArray(list)) {
+			for (const data of list) {
+				let node = this.newNode();
+				transferObject(data, node);
 
-			// TODO: Possibly remove bad tags and delete incomplete relations
-			node.relations = [];
-			for (let r in data.relations) {
-				this.addRelation(node, data.relations[r].type);
-				transferObject(data.relations[r], node.relations[r]);
+				// TODO: Possibly remove bad tags and delete incomplete relations
+				node.relations = [];
+				for (let r in data.relations) {
+					this.addRelation(node, data.relations[r].type);
+					transferObject(data.relations[r], node.relations[r]);
+				}
+
+				if (JSON.stringify(node) !== JSON.stringify(data)) {
+					console.warn("Legacy node data found");
+				}
+
+				this.nodes.push(node);
 			}
-
-			if (JSON.stringify(node) !== JSON.stringify(data)) {
-				console.warn("Legacy node data found");
-			}
-
-			this.nodes.push(node);
 		}
 	}
 
@@ -327,22 +329,24 @@ class Database {
 	loadEvents(list) {
 		this.events.splice(0, this.events.length);
 
-		for (const data of list) {
-			let event = this.newEvent();
-			transferObject(data, event);
+		if (list && Array.isArray(list)) {
+			for (const data of list) {
+				let event = this.newEvent();
+				transferObject(data, event);
 
-			// TODO: Possibly remove bad tags and delete incomplete effects
-			event.effects = [];
-			for (let r in data.effects) {
-				this.addEffect(event, data.effects[r].type);
-				transferObject(data.effects[r], event.effects[r]);
+				// TODO: Possibly remove bad tags and delete incomplete effects
+				event.effects = [];
+				for (let r in data.effects) {
+					this.addEffect(event, data.effects[r].type);
+					transferObject(data.effects[r], event.effects[r]);
+				}
+
+				if (JSON.stringify(event) !== JSON.stringify(data)) {
+					console.warn("Legacy event data found");
+				}
+
+				this.events.push(event);
 			}
-
-			if (JSON.stringify(event) !== JSON.stringify(data)) {
-				console.warn("Legacy event data found");
-			}
-
-			this.events.push(event);
 		}
 	}
 
@@ -421,22 +425,24 @@ class Database {
 	loadScenarios(list) {
 		this.scenarios.splice(0, this.scenarios.length);
 
-		for (const data of list) {
-			let scenario = this.newScenario();
-			transferObject(data, scenario);
+		if (list && Array.isArray(list)) {
+			for (const data of list) {
+				let scenario = this.newScenario();
+				transferObject(data, scenario);
 
-			// TODO: Possibly remove bad tags and delete incomplete actors
-			scenario.actors = [];
-			for (let r in data.actors) {
-				this.addActor(scenario, data.actors[r].type);
-				transferObject(data.actors[r], scenario.actors[r]);
+				// TODO: Possibly remove bad tags and delete incomplete actors
+				scenario.actors = [];
+				for (let r in data.actors) {
+					this.addActor(scenario, data.actors[r].type);
+					transferObject(data.actors[r], scenario.actors[r]);
+				}
+
+				if (JSON.stringify(scenario) !== JSON.stringify(data)) {
+					console.warn("Legacy scenario data found");
+				}
+
+				this.scenarios.push(scenario);
 			}
-
-			if (JSON.stringify(scenario) !== JSON.stringify(data)) {
-				console.warn("Legacy scenario data found");
-			}
-
-			this.scenarios.push(scenario);
 		}
 	}
 
@@ -615,7 +621,7 @@ class Database {
 	}
 
 	loadCustomTags(list) {
-		if (list) {
+		if (list && Array.isArray(list)) {
 			this.setCustomTags(list);
 		}
 	}
