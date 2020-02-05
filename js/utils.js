@@ -102,3 +102,22 @@ function getDateAsString() {
 
 	return '{0}-{1}-{2}'.format(yyyy, mm, dd);
 }
+
+// Check if variable is Object
+function isPlainObject(obj) {
+	return Object.prototype.toString.call(obj) === '[object Object]';
+};
+
+// Recursively copies data where keys match
+function transferObject(data, obj) {
+	for (const key in obj) {
+		if (data.hasOwnProperty(key)) {
+			if (isPlainObject(data[key])) {
+				transferObject(data[key], obj[key]);
+			}
+			else {
+				obj[key] = data[key];
+			}
+		}
+	}
+}
