@@ -123,7 +123,7 @@
 								<input class="col-sm-3"
 									type="number"
 									min="0" max="1000" step="10"
-									v-model="duration"
+									v-model.number="duration"
 									v-on:change="updateDuration($event)"/>
 							</div>
 							<button type="button" class="btn btn-secondary"
@@ -179,7 +179,7 @@
 								<input class="col-sm-3"
 									type="number"
 									min="0" max="1" step="0.01"
-									v-model="s.startPopulation"
+									v-model.number="s.startPopulation"
 									v-on:change="updateValue($event, s, 'startPopulation')"/>
 							</div>
 							<div class="row no-gutters mb-1" style="height: 2em;">
@@ -193,7 +193,7 @@
 								<input class="col-sm-3"
 									type="number"
 									min="-1" max="1" step="0.01"
-									v-model="s.growthRate"
+									v-model.number="s.growthRate"
 									v-on:change="updateValue($event, s, 'growthRate')"/>
 							</div>
 							<div class="row no-gutters mb-1" style="height: 2em;">
@@ -207,7 +207,7 @@
 								<input class="col-sm-3"
 									type="number"
 									min="-1" max="0" step="0.01"
-									v-model="s.selfCompetition"
+									v-model.number="s.selfCompetition"
 									v-on:change="updateValue($event, s, 'selfCompetition')"/>
 							</div>
 							<hr>
@@ -222,7 +222,7 @@
 								<input class="col-sm-3"
 									type="number"
 									min="-1" max="0" step="0.01"
-									v-model="s.relationship[key]"
+									v-model.number="s.relationship[key]"
 									v-on:change="updateValue($event, s, 'relationship[key]')"/>
 							</div>
 							<!--
@@ -237,7 +237,7 @@
 								<input class="col-sm-3"
 									type="number"
 									min="-1" max="0" step="0.01"
-									v-model="s.relationship[key]"
+									v-model.number="s.relationship[key]"
 									v-on:change="updateValue($event, s, 'relationship[key]')"/>
 							</div>
 							-->
@@ -415,7 +415,7 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Consumption</label>
 								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.consumption" type="number" class="form-control" step="0.01" required>
+									<input v-model.number="node.animal.consumption" type="number" class="form-control" min="0" step="0.01" required>
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">kg / day</span>
 									</div>
@@ -426,7 +426,7 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Weight</label>
 								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.weight" type="number" class="form-control" step="0.01" required>
+									<input v-model.number="node.animal.weight" type="number" class="form-control" min="0" step="0.01" required>
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">kg</span>
 									</div>
@@ -437,7 +437,7 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Age</label>
 								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.age" type="number" class="form-control" step="0.01" required>
+									<input v-model.number="node.animal.age" type="number" class="form-control" min="0" step="0.01" required>
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">years</span>
 									</div>
@@ -448,7 +448,7 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Offspring</label>
 								<div class="col-sm-8 input-group">
-									<input v-model="node.animal.offspring" type="number" class="form-control" step="0.01" required>
+									<input v-model.number="node.animal.offspring" type="number" class="form-control" min="0" step="0.01" required>
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">/ year</span>
 									</div>
