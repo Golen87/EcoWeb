@@ -135,12 +135,8 @@ function createDatabaseTools(database) {
 				this.show = false;
 				databaseEditor.open();
 			},
-			getImagesrc: function (image) {
-				for (var i = NODE_IMAGES.length - 1; i >= 0; i--) {
-					if (image == NODE_IMAGES[i].value) {
-						return NODE_IMAGES[i].path;
-					}
-				}
+			getImage: function (image) {
+				return getTextFromValue(NODE_IMAGES, image);
 			},
 			editNode: function (node) {
 				this.show = false;
@@ -178,11 +174,7 @@ function createDatabaseTools(database) {
 				return database.getIncomingRelations(this.node.id);
 			},
 			imagesrc: function () {
-				for (var i = NODE_IMAGES.length - 1; i >= 0; i--) {
-					if (this.node.image == NODE_IMAGES[i].value) {
-						return NODE_IMAGES[i].path;
-					}
-				}
+				return getTextFromValue(NODE_IMAGES, this.node.image);
 			},
 			all_nodes: function () { return database.nodes; },
 			all_tags: function () { return database.tags; },
@@ -228,11 +220,9 @@ function createDatabaseTools(database) {
 			deleteRelation: function (index) {
 				database.deleteRelation(this.node, index);
 			},
-			getImagesrc: function (image) {
-				for (var i = NODE_IMAGES.length - 1; i >= 0; i--) {
-					if (image == NODE_IMAGES[i].value) {
-						return NODE_IMAGES[i].path;
-					}
+			getImage: function (image) {
+				return getTextFromValue(NODE_IMAGES, image);
+			},
 				}
 			},
 		},

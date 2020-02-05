@@ -76,6 +76,7 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('dovhjort', 'assets/images/icons/Dovhjort_128.png');
 		this.load.image('rådjur', 'assets/images/icons/Rådjur_128.png');
 		this.load.image('hare', 'assets/images/icons/Hare_128.png');
+		this.load.image('skogssorkgråsiding', 'assets/images/icons/Skogssork_Grasiding_128.png');
 		this.load.image('norvacka', 'assets/images/icons/Norvacka_128.png');
 		this.load.image('koltrast', 'assets/images/icons/Koltrast_128.png');
 		this.load.image('vanliggroda', 'assets/images/icons/VanligGroda_128.png');

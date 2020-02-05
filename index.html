@@ -293,7 +293,7 @@
 							<tr v-for="s in list">
 								<td scope="row" class="align-middle d-none d-sm-table-cell">
 									<img
-										v-bind:src="getImagesrc(s.image)"
+										v-bind:src="getImage(s.image)"
 										class="img-thumbnail p-0 rounded-circle"
 										style="border: none; height: 40px;"
 										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + s.color }"
@@ -363,7 +363,7 @@
 							<label class="col-sm-4 col-form-label">Image</label>
 							<div class="col-sm-8">
 								<select v-model="node.image" class="form-control" required>
-									<option v-for="option in node_images" v-bind:value="option.value">{{ option.path }}</option>
+									<option v-for="option in node_images" v-bind:value="option.value">{{ option.text }}</option>
 								</select>
 							</div>
 						</div>
@@ -464,7 +464,7 @@
 								<label class="col-sm-4 col-form-label">Category</label>
 								<div class="col-sm-8">
 									<select v-model="node.abiotic.category" class="form-control" required>
-										<option v-for="option in abiotic_types" v-bind:value="option.value">{{ option.text }}</option>
+										<option v-for="option in abiotic_categories" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
 							</div>
@@ -574,7 +574,7 @@
 								<div v-for="r in incoming_relations">
 									{{ r.relation.interaction }} by
 									<img
-										v-bind:src="getImagesrc(r.node.image)"
+										v-bind:src="getImage(r.node.image)"
 										class="img-thumbnail p-0 rounded-circle"
 										style="border: none; height: 40px;"
 										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + r.node.color }"
