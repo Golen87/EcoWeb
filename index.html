@@ -308,11 +308,11 @@
 								</td>
 								<th class="align-middle">{{ s.name }}</th>
 								<!--td class="align-middle d-none d-md-table-cell">{{ s.id }}</td-->
-								<td class="align-middle d-none d-lg-table-cell">{{ s.type }}</td>
+								<td class="align-middle d-none d-lg-table-cell">{{ s.type }} &ndash; {{ s.animal.food }}</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
-									<input type="button" class="btn btn-secondary" value="Edit" v-on:click="editNode(s)">
-									<input type="button" class="btn btn-secondary" value="Copy" v-on:click="copyNode(s)">
-									<input type="button" class="btn btn-danger" value="Delete" v-on:click="deleteNode(s)">
+									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editNode(s)"><i class="fas fa-fw fa-edit"></i></button>
+									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyNode(s)"><i class="fas fa-fw fa-copy"></i></button>
+									<button class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteNode(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
 								</td>
 							</tr>
 						</tbody>
@@ -354,9 +354,11 @@
 								<th class="align-middle">{{ s.name }}</th>
 								<td class="align-middle d-none d-lg-table-cell">{{ s.category }}</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
-									<input type="button" class="btn btn-secondary" value="Edit" v-on:click="editEvent(s)">
-									<input type="button" class="btn btn-secondary" value="Copy" v-on:click="copyEvent(s)">
-									<input type="button" class="btn btn-danger" value="Delete" v-on:click="deleteEvent(s)">
+									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editEvent(s)"><i class="fas fa-fw fa-edit"></i></button>
+									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyEvent(s)"><i class="fas fa-fw fa-copy"></i></button>
+									<button class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteEvent(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
+									<button class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveEvent(s,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
+									<button class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveEvent(s,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
 								</td>
 							</tr>
 						</tbody>
@@ -398,9 +400,11 @@
 										v-bind:title="getNodeName(actor)">
 								</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
-									<input type="button" class="btn btn-secondary" value="Edit" v-on:click="editScenario(s)">
-									<input type="button" class="btn btn-secondary" value="Copy" v-on:click="copyScenario(s)">
-									<input type="button" class="btn btn-danger" value="Delete" v-on:click="deleteScenario(s)">
+									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editScenario(s)"><i class="fas fa-fw fa-edit"></i></button>
+									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyScenario(s)"><i class="fas fa-fw fa-copy"></i></button>
+									<button class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteScenario(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
+									<button class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveScenario(s,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
+									<button class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveScenario(s,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
 								</td>
 							</tr>
 						</tbody>

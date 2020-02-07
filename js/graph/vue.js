@@ -205,6 +205,10 @@ function createDatabaseTools(database) {
 					}.bind(this)
 				);
 			},
+			moveEvent: function (event, dir) {
+				database.moveEvent(event.id, dir);
+				database.save();
+			},
 			addEvent: function () {
 				this.show = false;
 				let event = database.newEvent();
@@ -249,6 +253,10 @@ function createDatabaseTools(database) {
 						database.save();
 					}.bind(this)
 				);
+			},
+			moveScenario: function (scenario, dir) {
+				database.moveScenario(scenario.id, dir);
+				database.save();
 			},
 			addScenario: function () {
 				this.show = false;

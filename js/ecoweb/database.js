@@ -28,8 +28,6 @@ class Database {
 		}
 
 		this.nodes.sort(this.nodeCompare);
-		this.events.sort(this.eventCompare);
-		this.scenarios.sort(this.scenarioCompare);
 		this.save();
 	}
 
@@ -112,21 +110,23 @@ class Database {
 
 		if (list && Array.isArray(list)) {
 			for (const data of list) {
-				let node = this.newNode();
-				transferObject(data, node);
+				if (isPlainObject(data)) {
+					let node = this.newNode();
+					this.transferObject(data, node);
 
-				// TODO: Possibly remove bad tags and delete incomplete relations
-				node.relations = [];
-				for (let r in data.relations) {
-					this.addRelation(node, data.relations[r].type);
-					transferObject(data.relations[r], node.relations[r]);
+					// TODO: Possibly remove bad tags and delete incomplete relations
+					node.relations = [];
+					for (let r in data.relations) {
+						this.addRelation(node, data.relations[r].type);
+						this.transferObject(data.relations[r], node.relations[r]);
+					}
+
+					if (JSON.stringify(node) !== JSON.stringify(data)) {
+						console.warn("Legacy node data found");
+					}
+
+					this.nodes.push(node);
 				}
-
-				if (JSON.stringify(node) !== JSON.stringify(data)) {
-					console.warn("Legacy node data found");
-				}
-
-				this.nodes.push(node);
 			}
 		}
 	}
@@ -186,11 +186,7 @@ class Database {
 	}
 
 	deleteNode(id, check=true) {
-		for (let i = this.nodes.length-1; i >= 0; i--) {
-			if (this.nodes[i].id == id) {
-				this.nodes.splice(i, 1);
-			}
-		}
+		this.deleteObj(this.nodes, id);
 	}
 
 	nodeCompare(a, b) {
@@ -331,21 +327,23 @@ class Database {
 
 		if (list && Array.isArray(list)) {
 			for (const data of list) {
-				let event = this.newEvent();
-				transferObject(data, event);
+				if (isPlainObject(data)) {
+					let event = this.newEvent();
+					this.transferObject(data, event);
 
-				// TODO: Possibly remove bad tags and delete incomplete effects
-				event.effects = [];
-				for (let r in data.effects) {
-					this.addEffect(event, data.effects[r].type);
-					transferObject(data.effects[r], event.effects[r]);
+					// TODO: Possibly remove bad tags and delete incomplete effects
+					event.effects = [];
+					for (let r in data.effects) {
+						this.addEffect(event, data.effects[r].type);
+						this.transferObject(data.effects[r], event.effects[r]);
+					}
+
+					if (JSON.stringify(event) !== JSON.stringify(data)) {
+						console.warn("Legacy event data found");
+					}
+
+					this.events.push(event);
 				}
-
-				if (JSON.stringify(event) !== JSON.stringify(data)) {
-					console.warn("Legacy event data found");
-				}
-
-				this.events.push(event);
 			}
 		}
 	}
@@ -353,7 +351,6 @@ class Database {
 	addEvent(event) {
 		this.deleteEvent(event.id);
 		this.events.push(event);
-		this.events.sort(this.eventCompare);
 	}
 
 	getEventById(id) {
@@ -375,11 +372,11 @@ class Database {
 	}
 
 	deleteEvent(id) {
-		for (let i = this.events.length-1; i >= 0; i--) {
-			if (this.events[i].id == id) {
-				this.events.splice(i, 1);
-			}
-		}
+		this.deleteObj(this.events, id);
+	}
+
+	moveEvent(id, dir) {
+		this.moveObj(this.events, id, dir);
 	}
 
 	eventCompare(a, b) {
@@ -427,21 +424,23 @@ class Database {
 
 		if (list && Array.isArray(list)) {
 			for (const data of list) {
-				let scenario = this.newScenario();
-				transferObject(data, scenario);
+				if (isPlainObject(data)) {
+					let scenario = this.newScenario();
+					this.transferObject(data, scenario);
 
-				// TODO: Possibly remove bad tags and delete incomplete actors
-				scenario.actors = [];
-				for (let r in data.actors) {
-					this.addActor(scenario, data.actors[r].type);
-					transferObject(data.actors[r], scenario.actors[r]);
+					// TODO: Possibly remove bad tags and delete incomplete actors
+					scenario.actors = [];
+					for (let r in data.actors) {
+						this.addActor(scenario, data.actors[r].type);
+						this.transferObject(data.actors[r], scenario.actors[r]);
+					}
+
+					if (JSON.stringify(scenario) !== JSON.stringify(data)) {
+						console.warn("Legacy scenario data found");
+					}
+
+					this.scenarios.push(scenario);
 				}
-
-				if (JSON.stringify(scenario) !== JSON.stringify(data)) {
-					console.warn("Legacy scenario data found");
-				}
-
-				this.scenarios.push(scenario);
 			}
 		}
 	}
@@ -449,7 +448,6 @@ class Database {
 	addScenario(scenario) {
 		this.deleteScenario(scenario.id);
 		this.scenarios.push(scenario);
-		this.scenarios.sort(this.scenarioCompare);
 	}
 
 	getScenarioById(id) {
@@ -471,11 +469,11 @@ class Database {
 	}
 
 	deleteScenario(id) {
-		for (let i = this.scenarios.length-1; i >= 0; i--) {
-			if (this.scenarios[i].id == id) {
-				this.scenarios.splice(i, 1);
-			}
-		}
+		this.deleteObj(this.scenarios, id);
+	}
+
+	moveScenario(id, dir) {
+		this.moveObj(this.scenarios, id, dir);
 	}
 
 	scenarioCompare(a, b) {
@@ -623,6 +621,45 @@ class Database {
 	loadCustomTags(list) {
 		if (list && Array.isArray(list)) {
 			this.setCustomTags(list);
+		}
+	}
+
+
+	/* General actions */
+
+	deleteObj(objs, id) {
+		for (let i = objs.length-1; i >= 0; i--) {
+			if (objs[i].id == id) {
+				objs.splice(i, 1);
+			}
+		}
+	}
+
+	moveObj(objs, id, dir) {
+		for (let i = objs.length-1; i >= 0; i--) {
+			if (objs[i].id == id && objs[i+dir]) {
+				let min = Math.min(i, i+dir);
+				let max = Math.max(i, i+dir);
+				objs.splice(min, 2, objs[max], objs[min]);
+				return;
+			}
+		}
+	}
+
+	// Recursively copies data where keys match
+	transferObject(data, obj) {
+		if (!isPlainObject(data)) {
+			return;
+		}
+		for (const key in obj) {
+			if (data.hasOwnProperty(key)) {
+				if (isPlainObject(data[key])) {
+					this.transferObject(data[key], obj[key]);
+				}
+				else {
+					obj[key] = data[key];
+				}
+			}
 		}
 	}
 }

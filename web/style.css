@@ -100,3 +100,11 @@ select:invalid { color: #AAAAAA; }
 	border-radius: .25rem 0 50%;
 	font-size: 1.4em;
 }
+
+.list-edit-button {
+	padding: 0.375rem 0.55rem;
+}
+
+.list-edit-button-small {
+	padding: 0.375rem 0.15rem;
+}
