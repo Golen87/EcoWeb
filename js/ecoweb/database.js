@@ -18,7 +18,7 @@ class Database {
 	importJSON(json) {
 		let data = JSON.parse(json);
 
-		if (data) {
+		if (data && isPlainObject(data) && data.version) {
 			this.loadNodes(data["nodes"]);
 			this.loadEvents(data["events"]);
 			this.loadScenarios(data["scenarios"]);
@@ -43,12 +43,11 @@ class Database {
 	}
 
 	load() {
+		this.importJSON(defaultDatabase);
+
 		let localdata = localStorage.getItem("database");
 		if (localdata) {
 			this.importJSON(localdata);
-		}
-		else {
-			this.importJSON(defaultDatabase);
 		}
 	}
 
@@ -223,7 +222,8 @@ class Database {
 
 	addRelation(node, type) {
 		if (!["node", "tags"].includes(type)) {
-			throw "Unknown relation type";
+			console.error("Unknown relation type");
+			return;
 		}
 		node.relations.push({
 			"type": type,
@@ -391,7 +391,8 @@ class Database {
 
 	addEffect(event, type) {
 		if (!["node", "tags"].includes(type)) {
-			throw "Unknown relation type";
+			console.error("Unknown relation type");
+			return;
 		}
 		event.effects.push({
 			"type": type,
