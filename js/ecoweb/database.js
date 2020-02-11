@@ -53,7 +53,7 @@ class Database {
 			this.importJSON(localdata);
 		}
 		else {
-			console.warning("No localdata for database");
+			console.warning("No localdata for database.");
 		}
 	}
 
