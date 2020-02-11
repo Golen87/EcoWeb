@@ -18,13 +18,16 @@ class Database {
 	importJSON(json) {
 		let data = JSON.parse(json);
 
-		if (data) {
+		if (data && isPlainObject(data) && data.version) {
 			this.loadNodes(data["nodes"]);
 			this.loadEvents(data["events"]);
 			this.loadScenarios(data["scenarios"]);
 			this.loadCustomTags(data["tags"]);
 
 			this.updateUniqueId();
+		}
+		else {
+			console.error("Ignore loading old database.");
 		}
 
 		this.nodes.sort(this.nodeCompare);
@@ -43,12 +46,14 @@ class Database {
 	}
 
 	load() {
+		this.importJSON(defaultDatabase);
+
 		let localdata = localStorage.getItem("database");
 		if (localdata) {
 			this.importJSON(localdata);
 		}
 		else {
-			this.importJSON(defaultDatabase);
+			console.warning("No localdata for database");
 		}
 	}
 
@@ -223,7 +228,8 @@ class Database {
 
 	addRelation(node, type) {
 		if (!["node", "tags"].includes(type)) {
-			throw "Unknown relation type";
+			console.error("Unknown relation type");
+			return;
 		}
 		node.relations.push({
 			"type": type,
@@ -391,7 +397,8 @@ class Database {
 
 	addEffect(event, type) {
 		if (!["node", "tags"].includes(type)) {
-			throw "Unknown relation type";
+			console.error("Unknown relation type");
+			return;
 		}
 		event.effects.push({
 			"type": type,
