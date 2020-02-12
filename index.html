@@ -713,7 +713,7 @@
 								<h4 class="col-12">Affected by</h4>
 								<p v-if="incoming_relations.length == 0" class="col-12">None</p>
 								<div v-for="r in incoming_relations" class="col-6 text-left pb-1 px-1">
-									{{ r.relation.interaction }} by
+									<small>{{ r.relation.interaction }} by</small>
 									<img
 										v-bind:src="getImage(r.node.image)"
 										class="img-thumbnail p-0 rounded-circle"
