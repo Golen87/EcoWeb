@@ -31,7 +31,6 @@ class Database {
 		}
 
 		this.nodes.sort(this.nodeCompare);
-		this.save();
 	}
 
 	exportJSON(prettyprint=false) {
@@ -55,6 +54,8 @@ class Database {
 		else {
 			console.warning("No localdata for database.");
 		}
+
+		this.save();
 	}
 
 	save() {
@@ -154,7 +155,7 @@ class Database {
 	getNodesByTags(tags) {
 		let result = [];
 		for (const node of this.nodes) {
-			if (this.hasTags(node)) {
+			if (this.hasTags(node, tags)) {
 				result.push(node);
 			}
 		}
