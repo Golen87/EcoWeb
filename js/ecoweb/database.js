@@ -28,9 +28,11 @@ class Database {
 		}
 		else {
 			console.error("Ignore loading old database.");
+			return false;
 		}
 
 		this.nodes.sort(this.nodeCompare);
+		return true;
 	}
 
 	exportJSON(prettyprint=false) {
@@ -45,14 +47,15 @@ class Database {
 	}
 
 	load() {
-		this.importJSON(defaultDatabase);
-
+		let success = false;
 		let localdata = localStorage.getItem("database");
 		if (localdata) {
-			this.importJSON(localdata);
+			success = this.importJSON(localdata);
 		}
-		else {
-			console.warning("No localdata for database.");
+
+		if (!success) {
+			console.log("Loading default database");
+			this.importJSON(defaultDatabase);
 		}
 
 		this.save();
@@ -122,13 +125,13 @@ class Database {
 
 					// TODO: Possibly remove bad tags and delete incomplete relations
 					node.relations = [];
-					for (let r in data.relations) {
+					for (const r in data.relations) {
 						this.addRelation(node, data.relations[r].type);
 						this.transferObject(data.relations[r], node.relations[r]);
 					}
 
 					if (JSON.stringify(node) !== JSON.stringify(data)) {
-						console.warn("Legacy node data found");
+						console.warn("Legacy node data updated");
 					}
 
 					this.nodes.push(node);
@@ -149,7 +152,8 @@ class Database {
 				return node;
 			}
 		}
-		throw "Could not find node with id '" + id + "'"
+		console.error("Could not find node with id '" + id + "'");
+		return this.newNode();
 	}
 
 	getNodesByTags(tags) {
@@ -340,13 +344,13 @@ class Database {
 
 					// TODO: Possibly remove bad tags and delete incomplete effects
 					event.effects = [];
-					for (let r in data.effects) {
+					for (const r in data.effects) {
 						this.addEffect(event, data.effects[r].type);
 						this.transferObject(data.effects[r], event.effects[r]);
 					}
 
 					if (JSON.stringify(event) !== JSON.stringify(data)) {
-						console.warn("Legacy event data found");
+						console.warn("Legacy event data updated");
 					}
 
 					this.events.push(event);
@@ -366,7 +370,8 @@ class Database {
 				return event;
 			}
 		}
-		throw "Could not find event with id '" + id + "'"
+		console.error("Could not find event with id '" + id + "'");
+		return this.newEvent();
 	}
 
 	cloneEvent(id) {
@@ -401,12 +406,14 @@ class Database {
 			console.error("Unknown relation type");
 			return;
 		}
-		event.effects.push({
+		let effect = {
 			"type": type,
 			"node_id": -1,
 			"tags": [],
 			"something": 0
-		});
+		};
+		event.effects.push(effect);
+		return effect;
 	}
 
 	deleteEffect(event, index) {
@@ -438,13 +445,13 @@ class Database {
 
 					// TODO: Possibly remove bad tags and delete incomplete actors
 					scenario.actors = [];
-					for (let r in data.actors) {
-						this.addActor(scenario, data.actors[r].type);
+					for (const r in data.actors) {
+						this.addActor(scenario);
 						this.transferObject(data.actors[r], scenario.actors[r]);
 					}
 
 					if (JSON.stringify(scenario) !== JSON.stringify(data)) {
-						console.warn("Legacy scenario data found");
+						console.warn("Legacy scenario data updated");
 					}
 
 					this.scenarios.push(scenario);
@@ -464,7 +471,8 @@ class Database {
 				return scenario;
 			}
 		}
-		throw "Could not find scenario with id '" + id + "'"
+		console.error("Could not find scenario with id '" + id + "'");
+		return this.newScenario();
 	}
 
 	cloneScenario(id) {
@@ -495,10 +503,31 @@ class Database {
 	}
 
 	addActor(scenario) {
-		scenario.actors.push({
+		let actor = {
 			"node_id": -1,
-			"population": 1,
-		});
+			"population": 0.1,
+		};
+		scenario.actors.push(actor);
+		return actor;
+	}
+
+	setActors(scenario, nodeList) {
+		// Save old data
+		let data = {};
+		for (const i in scenario.actors) {
+			let actor = scenario.actors[i];
+			data[actor.node_id] = actor;
+		}
+		scenario.actors.splice(0, scenario.actors.length);
+
+		// Add new actors from list in order
+		for (const node of this.nodes) {
+			if (nodeList.includes(node.id)) {
+				let actor = this.addActor(scenario);
+				this.transferObject(data[node.id], actor);
+				actor.node_id = node.id;
+			}
+		}
 	}
 
 	deleteActor(scenario, index) {
@@ -588,7 +617,7 @@ class Database {
 				this.customTags.push(tag);
 			}
 
-			for (let warning of warnings) {
+			for (const warning of warnings) {
 				console.warn(warning.tag, warning.text, warning.name);
 			}
 		}

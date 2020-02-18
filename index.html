@@ -971,7 +971,12 @@
 								<hr v-if="tag_warnings.length > 0">
 								<ul>
 									<div v-for="tag in parsed_tags">
-										<li v-if="tag">{{tag}}</li>
+										<li v-if="tag">
+											{{ tag }}
+											<button type="button" class="btn btn-warning btn-sm" style="padding: 0 0.25rem; float: right;" v-on:click="selectNodes(tag)">
+												nodes <span class="badge badge-light">{{ getNodeCountByTag(tag) }}</span>
+											</button>
+										</li>
 										<hr v-else>
 									</div>
 								</ul>
@@ -1006,6 +1011,36 @@
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" v-on:click="deny()">{{ denyText }}</button>
 						<button type="button" class="btn" v-bind:class="{ 'btn-primary': type == 'save', 'btn-danger': type == 'delete' }" v-on:click="accept()">{{ acceptText }}</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Node Selector Modal -->
+		<div class="modal fade" id="nodeSelectorModal" tabindex="-1" role="dialog" aria-labelledby="nodeSelectorModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="nodeSelectorModalLabel" v-html="titleText"></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body row">
+						<ul v-for="node in all_nodes" class="list-group col-12 col-sm-6 col-lg-4" style="padding: 0.1rem;">
+							<li class="list-group-item list-group-item-action" v-bind:class="{ 'active': selected[node.id] }" style="text-align: left; padding: 0.75rem; cursor: pointer; white-space: nowrap; overflow: hidden;" v-on:click="selected[node.id] = !selected[node.id]">
+								<img
+									v-bind:src="getImage(node.image)"
+									class="img-thumbnail p-0 rounded-circle"
+									style="border: none; height: 40px;"
+									v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + node.color }"
+									v-bind:title="node.name">
+								<span class="align-middle">{{ node.name }}</span>
+							</li>
+						</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" v-on:click="accept()">OK</button>
 					</div>
 				</div>
 			</div>
