@@ -32,9 +32,13 @@ class EcoWeb {
 	startScenario(i) {
 		this.activeEvents = [];
 
-		web.build(this.scenarios[i]());
+		let scenario = new Scenario(window.database.scenarios[i]);
+		web.build(scenario.species);
+		this.maxTime = scenario.maxTime;
+		//web.build(this.scenarios[i]());
+
 		web.initWiggle();
-		web.stabilize();
+		//web.stabilize();
 		web.solve(this.maxTime);
 		updateChart();
 
@@ -524,5 +528,6 @@ function initWeb() {
 	//web.initWiggle();
 	//web.solve(100);
 
-	let database = new Database();
+	// Global
+	window.database = new Database();
 }

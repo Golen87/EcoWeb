@@ -7,10 +7,16 @@ class WorldScene extends Phaser.Scene {
 		let bg = this.add.image(this.CX, this.CY, 'bg_3');
 		this.fitToScreen(bg);
 
-		for (let i = 0; i < web.scenarios.length; i++) {
+		let title = this.add.text(this.CX, 0.13*this.H, "Nivåer", {
+			font: "30px 'Crete Round'"
+		});
+		title.setOrigin(0.5);
+
+		for (let i in window.database.scenarios) {
+			let scenario = database.scenarios[i];
 			let y = 140 + i * 90;
 
-			this.button = new PauseButton(this, this.CX, y, 'Level ' + (i+1), () => {
+			this.button = new PauseButton(this, this.CX, y, scenario.name, () => {
 				web.startScenario(i);
 				this.soundSwoosh.play();
 				this.scene.start("LevelScene");

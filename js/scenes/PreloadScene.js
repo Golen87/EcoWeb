@@ -117,6 +117,7 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
+		web.startScenario(0);
 		//this.scene.start("LevelScene");
 		this.scene.start("TitleScene");
 	}

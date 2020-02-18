@@ -7,7 +7,7 @@ class LevelScene extends Phaser.Scene {
 			'trad': [0.4808, 1.0],
 			'rodrav': [0.6571, 0.0],
 			'lo': [0.3971, 0.0],
-			'hare': [0.2724, 0.5],
+			'skogshare': [0.2724, 0.5],
 			'gras': [0.25, 1.0],
 			'koltrast': [0.7981, 0.5],
 			'orter': [0.0192, 1.0],
