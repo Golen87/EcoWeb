@@ -445,6 +445,7 @@ function createDatabaseTools(database) {
 			//	return getTextFromValue(NODE_IMAGES, this.scenario.image);
 			//},
 			all_nodes: function () { return database.nodes; },
+			all_visibility: function () { return ACTOR_VISIBILITY; },
 			form_changed: function () { return JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
 		},
 		methods: {

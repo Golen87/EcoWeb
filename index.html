@@ -889,39 +889,43 @@
 					<div class="input-fields col-md-9 col-lg-8 col-xl-6" style="display: flex; flex-direction: column;">
 
 						<!-- Actors list -->
-						<div style="overflow-y: auto;">
-							<div class="card bg-light mb-1" v-for="(actor, index) in scenario.actors">
-								<div class="card-body">
+						<div class="editor-full-list">
+							<table class="table">
+								<tbody>
+									<tr v-for="(actor, index) in scenario.actors">
+									<!-- <tr > -->
+										<!-- <th class="align-middle">{{ s.name }}</th> -->
+										<td class="align-middle" style="width: 1%;">
+											<img
+												v-bind:src="getNodeImage(actor)"
+												class="img-thumbnail p-0 rounded-circle"
+												style="border: none; max-width: 40px; max-height: 40px;"
+												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getNodeColor(actor) }"
+												v-bind:title="getNodeName(actor)">
+										</td>
 
-									<!-- Node -->
-									<div class="form-group row">
-										<label class="col-sm-4 col-form-label">Node</label>
-										<div class="col-sm-8">
-											<select v-model="actor.node_id" class="form-control" required>
-												<option value="" disabled hidden>Select a node...</option>
-												<option v-for="option in all_nodes" v-bind:value="option.id">{{ option.name }}</option>
-											</select>
-										</div>
-									</div>
+										<!-- Population -->
+										<td class="align-middle">
+											<div class="input-group input-lg">
+												<input v-model.number="actor.population" type="number" class="form-control" min="0" max="1" step="0.01" required>
+												<div class="input-group-append">
+													<div class="input-group-text">pop.</div>
+												</div>
+											</div>
+										</td>
 
-									<!-- Population -->
-									<div class="form-group row">
-										<label class="col-sm-4 col-form-label">Population</label>
-										<div class="col-sm-8 input-group">
-											<input v-model.number="actor.population" type="number" class="form-control" min="0" max="1" step="0.01" required>
-										</div>
-									</div>
-
-									<!-- Delete button -->
-									<input type="button" class="corner-close-button btn btn-danger" value="&#10005;" v-on:click="deleteActor(index)">
-
-								</div>
-							</div>
-						</div>
-
-						<div class="row no-gutters d-flex justify-content-end">
-							<hr class="col-12">
-							<input type="button" class="btn btn-primary mr-1" value="Add actor" v-on:click="addActor()">
+										<!-- Visibility -->
+										<td class="align-middle">
+											<div class="" style="display: flex; justify-content: center; align-items: center;">
+												<select v-model="actor.visibility" class="form-control" required>
+													<option value="" disabled hidden>Select tags...</option>
+													<option v-for="option in all_visibility" v-bind:value="option.value">{{ option.text }}</option>
+												</select>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 
 					</div>
@@ -940,8 +944,16 @@
 				<!-- Save/Back buttons -->
 				<div class="row no-gutters d-flex justify-content-end">
 					<hr class="col-12">
-					<input type="button" class="btn btn-secondary mr-2" value="Back" v-on:click="cancel()">
-					<input type="submit" class="btn" :disabled="!form_changed" v-bind:class="{ 'btn-primary': form_changed, 'btn-secondary': !form_changed }" value="Save">
+					<div>
+						<input type="button" class="btn btn-primary mr-1" value="Select nodes" v-on:click="openNodeSelector()">
+						<input type="button" class="btn btn-primary" value="Select events" v-on:click="openEventSelector()">
+					</div>
+					<div style="flex-grow: 1;"></div>
+					<div>
+						<input type="button" class="btn btn-secondary mr-1" value="Back" v-on:click="cancel()">
+						<input type="submit" class="btn mr-1" :disabled="!form_changed" v-bind:class="{ 'btn-primary': form_changed, 'btn-secondary': !form_changed }" value="Save">
+						<input type="button" class="btn btn-warning" value="Run" v-on:click="run()">
+					</div>
 				</div>
 			</form>
 

@@ -67,6 +67,12 @@ const RELATION_INTERACTIONS = [
 	{ value: "neutralism",		text: "(o,o) Neutralism" },
 ];
 
+const ACTOR_VISIBILITY = [
+	{ value: "explored",	text: "Explored" },
+	{ value: "unexplored",	text: "Unexplored" },
+	{ value: "hidden",		text: "Hidden" },
+];
+
 
 const NODE_TYPES_VALUES = NODE_TYPES.map((x) => {return x.value;});
 const NODE_IMAGES_VALUES = NODE_IMAGES.map((x) => {return x.value;});
@@ -74,6 +80,7 @@ const ANIMAL_FOODS_VALUES = ANIMAL_FOODS.map((x) => {return x.value;});
 const ANIMAL_SIZES_VALUES = ANIMAL_SIZES.map((x) => {return x.value;});
 const ABIOTIC_CATEGORIES_VALUES = ABIOTIC_CATEGORIES.map((x) => {return x.value;});
 const RELATION_INTERACTIONS_VALUES = RELATION_INTERACTIONS.map((x) => {return x.value;});
+const ACTOR_VISIBILITY_VALUES = ACTOR_VISIBILITY.map((x) => {return x.value;});
 
 function getTextFromValue(dataset, value) {
 	for (const data of dataset) {

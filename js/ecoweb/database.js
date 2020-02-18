@@ -506,6 +506,7 @@ class Database {
 		let actor = {
 			"node_id": -1,
 			"population": 0.1,
+			"visibility": ACTOR_VISIBILITY[0].value,
 		};
 		scenario.actors.push(actor);
 		return actor;
