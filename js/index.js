@@ -1,13 +1,12 @@
 var config = {
-	type: Phaser.AUTO,
+	type: Phaser.WEBGL,
 	width: 800,
 	height: 600,
 	parent: 'game',
-	//scale: {
-	//	width: "100%",
-	//	height: "100%",
-	//	mode: Phaser.Scale.ScaleModes.FIT
-	//},
+	scale: {
+		mode: Phaser.Scale.FIT
+		//mode: Phaser.Scale.RESIZE
+	},
 	physics: {
 		default: 'arcade',
 		arcade: {

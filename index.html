@@ -5,6 +5,7 @@
 		<meta charset="utf-8">
 
 		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
 		<meta name="author" content="Måns Gezelius">
 		<meta name="description" content="Project description.">
@@ -25,7 +26,7 @@
 		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 		<!-- Font Awesome -->
-		<script defer src="https://use.fontawesome.com/releases/v5.0.10/js/all.js" integrity="sha384-slN8GvtUJGnv6ca26v8EzVaR9DC58QEwsIk9q1QXdCU8Yu8ck/tL/5szYlBbqmS+" crossorigin="anonymous"></script>
+		<script defer src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/js/all.min.js"></script>
 
 		<!-- Styles and fonts -->
 		<link href="web/style.css" type="text/css" rel="stylesheet" />
@@ -95,7 +96,7 @@
 		<!-- Graph -->
 		<div class="d-flex flex-wrap justify-content-center p-2 mt-4" style="background: rgba(0,0,255,0.0);">
 
-			<div class="" style="flex-grow: 1; flex-basis: 0; min-width: 600px;">
+			<div id="myChartWrapper">
 				<div style="background: white;">
 					<canvas id="myChart"></canvas>
 				</div>
@@ -252,7 +253,7 @@
 
 
 		<!-- Database editor -->
-		<div class="container card-body bg-light mx-auto justify-content-center my-3" style="height: 800px;">
+		<div id="databaseWrapper" class="container card-body bg-light mx-auto justify-content-center my-3">
 
 			<!-- Main menu -->
 			<div id="databaseEditor" class="editor-container" v-show="show" v-cloak>
@@ -653,7 +654,7 @@
 									<div class="col-sm-8 input-group">
 										<input v-model.number="relation.preference" type="number" class="form-control" min="0" step="1" required>
 										<div class="input-group-append">
-											<span class="input-group-text" id="basic-addon2">{{ getPreference(relation) }}</span>
+											<span class="input-group-text">{{ getPreference(relation) }}</span>
 										</div>
 									</div>
 								</div>
@@ -865,9 +866,8 @@
 				<!-- Scenario input section -->
 				<div class="input-section">
 
-					<!-- Input fields -->
-					<div class="input-fields col-md-9 col-lg-8 col-xl-6" style="display: flex; flex-direction: column;">
-
+					<!-- Input fields left -->
+					<div class="input-fields col-md-3 col-lg-4 col-xl-6" style="display: flex; flex-direction: column;">
 						<!-- Name -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
@@ -879,12 +879,14 @@
 						<!-- Time -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Time</label>
-							<div class="col-sm-8 input-group">
+							<div class="col-sm-8">
 								<input v-model.number="scenario.time" type="number" class="form-control" min="0" step="1" max="1000" required>
 							</div>
 						</div>
+					</div>
 
-						<hr>
+					<!-- Input fields right -->
+					<div class="input-fields col-md-9 col-lg-8 col-xl-6" style="display: flex; flex-direction: column;">
 
 						<!-- Actors list -->
 						<div style="overflow-y: auto;">
@@ -954,7 +956,7 @@
 					<!-- Tag list -->
 					<div class="input-fields col-md-6 col-lg-6 col-xl-6">
 
-						<textarea v-model="tags" class="form-control" style="height: 100%; resize: none;"></textarea>
+						<textarea v-model="tags" class="form-control" style="min-height: 300px; height: 100%; resize: none;"></textarea>
 
 					</div>
 
@@ -988,7 +990,7 @@
 		</div>
 
 
-		<!-- Modal -->
+		<!-- Warning Modal -->
 		<div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered" role="document">
 				<div class="modal-content">
