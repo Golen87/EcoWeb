@@ -129,11 +129,11 @@
 									v-model.number="duration"
 									v-on:change="updateDuration($event)"/>
 							</div>
-							<button type="button" class="btn btn-secondary"
+							<!-- <button type="button" class="btn btn-secondary"
 								title="Apply slight randomness to all interaction values"
 								v-on:click="wiggle">
 								Wiggle
-							</button>
+							</button> -->
 							<button type="button" class="btn btn-secondary"
 								title="Skip in time to where populations have stabilized"
 								v-on:click="stabilize">
@@ -144,12 +144,12 @@
 								v-on:click="reset">
 								Reset
 							</button>
-							<hr>
+							<!-- <hr>
 							<button v-for="scenario,i in scenarios" type="button" class="btn btn-secondary"
 								v-bind:title="'Start scenario ' + i"
 								v-on:click="startScenario(i)">
 								Scenario {{i}}
-							</button>
+							</button> -->
 						</div>
 					</div>
 				</div>

@@ -14,20 +14,20 @@ function createGraphTools() {
 			}
 		},
 		methods: {
-			wiggle(event) {
-				web.initWiggle();
-				this.updateGraph();
-			},
+			//wiggle(event) {
+			//	web.initWiggle();
+			//	this.updateGraph();
+			//},
 			stabilize(event) {
 				web.stabilize();
 				this.updateGraph();
 			},
 			reset(event) {
-				this.updateGraph();
+				web.restart();
 			},
-			startScenario(id) {
-				web.startScenario(id);
-			},
+			// startScenario(id) {
+			// 	web.startScenario(id);
+			// },
 			updateValue(event, s, key) {
 				s[key] = parseFloat(event.target.value);
 				this.updateGraph();

@@ -30,6 +30,7 @@ class EcoWeb {
 	}
 
 	startScenario(i) {
+		this.currentScenarioIndex = i;
 		this.activeEvents = [];
 
 		let scenario = new Scenario(window.database.scenarios[i]);
@@ -47,6 +48,10 @@ class EcoWeb {
 		}
 		this.vue.species = this.species;
 		this.vue.scenarios = this.scenarios;
+	}
+
+	restart() {
+		this.startScenario(this.currentScenarioIndex);
 	}
 
 	getSpeciesIndex(name) {
