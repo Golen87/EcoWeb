@@ -1,8 +1,9 @@
 const NODE_TYPES = [
-	{ value: "animal",	text: "Animal" },
-	{ value: "plant",	text: "Plant" },
-	{ value: "fungi",	text: "Fungi" },
-	{ value: "abiotic",	text: "Abiotic" },
+	{ value: "animal",	text: "Consumer (animal)" },
+	{ value: "plant",	text: "Producer (plant)" },
+	{ value: "fungi",	text: "Decomposer (detrivore)" },
+	{ value: "abiotic",	text: "Abiotic (non-living)" },
+	{ value: "service",	text: "Ecosystem services" },
 ];
 
 const NODE_IMAGES = [
@@ -48,12 +49,11 @@ const ANIMAL_SIZES = [
 	{ value: "gigantic",		text: "Gigantic (>5 000 kg)" },
 ];
 
-const ABIOTIC_CATEGORIES = [
+const SERVICE_CATEGORIES = [
 	{ value: "support",		text: "Support" },
 	{ value: "provision",	text: "Provision" },
 	{ value: "regulation",	text: "Regulation" },
 	{ value: "culture",		text: "Culture" },
-	{ value: "harmful",		text: "Harmful" },
 ];
 
 const RELATION_INTERACTIONS = [
@@ -73,14 +73,18 @@ const ACTOR_VISIBILITY = [
 	{ value: "hidden",		text: "Hidden" },
 ];
 
+const ACTION_TYPE = [
+	{ value: "player",		text: "Purchasable" },
+	{ value: "automatic",	text: "Automatic" },
+];
+
 
 const NODE_TYPES_VALUES = NODE_TYPES.map((x) => {return x.value;});
 const NODE_IMAGES_VALUES = NODE_IMAGES.map((x) => {return x.value;});
 const ANIMAL_FOODS_VALUES = ANIMAL_FOODS.map((x) => {return x.value;});
 const ANIMAL_SIZES_VALUES = ANIMAL_SIZES.map((x) => {return x.value;});
-const ABIOTIC_CATEGORIES_VALUES = ABIOTIC_CATEGORIES.map((x) => {return x.value;});
-const RELATION_INTERACTIONS_VALUES = RELATION_INTERACTIONS.map((x) => {return x.value;});
-const ACTOR_VISIBILITY_VALUES = ACTOR_VISIBILITY.map((x) => {return x.value;});
+const SERVICE_CATEGORIES_VALUES = SERVICE_CATEGORIES.map((x) => {return x.value;});
+
 
 function getTextFromValue(dataset, value) {
 	for (const data of dataset) {

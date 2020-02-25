@@ -300,7 +300,7 @@ function createDatabaseTools(database) {
 			animal_foods: function () { return ANIMAL_FOODS; },
 			animal_sizes: function () { return ANIMAL_SIZES; },
 			node_images: function () { return NODE_IMAGES; },
-			abiotic_categories: function () { return ABIOTIC_CATEGORIES; },
+			service_categories: function () { return SERVICE_CATEGORIES; },
 			relation_interactions: function () { return RELATION_INTERACTIONS; },
 			form_changed: function () { return JSON.stringify(this.node) !== JSON.stringify(this.original); },
 		},
@@ -389,7 +389,6 @@ function createDatabaseTools(database) {
 			all_events: function () { return database.events; },
 			custom_tags: function () { return database.getCustomTags(); },
 			all_tags: function () { return database.getAllTags(database.getCustomTags()); },
-			abiotic_categories: function () { return ABIOTIC_CATEGORIES; },
 			node_images: function () { return NODE_IMAGES; },
 			form_changed: function () { return JSON.stringify(this.event) !== JSON.stringify(this.original); },
 		},
@@ -445,7 +444,8 @@ function createDatabaseTools(database) {
 			//	return getTextFromValue(NODE_IMAGES, this.scenario.image);
 			//},
 			all_nodes: function () { return database.nodes; },
-			all_visibility: function () { return ACTOR_VISIBILITY; },
+			all_actor_visibility: function () { return ACTOR_VISIBILITY; },
+			all_action_types: function () { return ACTION_TYPE; },
 			form_changed: function () { return JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
 		},
 		methods: {
@@ -486,12 +486,28 @@ function createDatabaseTools(database) {
 				}
 				nodeSelectorModal.show(
 					"Select nodes",
+					database.nodes,
 					idList,
 					this.setActors.bind(this)
 				);
 			},
+			openEventSelector: function () {
+				let idList = [];
+				for (const action of this.scenario.actions) {
+					idList.push(action.node_id);
+				}
+				nodeSelectorModal.show(
+					"Select events",
+					database.events,
+					idList,
+					this.setActions.bind(this)
+				);
+			},
 			setActors(idList) {
 				database.setActors(this.scenario, idList);
+			},
+			setActions(idList) {
+				database.setActions(this.scenario, idList);
 			},
 			run: function () {
 				$(this.$el).find(":submit").click();
@@ -511,6 +527,16 @@ function createDatabaseTools(database) {
 			},
 			getNodeName: function (actor) {
 				return database.getNodeById(actor.node_id).name;
+			},
+			getEventImage: function (actor) {
+				let image = database.getEventById(actor.event_id).image;
+				return getTextFromValue(NODE_IMAGES, image);
+			},
+			getEventColor: function (actor) {
+				return database.getEventById(actor.event_id).color;
+			},
+			getEventName: function (actor) {
+				return database.getEventById(actor.event_id).name;
 			},
 		},
 	});
@@ -604,6 +630,7 @@ function createDatabaseTools(database) {
 
 				nodeSelectorModal.show(
 					"Select nodes for tag <b>" + tag + "</b>",
+					database.nodes,
 					idList,
 					this.setTagToNodes.bind(this, tag)
 				);
@@ -666,21 +693,20 @@ function createDatabaseTools(database) {
 		el: "#nodeSelectorModal",
 		data: {
 			selected: {},
+			allNodes: [],
 			titleText: null,
 			bodyText: "Body",
 			acceptText: "Accept",
 			denyText: "Deny",
 			callback: null,
 		},
-		computed: {
-			all_nodes: function () { return database.nodes; },
-		},
 		methods: {
-			show: function (titleText, nodeList=[], callback=null) {
+			show: function (titleText, allNodes, nodeList=[], callback=null) {
 				this.titleText = titleText;
+				this.allNodes = allNodes;
 				this.callback = callback;
 
-				for (const node of this.all_nodes) {
+				for (const node of this.allNodes) {
 					Vue.set(this.selected, node.id, nodeList.includes(node.id));
 				}
 

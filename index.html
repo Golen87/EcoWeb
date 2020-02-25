@@ -310,7 +310,7 @@
 								</td>
 								<th class="align-middle">{{ s.name }}</th>
 								<!--td class="align-middle d-none d-md-table-cell">{{ s.id }}</td-->
-								<td class="align-middle d-none d-lg-table-cell">{{ s.type }} &ndash; {{ s.animal.food }}</td>
+								<td class="align-middle d-none d-lg-table-cell">{{ s.type }} &ndash; {{ s.animal.food || s.service.category }}</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
 									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editNode(s)"><i class="fas fa-fw fa-edit"></i></button>
 									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyNode(s)"><i class="fas fa-fw fa-copy"></i></button>
@@ -556,15 +556,15 @@
 							</div>
 						</div>
 
-						<!-- Abiotic parameters -->
-						<div v-if="node.type == 'abiotic'">
+						<!-- Service parameters -->
+						<div v-if="node.type == 'service'">
 
 							<!-- Size -->
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Category</label>
 								<div class="col-sm-8">
-									<select v-model="node.abiotic.category" class="form-control" required>
-										<option v-for="option in abiotic_categories" v-bind:value="option.value">{{ option.text }}</option>
+									<select v-model="node.service.category" class="form-control" required>
+										<option v-for="option in service_categories" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
 							</div>
@@ -776,16 +776,6 @@
 							</div>
 						</div>
 
-						<!-- Category -->
-						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Category</label>
-							<div class="col-sm-8">
-								<select v-model="event.category" class="form-control" required>
-									<option v-for="option in abiotic_categories" v-bind:value="option.value">{{ option.text }}</option>
-								</select>
-							</div>
-						</div>
-
 						<hr>
 
 						<!-- Effects list -->
@@ -884,6 +874,73 @@
 								<input v-model.number="scenario.time" type="number" class="form-control" min="0" step="1" max="1000" required>
 							</div>
 						</div>
+
+						<!-- Budget -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Budget</label>
+							<div class="col-sm-8">
+								<input v-model.number="scenario.budget" type="number" class="form-control" min="0" step="1" max="1000" required>
+							</div>
+						</div>
+
+						<!-- Description -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Description</label>
+							<div class="col-sm-8">
+								<textarea v-model="scenario.description" class="form-control" rows="3"></textarea>
+							</div>
+						</div>
+
+						<hr>
+
+						<!-- Actions list -->
+						<div class="editor-full-list">
+							<table class="table">
+								<tbody>
+									<tr v-for="(action, index) in scenario.actions">
+										<!-- Image -->
+										<td class="align-middle" style="width: 1%;">
+											<img
+												v-bind:src="getEventImage(action)"
+												class="img-thumbnail p-0 rounded-circle"
+												style="border: none; max-width: 40px; max-height: 40px;"
+												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getEventColor(action) }"
+												v-bind:title="getEventName(action)">
+										</td>
+
+										<!-- Type -->
+										<td class="align-middle">
+											<div class="" style="display: flex; justify-content: center; align-items: center;">
+												<select v-model="action.type" class="form-control" required>
+													<option value="" disabled hidden>Select tags...</option>
+													<option v-for="option in all_action_types" v-bind:value="option.value">{{ option.text }}</option>
+												</select>
+											</div>
+										</td>
+
+										<!-- Cost -->
+										<td v-if="action.type == 'player'" class="align-middle">
+											<div class="input-group input-lg">
+												<input v-model.number="action.cost" type="number" class="form-control" min="0" max="1" step="0.01" required>
+												<div class="input-group-append">
+													<div class="input-group-text">cost</div>
+												</div>
+											</div>
+										</td>
+
+										<!-- Time -->
+										<td v-if="action.type == 'automatic'" class="align-middle">
+											<div class="input-group input-lg">
+												<input v-model.number="action.time" type="number" class="form-control" min="0" max="1" step="0.01" required>
+												<div class="input-group-append">
+													<div class="input-group-text">time</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 
 					<!-- Input fields right -->
@@ -894,8 +951,7 @@
 							<table class="table">
 								<tbody>
 									<tr v-for="(actor, index) in scenario.actors">
-									<!-- <tr > -->
-										<!-- <th class="align-middle">{{ s.name }}</th> -->
+										<!-- Image -->
 										<td class="align-middle" style="width: 1%;">
 											<img
 												v-bind:src="getNodeImage(actor)"
@@ -920,7 +976,7 @@
 											<div class="" style="display: flex; justify-content: center; align-items: center;">
 												<select v-model="actor.visibility" class="form-control" required>
 													<option value="" disabled hidden>Select tags...</option>
-													<option v-for="option in all_visibility" v-bind:value="option.value">{{ option.text }}</option>
+													<option v-for="option in all_actor_visibility" v-bind:value="option.value">{{ option.text }}</option>
 												</select>
 											</div>
 										</td>
@@ -932,22 +988,12 @@
 					</div>
 				</div>
 
-				<!-- Scenario image -->
-				<!-- <div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
-					<img
-						v-bind:src="imagesrc"
-						class="img-thumbnail p-0 rounded-circle d-none d-md-block"
-						style="border: none"
-						v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + scenario.color }"
-						v-bind:title="scenario.name">
-				</div> -->
-
 				<!-- Save/Back buttons -->
 				<div class="row no-gutters d-flex justify-content-end">
 					<hr class="col-12">
 					<div>
-						<input type="button" class="btn btn-primary mr-1" value="Select nodes" v-on:click="openNodeSelector()">
-						<input type="button" class="btn btn-primary" value="Select events" v-on:click="openEventSelector()">
+						<input type="button" class="btn btn-primary mr-1" value="Select events" v-on:click="openEventSelector()">
+						<input type="button" class="btn btn-primary" value="Select nodes" v-on:click="openNodeSelector()">
 					</div>
 					<div style="flex-grow: 1;"></div>
 					<div>
@@ -1040,7 +1086,7 @@
 						</button>
 					</div>
 					<div class="modal-body row">
-						<ul v-for="node in all_nodes" class="list-group col-12 col-sm-6 col-lg-4" style="padding: 0.1rem;">
+						<ul v-for="node in allNodes" class="list-group col-12 col-sm-6 col-lg-4" style="padding: 0.1rem;">
 							<li class="list-group-item list-group-item-action" v-bind:class="{ 'active': selected[node.id] }" style="text-align: left; padding: 0.75rem; cursor: pointer; white-space: nowrap; overflow: hidden;" v-on:click="selected[node.id] = !selected[node.id]">
 								<img
 									v-bind:src="getImage(node.image)"

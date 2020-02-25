@@ -107,6 +107,8 @@ class Database {
 				"size": null
 			},
 			"abiotic": {
+			},
+			"service": {
 				"category": null
 			},
 			"notes": "",
@@ -175,8 +177,8 @@ class Database {
 			myTags.push("Animal Diet: " + getTextFromValue(ANIMAL_FOODS, node.animal.food));
 		if (node.animal.size)
 			myTags.push("Animal Size: " + getTextFromValue(ANIMAL_SIZES, node.animal.size));
-		if (node.abiotic.category)
-			myTags.push("Abiotic Category: " + getTextFromValue(ABIOTIC_CATEGORIES, node.abiotic.category));
+		if (node.service.category)
+			myTags.push("Service Category: " + getTextFromValue(SERVICE_CATEGORIES, node.service.category));
 
 		for (const tag of otherTags) {
 			if (!myTags.includes(tag)) {
@@ -219,6 +221,14 @@ class Database {
 				return -1;
 			}
 			if (a.animal.weight < b.animal.weight) {
+				return 1;
+			}
+		}
+		if (a.type == "service") {
+			if (SERVICE_CATEGORIES_VALUES.indexOf(a.service.category) < SERVICE_CATEGORIES_VALUES.indexOf(b.service.category)) {
+				return -1;
+			}
+			if (SERVICE_CATEGORIES_VALUES.indexOf(a.service.category) > SERVICE_CATEGORIES_VALUES.indexOf(b.service.category)) {
 				return 1;
 			}
 		}
@@ -328,7 +338,6 @@ class Database {
 			"name": null,
 			"description": null,
 			"image": "missing",
-			"category": null,
 			"effects": []
 		};
 	}
@@ -428,9 +437,10 @@ class Database {
 			"id": this.getUniqueId(),
 			"name": null,
 			"time": 100,
+			"budget": 100,
+			"description": "",
 			"actors": [],
-			"events": [],
-			//"notes": null
+			"actions": [],
 		};
 	}
 
@@ -502,6 +512,7 @@ class Database {
 		return 0;
 	}
 
+	// Actor: node in a scenario
 	addActor(scenario) {
 		let actor = {
 			"node_id": -1,
@@ -531,8 +542,35 @@ class Database {
 		}
 	}
 
-	deleteActor(scenario, index) {
-		scenario.actors.splice(index, 1);
+	// Action: event in a scenario
+	addAction(scenario) {
+		let action = {
+			"event_id": -1,
+			"type": ACTION_TYPE[0].value,
+			"time": 0,
+			"cost": 0,
+		};
+		scenario.actions.push(action);
+		return action;
+	}
+
+	setActions(scenario, eventList) {
+		// Save old data
+		let data = {};
+		for (const i in scenario.actions) {
+			let action = scenario.actions[i];
+			data[action.event_id] = action;
+		}
+		scenario.actions.splice(0, scenario.actions.length);
+
+		// Add new actions from list in order
+		for (const event of this.events) {
+			if (eventList.includes(event.id)) {
+				let action = this.addAction(scenario);
+				this.transferObject(data[event.id], action);
+				action.event_id = event.id;
+			}
+		}
 	}
 
 
@@ -646,7 +684,7 @@ class Database {
 		addCategory(NODE_TYPES, "Type");
 		addCategory(ANIMAL_FOODS, "Animal Diet");
 		addCategory(ANIMAL_SIZES, "Animal Size");
-		addCategory(ABIOTIC_CATEGORIES, "Abiotic Category");
+		addCategory(SERVICE_CATEGORIES, "Service Category");
 
 		return result;
 	}
