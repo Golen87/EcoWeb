@@ -518,6 +518,7 @@ class Database {
 			"node_id": -1,
 			"population": 0.1,
 			"visibility": ACTOR_VISIBILITY[0].value,
+			"position": [0,0],
 		};
 		scenario.actors.push(actor);
 		return actor;
