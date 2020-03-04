@@ -97,15 +97,21 @@ function createDatabaseTools(database) {
 			importFile: function () {
 				$("#importJsonInput").click();
 				$("#importJsonInput").change(function(event) {
+					event.stopImmediatePropagation();
 					if (this.files.length === 0)
 						return;
 
 					var reader = new FileReader();
 					reader.onload = function(event) {
 						try {
-							database.importJSON(event.target.result);
-							alert("Success! Loaded ({0}) nodes.".format(
-								database.nodes.length));
+							let success = database.importJSON(event.target.result);
+							if (success) {
+								alert("Success! Loaded ({0}) nodes.".format(database.nodes.length));
+								database.save();
+							}
+							else {
+								throw "Couldn't load old database.";
+							}
 						}
 						catch(error) {
 							alert(error);
