@@ -1,6 +1,7 @@
 class Node extends Button {
 	constructor(scene, x, y, species) {
 		super(scene, x, y);
+		this.scene = scene;
 		this.species = species;
 		scene.add.existing(this);
 
@@ -17,12 +18,13 @@ class Node extends Button {
 		//this.BLACK = 0x332d24;
 		//this.BLACK = 0x474741;
 		//this.BLACK = 0x33312e;
-		this.BLACK = 0x6e6766;
+		//this.BLACK = 0x6e6766;
+		this.BLACK = Phaser.Display.Color.HexStringToColor(species.color).color;
 
 		const LAYER_1 = 1.00 - 0 * 0.05;
-		const LAYER_2 = 1.00 - 1 * 0.05;
+		const LAYER_2 = 1.00 - 0 * 0.05;
 		const LAYER_3 = 1.00 - 2 * 0.05;
-		const LAYER_4 = 1.00 - 3 * 0.05;
+		const LAYER_4 = 1.00 - 1.8 * 0.05;
 
 		this.circle = scene.add.image(0, 0, 'circle');
 		this.circle.setScale((LAYER_1 * this.size) / this.circle.height);
@@ -43,14 +45,13 @@ class Node extends Button {
 		this.image.setScale(LAYER_4 * this.size / Math.max(this.image.width, this.image.height));
 		this.add(this.image);
 
-
 		let shape = scene.make.graphics({ fillStyle: { color: 0x000000 }, add: false });
 		let circle = new Phaser.Geom.Circle(0, 0, this.size*0.4);
 		shape.fillCircleShape(circle);
 		//let mask = shape.createGeometryMask();
 		//this.image.setMask(mask);
 
-		this.bindInteractive(this.circle);
+		//this.bindInteractive(this.circle);
 
 		this.hoverSpeed = 1 / 0.3;
 		this.hoverEasing = 0;
@@ -74,7 +75,7 @@ class Node extends Button {
 		let w = this.aliveValue;
 		let smooth = 0.5 + Math.atan(4 * (this.populationValue - 0.5)) / Math.PI + w * this.wiggle;
 		//let value = (0.3 + 1.0 * smooth) * (1+w)/2 + 0.1 * this.selectFactor;
-		let value = (0.3 + 1.0 * smooth) * w + 0.1 * this.selectFactor;
+		let value = (0.3 + 1.0 * smooth) * w - 0.1 * this.selectFactor;
 		return value;
 	}
 
@@ -124,25 +125,35 @@ class Node extends Button {
 
 	onOut() {
 		super.onOut();
-		this.setScale(1.00 * this.getScale());
+		//this.setScale(1.00 * this.getScale());
 		this.image.setTint(0xEEEEEE);
 	}
 
 	onOver() {
 		super.onOver();
-		this.setScale(1.05 * this.getScale());
+		//this.setScale(1.05 * this.getScale());
 		this.image.setTint(0xFFFFFF);
 	}
 
 	onDown() {
 		super.onDown();
-		this.setScale(0.95 * this.getScale());
+		//this.setScale(0.95 * this.getScale());
 		this.image.setTint(0xDDDDDD);
+		//this.selectFactor = -1;
 	}
 
 	onClick() {
 		this.selected = !this.selected;
 		this.circle.setTint(this.selected ? this.WHITE : this.BLACK);
+
+		// TODO: replace selectfactor with actually holding the node??
+		this.scene.tweens.add({
+			targets: this,
+			selectFactor: {from: 0, to: 1},
+			ease: 'Circ.easeOut',
+			duration: 100,
+			yoyo: true
+		});
 
 		this.onOver();
 	}

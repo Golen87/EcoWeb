@@ -19,7 +19,7 @@ class WorldScene extends Phaser.Scene {
 			this.button = new PauseButton(this, this.CX, y, scenario.name, () => {
 				web.startScenario(i);
 				this.soundSwoosh.play();
-				this.scene.start("LevelScene");
+				this.scene.start("LevelScene2");
 			});
 			this.add.existing(this.button);
 		}

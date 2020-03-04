@@ -14,6 +14,15 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('bg_1', 'assets/images/background/BG1.png');
 		this.load.image('bg_2', 'assets/images/background/BG2.png');
 		this.load.image('bg_3', 'assets/images/background/BG3.png');
+		this.load.image('firewatch0', 'assets/images/firewatch/parallax0.png');
+		this.load.image('firewatch1', 'assets/images/firewatch/parallax1.png');
+		this.load.image('firewatch2', 'assets/images/firewatch/parallax2.png');
+		this.load.image('firewatch3', 'assets/images/firewatch/parallax3.png');
+		this.load.image('firewatch4', 'assets/images/firewatch/parallax4.png');
+		this.load.image('firewatch5', 'assets/images/firewatch/parallax5.png');
+		this.load.image('firewatch6', 'assets/images/firewatch/parallax6.png');
+		this.load.image('firewatch7', 'assets/images/firewatch/parallax7.png');
+		this.load.image('firewatch8', 'assets/images/firewatch/parallax8.png');
 
 
 		/* Menu */		

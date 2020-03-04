@@ -33,9 +33,9 @@ class EcoWeb {
 		this.currentScenarioIndex = i;
 		this.activeEvents = [];
 
-		let scenario = new Scenario(window.database.scenarios[i]);
-		web.build(scenario.species);
-		this.maxTime = scenario.maxTime;
+		this.currentScenario = new Scenario(window.database.scenarios[i]);
+		web.build(this.currentScenario.species);
+		this.maxTime = this.currentScenario.maxTime;
 		//web.build(this.scenarios[i]());
 
 		web.initWiggle();

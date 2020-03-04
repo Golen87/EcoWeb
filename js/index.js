@@ -1,7 +1,7 @@
 var config = {
 	type: Phaser.WEBGL,
-	width: 800,
-	height: 600,
+	width: 16*70,
+	height: 9*70,
 	parent: 'game',
 	scale: {
 		mode: Phaser.Scale.FIT
@@ -18,6 +18,7 @@ var config = {
 		TitleScene,
 		WorldScene,
 		LevelScene,
+		LevelScene2,
 
 		ExampleScene1,
 		ExampleScene2,

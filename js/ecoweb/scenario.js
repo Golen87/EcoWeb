@@ -3,11 +3,12 @@ class Scenario {
 		this.species = [];
 
 
-		console.log("scenario from database", data);
 		this.maxTime = data.time;
 		
 		for (let actor of data.actors) {
 			let node = window.database.getNodeById(actor.node_id);
+
+			// actor.visibility
 
 			let name = node.name;
 			let pop = actor.population;
@@ -15,6 +16,7 @@ class Scenario {
 			let self = 0;
 			let image = node.image;
 			let color = node.color;
+			let position = actor.position;
 
 			// TODO: Improve
 			if (node.type == "animal") {
@@ -26,7 +28,7 @@ class Scenario {
 				self = -1.0;
 			}
 
-			let organism = new Organism(name, pop, growth, self, image, color);
+			let organism = new Organism(name, pop, growth, self, image, color, position);
 
 			// node.animal.size
 			// node.animal.food
