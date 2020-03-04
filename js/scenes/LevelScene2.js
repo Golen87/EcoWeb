@@ -35,35 +35,19 @@ class LevelScene2 extends Phaser.Scene {
 
 		let box = this.add.rectangle(0, 0, size, size, 0xFFFFFF);
 		box.setAlpha(0.0);
-		// for (const organism of web.currentScenario.species) {
-		// 	let x = size * (-0.5 + (organism.x / 100));
-		// 	let y = size * (-0.5 + (organism.y / 100));
-		// 	let circle = this.add.sprite(x, y, "circle");
-		// 	circle.setInteractive({ useHandCursor: true })
-		// 		.on('pointerup', this.clickNode.bind(this, circle));
-		// 	let image = this.add.sprite(x, y, organism.image);
-		// 	circle.setScale(0.1*size/circle.width);
-		// 	image.setScale(0.1*0.9*size/image.width);
-		// }
-
-		/*
-		var container = this.add.container(this.CX, this.CY);
-		let circle = this.add.sprite(0, 0, "circle");
-		circle.setInteractive({ useHandCursor: true })
-			.on('pointerover', function() {circle.setTint(0xff0000);})
-			.on('pointerout', function() {circle.setTint(0xffffff);})
-		container.add(circle);
-		container.setScrollFactor(0);
-		circle.setScrollFactor(0);
-		*/
 
 
-		this.cameraCenter = new Phaser.Math.Vector2(this.CX, this.CY);
+		this.cameraCenter = new Phaser.Math.Vector2(3/4*this.CX, this.CY);
 		this.cameraCenterDebug = this.add.circle(this.cameraCenter.x, this.cameraCenter.y, this.W*0.005, 0xFF0000);
 		this.cameraCenterDebug.setDepth(1000);
 		this.cameraCenterDebug.setScrollFactor(0);
 		this.cameras.main.setScroll(-this.cameraCenter.x, -this.cameraCenter.y);
 		this.limitSize = size;
+
+		let camX = size * (-0.5 + (web.currentScenario.cameraPos.x / 100));
+		let camY = size * (-0.5 + (web.currentScenario.cameraPos.y / 100));
+		this.cameras.main.scrollX = camX - this.cameraCenter.x;
+		this.cameras.main.scrollY = camY - this.cameraCenter.y;
 
 		this.drag = new Phaser.Math.Vector2(0, 0);
 		this.centerGoal = this.cameraCenter.clone();

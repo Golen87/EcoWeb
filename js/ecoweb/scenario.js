@@ -2,9 +2,13 @@ class Scenario {
 	constructor(data) {
 		this.species = [];
 
-
+		this.name = data.name;
 		this.maxTime = data.time;
-		
+		this.budget = data.budget;
+		this.description = data.description;
+		this.cameraPos = {x: data.position[0], y: data.position[1]};
+
+
 		for (let actor of data.actors) {
 			let node = window.database.getNodeById(actor.node_id);
 

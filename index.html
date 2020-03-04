@@ -886,6 +886,19 @@
 							</div>
 						</div>
 
+						<!-- Position -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Camera position</label>
+							<div class="col-sm-8">
+								<div class="input-group">
+									<input v-model.number="scenario.position[0]" type="number" class="form-control" min="0" max="100" step="1" required>
+									<input v-model.number="scenario.position[1]" type="number" class="form-control" min="0" max="100" step="1" required>
+								</div>
+							</div>
+						</div>
+						<!-- <td class="align-middle p-2"> -->
+						<!-- </td> -->
+
 						<!-- Description -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Description</label>

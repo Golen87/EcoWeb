@@ -437,6 +437,7 @@ class Database {
 			"time": 100,
 			"budget": 100,
 			"description": "",
+			"position": [50,50],
 			"actors": [],
 			"actions": [],
 		};
