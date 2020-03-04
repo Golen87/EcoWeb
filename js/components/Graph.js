@@ -72,7 +72,7 @@ class Graph extends Phaser.GameObjects.Container {
 				let value = web.getValueAt(s, i * web.time);
 				points.push({
 					x: PADDING + i * (WIDTH - 2*PADDING),
-					y: PADDING + value * (HEIGHT - 2*PADDING)
+					y: PADDING + (1-value) * (HEIGHT - 2*PADDING)
 				});
 			}
 
