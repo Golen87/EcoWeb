@@ -143,8 +143,7 @@ class Database {
 	}
 
 	addNode(node) {
-		this.deleteNode(node.id, false);
-		this.nodes.push(node);
+		this.addObj(this.nodes, node);
 		this.nodes.sort(this.nodeCompare);
 	}
 
@@ -197,7 +196,7 @@ class Database {
 		}
 	}
 
-	deleteNode(id, check=true) {
+	deleteNode(id) {
 		this.deleteObj(this.nodes, id);
 	}
 
@@ -369,8 +368,7 @@ class Database {
 	}
 
 	addEvent(event) {
-		this.deleteEvent(event.id);
-		this.events.push(event);
+		this.addObj(this.events, event);
 	}
 
 	getEventById(id) {
@@ -471,8 +469,7 @@ class Database {
 	}
 
 	addScenario(scenario) {
-		this.deleteScenario(scenario.id);
-		this.scenarios.push(scenario);
+		this.addObj(this.scenarios, scenario);
 	}
 
 	getScenarioById(id) {
@@ -703,6 +700,16 @@ class Database {
 
 
 	/* General actions */
+
+	addObj(objs, obj) {
+		for (let i = objs.length-1; i >= 0; i--) {
+			if (objs[i].id == obj.id) {
+				objs[i] = obj;
+				return;
+			}
+		}
+		objs.push(obj);
+	}
 
 	deleteObj(objs, id) {
 		for (let i = objs.length-1; i >= 0; i--) {
