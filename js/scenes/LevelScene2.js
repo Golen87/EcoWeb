@@ -54,6 +54,7 @@ class LevelScene2 extends Phaser.Scene {
 
 
 		this.nodes = [];
+		this.selectedNode = null;
 		for (let i in web.currentScenario.species) {
 			const organism = web.currentScenario.species[i];
 
@@ -63,11 +64,8 @@ class LevelScene2 extends Phaser.Scene {
 			let s = organism;
 			this.nodes[i] = new Node(this, x, y, s);
 			this.nodes[i].setScale(0.1*size/this.nodes[i].circle.width);
-			this.nodes[i].circle.setInteractive({ useHandCursor: true })
-				.on('pointerup', this.clickNode.bind(this, this.nodes[i]));
 			this.nodes[i].setDepth(1);
-			//web.solve(10);
-			//updateChart();
+			this.nodes[i].on('onClick', this.clickNode, this);
 		}
 
 		this.paths = [];
@@ -88,13 +86,11 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.graph = new Graph(this);
 		this.graph.setPosition(this.W-315, this.H-330);
-		this.graph.setVisible(false);
 
 		this.timeController = new TimeController(this, this.W-165, this.H-90);
 		this.timeController.on('onChange', function() {
 			this.graph.draw(this.timeController.time);
 		}, this);
-		this.timeController.setVisible(false);
 
 
 		/* Testing */
@@ -136,14 +132,15 @@ class LevelScene2 extends Phaser.Scene {
 		for (var i = this.nodes.length - 1; i >= 0; i--) {
 			//let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
 			//this.nodes[i].setWiggle(s);
-
-			var d = Phaser.Math.Distance.Between(this.nodes[i].x, this.nodes[i].y, this.cameras.main.scrollX+this.cameraCenter.x, this.cameras.main.scrollY+this.cameraCenter.y);
-			this.nodes[i].hover = false;
-			if (d < this.nodes[i].circle.width/2) {
-				this.nodes[i].hover = true;
-			}
-
 			this.nodes[i].update(delta);
+		}
+
+		if (this.selectedNode && this.isDragging) {
+			var d = Phaser.Math.Distance.Between(this.selectedNode.x, this.selectedNode.y, this.cameras.main.scrollX+this.cameraCenter.x, this.cameras.main.scrollY+this.cameraCenter.y);
+			if (d > this.selectedNode.circle.width/2) {
+				this.selectedNode.setSelected(false);
+				this.selectedNode = null;
+			}
 		}
 
 		for (var i = this.paths.length - 1; i >= 0; i--) {
@@ -229,7 +226,12 @@ class LevelScene2 extends Phaser.Scene {
 
 	clickNode(gameObject) {
 		if (!this.isDragging) {
-			this.setCameraFocus(gameObject.x, gameObject.y);
+			if (this.selectedNode) {
+				this.selectedNode.setSelected(false);
+			}
+			this.selectedNode = gameObject;
+			this.selectedNode.setSelected(true);
+			this.setCameraFocus(this.selectedNode.x, this.selectedNode.y);
 		}
 	}
 

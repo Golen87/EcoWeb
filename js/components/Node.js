@@ -19,7 +19,7 @@ class Node extends Button {
 		//this.BLACK = 0x474741;
 		//this.BLACK = 0x33312e;
 		//this.BLACK = 0x6e6766;
-		this.BLACK = Phaser.Display.Color.HexStringToColor(species.color).color;
+		this.BLACK = Phaser.Display.Color.HexStringToColor(this.species.color).color;
 
 		const LAYER_1 = 1.00 - 0 * 0.05;
 		const LAYER_2 = 1.00 - 0 * 0.05;
@@ -51,7 +51,7 @@ class Node extends Button {
 		//let mask = shape.createGeometryMask();
 		//this.image.setMask(mask);
 
-		//this.bindInteractive(this.circle);
+		this.bindInteractive(this.circle);
 
 		this.hoverSpeed = 1 / 0.3;
 		this.hoverEasing = 0;
@@ -122,27 +122,44 @@ class Node extends Button {
 			//this.innerCircle2.setTint(color.color);
 	}
 
+	setSelected(value) {
+		this.selected = value;
+	}
+
 
 	onOut() {
-		super.onOut();
+		this.hover = false;
+		this.hold = false;
 		//this.setScale(1.00 * this.getScale());
-		this.image.setTint(0xEEEEEE);
+		//this.image.setTint(0xEEEEEE);
 	}
 
 	onOver() {
-		super.onOver();
+		this.hover = true;
+		//this.soundHover.play();
 		//this.setScale(1.05 * this.getScale());
-		this.image.setTint(0xFFFFFF);
+		//this.image.setTint(0xFFFFFF);
 	}
 
 	onDown() {
-		super.onDown();
+		this.hold = true;
+		//this.soundRelease.play();
 		//this.setScale(0.95 * this.getScale());
-		this.image.setTint(0xDDDDDD);
+		//this.image.setTint(0xDDDDDD);
 		//this.selectFactor = -1;
 	}
 
+	onUp() {
+		if (this.hold) {
+			//this.soundPress.play();
+			this.hold = false;
+			this.onClick();
+		}
+	}
+
 	onClick() {
+		this.emit('onClick', this);
+		/*
 		this.selected = !this.selected;
 		this.circle.setTint(this.selected ? this.WHITE : this.BLACK);
 
@@ -156,6 +173,7 @@ class Node extends Button {
 		});
 
 		this.onOver();
+		*/
 	}
 
 
@@ -182,11 +200,14 @@ class Node extends Button {
 
 
 		let hoverTarget = 0.37;
-		if (this.hover) {
+		// if (this.hover) {
+		// 	hoverTarget = 1.0;
+		// }
+		// else if (this.selected) {
+		// 	hoverTarget = 0.57;
+		// }
+		if (this.selected) {
 			hoverTarget = 1.0;
-		}
-		else if (this.selected) {
-			hoverTarget = 0.57;
 		}
 
 		let aliveTarget = this.isAlive() ? 1 : 0;
