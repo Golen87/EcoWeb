@@ -9,7 +9,7 @@ class LevelScene2 extends Phaser.Scene {
 		let size = 2 * 0.8 * Math.min(this.W, this.H);
 
 
-		this.scale.lockOrientation('portrait');
+		//this.scale.lockOrientation('portrait');
 
 
 		this.bg = [];
