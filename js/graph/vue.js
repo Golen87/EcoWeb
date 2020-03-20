@@ -66,9 +66,6 @@ function createDatabaseTools(database) {
 			nodeCount: function () {
 				return database.nodes.length;
 			},
-			allData: function () {
-				return database.exportJSON(true);
-			},
 			nodes: function () { return database.nodes; },
 			events: function () { return database.events; },
 			scenarios: function () { return database.scenarios; },
@@ -453,6 +450,17 @@ function createDatabaseTools(database) {
 			all_actor_visibility: function () { return ACTOR_VISIBILITY; },
 			all_action_types: function () { return ACTION_TYPE; },
 			form_changed: function () { return JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
+			abiotic_functions_valid: function () {
+				for (const actor of this.scenario.actors) {
+					const type = database.getNodeById(actor.node_id).type;
+					if (isAbiotic(type)) {
+						if (!this.checkAbioticFunction(actor)) {
+							return false;
+						}
+					}
+				}
+				return true;
+			},
 		},
 		methods: {
 			open: function (scenario) {
@@ -462,6 +470,16 @@ function createDatabaseTools(database) {
 			},
 			save: function (e) {
 				e.preventDefault();
+
+				for (const actor of this.scenario.actors) {
+					const type = database.getNodeById(actor.node_id).type;
+					if (isAbiotic(type)) {
+						if (!this.checkAbioticFunction(actor)) {
+							console.log("save fail");
+							return false;
+						}
+					}
+				}
 
 				let newScenario = JSON.parse(JSON.stringify(this.scenario));
 				database.addScenario(newScenario);
@@ -500,7 +518,7 @@ function createDatabaseTools(database) {
 			openEventSelector: function () {
 				let idList = [];
 				for (const action of this.scenario.actions) {
-					idList.push(action.node_id);
+					idList.push(action.event_id);
 				}
 				nodeSelectorModal.show(
 					"Select events",
@@ -516,11 +534,14 @@ function createDatabaseTools(database) {
 				database.setActions(this.scenario, idList);
 			},
 			run: function () {
-				$(this.$el).find(":submit").click();
-				// Hack
-				for (var i = database.scenarios.length - 1; i >= 0; i--) {
-					if (this.scenario.id == database.scenarios[i].id) {
-						web.startScenario(i);
+				let form = $(this.$el);
+				form.find(":submit").click();
+				if (form[0].checkValidity()) {
+					// Hack
+					for (var i = database.scenarios.length - 1; i >= 0; i--) {
+						if (this.scenario.id == database.scenarios[i].id) {
+							web.startScenario(i);
+						}
 					}
 				}
 			},
@@ -534,6 +555,10 @@ function createDatabaseTools(database) {
 			getNodeName: function (actor) {
 				return database.getNodeById(actor.node_id).name;
 			},
+			checkNodeAbiotic: function (actor) {
+				const type = database.getNodeById(actor.node_id).type;
+				return isAbiotic(type);
+			},
 			getEventImage: function (actor) {
 				let image = database.getEventById(actor.event_id).image;
 				return getTextFromValue(NODE_IMAGES, image);
@@ -543,6 +568,18 @@ function createDatabaseTools(database) {
 			},
 			getEventName: function (actor) {
 				return database.getEventById(actor.event_id).name;
+			},
+			checkAbioticFunction: function (actor) {
+				try {
+					const result = math.evaluate(actor.popfunc, {t: 0});
+					if (typeof result != 'number') {
+						return false;
+					}
+				}
+				catch {
+					return false;
+				}
+				return true;
 			},
 		},
 	});
@@ -675,7 +712,7 @@ function createDatabaseTools(database) {
 					this.denyText = "Cancel";
 				}
 
-				$('#warningModal').modal('show');
+				$("#warningModal").modal("show");
 			},
 			hide: function () {
 				$("#warningModal").modal("hide");
@@ -716,7 +753,7 @@ function createDatabaseTools(database) {
 					Vue.set(this.selected, node.id, nodeList.includes(node.id));
 				}
 
-				$('#nodeSelectorModal').modal('show');
+				$("#nodeSelectorModal").modal("show");
 			},
 			hide: function () {
 				$("#nodeSelectorModal").modal("hide");

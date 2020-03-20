@@ -35,6 +35,7 @@
 		<!-- Phaser -->
 		<script src="web/phaser_3_22_0.min.js"></script>
 		<script src="web/numeric.min.js"></script>
+		<script src="web/math.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0/dist/Chart.min.js"></script>
 
 		<!-- Script includes -->
@@ -992,9 +993,16 @@
 										</td>
 
 										<!-- Population -->
-										<td class="align-middle p-2">
+										<td class="align-middle p-2" v-if="!checkNodeAbiotic(actor)">
 											<div class="input-group">
 												<input v-model.number="actor.population" type="number" class="form-control" min="0" max="1" step="0.01" required>
+											</div>
+										</td>
+
+										<!-- Abiotic function -->
+										<td class="align-middle p-2" v-if="checkNodeAbiotic(actor)">
+											<div class="input-group">
+												<input v-model="actor.popfunc" type="text" class="form-control is-valid" v-bind:class="{ 'is-invalid': !checkAbioticFunction(actor) }" maxlength="50" required>
 											</div>
 										</td>
 
@@ -1033,8 +1041,8 @@
 					<div style="flex-grow: 1;"></div>
 					<div>
 						<input type="button" class="btn btn-secondary mr-1" value="Back" v-on:click="cancel()">
-						<input type="submit" class="btn mr-1" :disabled="!form_changed" v-bind:class="{ 'btn-primary': form_changed, 'btn-secondary': !form_changed }" value="Save">
-						<input type="button" class="btn btn-warning" value="Run" v-on:click="run()">
+						<input type="submit" class="btn mr-1" :disabled="!form_changed || !abiotic_functions_valid" v-bind:class="{ 'btn-primary': form_changed, 'btn-secondary': !form_changed }" value="Save">
+						<input type="button" class="btn btn-warning" :disabled="!abiotic_functions_valid" value="Run" v-on:click="run()">
 					</div>
 				</div>
 			</form>

@@ -1,9 +1,9 @@
 const NODE_TYPES = [
-	{ value: "animal",	text: "Consumer (animal)" },
-	{ value: "plant",	text: "Producer (plant)" },
-	{ value: "fungi",	text: "Decomposer (detrivore)" },
-	{ value: "abiotic",	text: "Abiotic (non-living)" },
-	{ value: "service",	text: "Ecosystem services" },
+	{ value: "animal",	text: "Consumer (animal)",		type: "biotic" },
+	{ value: "plant",	text: "Producer (plant)",		type: "biotic" },
+	{ value: "fungi",	text: "Decomposer (detrivore)",	type: "biotic" },
+	{ value: "abiotic",	text: "Abiotic (non-living)",	type: "abiotic" },
+	{ value: "service",	text: "Ecosystem services",		type: "abiotic" },
 ];
 
 const NODE_IMAGES = [
@@ -98,6 +98,14 @@ function getValueFromText(dataset, text) {
 	for (const data of dataset) {
 		if (text == data.text) {
 			return data.value;
+		}
+	}
+}
+
+function isAbiotic(value) {
+	for (const data of NODE_TYPES) {
+		if (value == data.value) {
+			return (data.type == "abiotic");
 		}
 	}
 }

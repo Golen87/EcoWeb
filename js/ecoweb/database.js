@@ -106,8 +106,7 @@ class Database {
 			"fungi": {
 				"size": null
 			},
-			"abiotic": {
-			},
+			"abiotic": {},
 			"service": {
 				"category": null
 			},
@@ -274,6 +273,16 @@ class Database {
 			}
 		}
 		return false;
+	}
+
+	getAffectedNodes(relation) {
+		let results = [];
+		for (const node of this.nodes) {
+			if (this.isAffected(relation, node)) {
+				results.push(node);
+			}
+		}
+		return results;
 	}
 
 	getIncomingRelations(node) {
@@ -516,6 +525,7 @@ class Database {
 		let actor = {
 			"node_id": -1,
 			"population": 0.1,
+			"popfunc": "0.5",
 			"visibility": ACTOR_VISIBILITY[0].value,
 			"position": [0,0],
 		};
