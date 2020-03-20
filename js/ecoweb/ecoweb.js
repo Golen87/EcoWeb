@@ -80,7 +80,7 @@ class EcoWeb {
 
 		for (let i = 0; i < species.length; i++) {
 			let s = species[i];
-			addSpecies(s.name, s.color, s.showGraph);
+			addSpecies(s.name, s.color, s.showGraph, isAbiotic(s.type));
 			this.startPop[i] = (s.enable ? s.startPopulation : 0);
 			this.r[i] = s.growthRate;
 			this.K[i] = s.carryingCapacity;

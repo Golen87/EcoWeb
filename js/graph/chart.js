@@ -35,16 +35,17 @@ function resetChart() {
 	chartData.datasets = [];
 }
 
-function addSpecies(name, color, showGraph) {
+function addSpecies(name, color, showGraph, isAbiotic) {
 	chartData.datasets.push({
 		label: name,
 		data: [],
 		borderColor: color,
 		borderWidth: 3,
-		pointRadius: 1,
+		pointRadius: isAbiotic ? 0 : 1,
 		fill: false,
 		tension: 0,
 		showLine: true,
+		borderDash: isAbiotic ? [3,6] : [],
 		hidden: !showGraph
 	});
 }
