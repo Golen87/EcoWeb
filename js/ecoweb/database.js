@@ -337,6 +337,7 @@ class Database {
 			"name": null,
 			"description": null,
 			"image": "missing",
+			"duration": 0,
 			"effects": []
 		};
 	}

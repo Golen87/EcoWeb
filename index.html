@@ -264,8 +264,6 @@
 				<h2 class="text-left">Database</h2>
 				<hr class="mt-0">
 
-				<!--textarea class="form-control" style="height: 100%;">{{allData}}</textarea-->
-
 				<div class="d-flex justify-content-end">
 					<div>
 						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Nodes (' + nodes.length + ')'" v-on:click="openNodes()">
@@ -457,7 +455,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
 							<div class="col-sm-8">
-								<input v-model="node.name" type="text" class="form-control" required>
+								<input v-model="node.name" type="text" class="form-control" minlength="2" maxlength="30" required>
 							</div>
 						</div>
 
@@ -589,7 +587,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Notes</label>
 							<div class="col-sm-8">
-								<textarea v-model="node.notes" class="form-control" rows="3"></textarea>
+								<textarea v-model="node.notes" class="form-control" rows="3" maxlength="1000"></textarea>
 							</div>
 						</div>
 
@@ -757,7 +755,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
 							<div class="col-sm-8">
-								<input v-model="event.name" type="text" class="form-control" required>
+								<input v-model="event.name" type="text" class="form-control" minlength="2" maxlength="30" required>
 							</div>
 						</div>
 
@@ -765,7 +763,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Description</label>
 							<div class="col-sm-8">
-								<textarea v-model="event.description" class="form-control" rows="3"></textarea>
+								<textarea v-model="event.description" class="form-control" rows="3" maxlength="1000"></textarea>
 							</div>
 						</div>
 
@@ -776,6 +774,14 @@
 								<select v-model="event.image" class="form-control" required>
 									<option v-for="option in node_images" v-bind:value="option.value">{{ option.text }}</option>
 								</select>
+							</div>
+						</div>
+
+						<!-- Duration -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Duration</label>
+							<div class="col-sm-8">
+								<input v-model.number="event.duration" type="number" class="form-control" min="0" step="1" max="1000" required>
 							</div>
 						</div>
 
@@ -866,7 +872,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
 							<div class="col-sm-8">
-								<input v-model="scenario.name" type="text" class="form-control" required>
+								<input v-model="scenario.name" type="text" class="form-control" minlength="2" maxlength="30" required>
 							</div>
 						</div>
 
@@ -903,7 +909,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Description</label>
 							<div class="col-sm-8">
-								<textarea v-model="scenario.description" class="form-control" rows="3"></textarea>
+								<textarea v-model="scenario.description" class="form-control" rows="3" maxlength="1000"></textarea>
 							</div>
 						</div>
 
@@ -937,7 +943,7 @@
 										<!-- Cost -->
 										<td v-if="action.type == 'player'" class="align-middle p-2">
 											<div class="input-group input-lg">
-												<input v-model.number="action.cost" type="number" class="form-control" min="0" max="1" step="0.01" required>
+												<input v-model.number="action.cost" type="number" class="form-control" min="0" :max="scenario.budget" step="1" required>
 												<div class="input-group-append">
 													<div class="input-group-text">cost</div>
 												</div>
@@ -947,7 +953,7 @@
 										<!-- Time -->
 										<td v-if="action.type == 'automatic'" class="align-middle p-2">
 											<div class="input-group input-lg">
-												<input v-model.number="action.time" type="number" class="form-control" min="0" max="1" step="0.01" required>
+												<input v-model.number="action.time" type="number" class="form-control" min="0" :max="scenario.time" step="1" required>
 												<div class="input-group-append">
 													<div class="input-group-text">time</div>
 												</div>
@@ -1043,9 +1049,7 @@
 
 					<!-- Tag list -->
 					<div class="input-fields col-md-6 col-lg-6 col-xl-6">
-
-						<textarea v-model="tags" class="form-control" style="min-height: 300px; height: 100%; resize: none;"></textarea>
-
+						<textarea v-model="tags" class="form-control" maxlength="10000" style="min-height: 300px; height: 100%; resize: none;"></textarea>
 					</div>
 
 					<!-- Something -->
