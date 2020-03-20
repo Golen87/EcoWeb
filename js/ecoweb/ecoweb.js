@@ -20,13 +20,8 @@ class EcoWeb {
 			y: []
 		};
 
-		this.scenarios = [];
 		this.events = [];
 		this.activeEvents = [];
-	}
-
-	setScenarios(scenarios) {
-		this.scenarios = scenarios;
 	}
 
 	startScenario(i) {
@@ -34,20 +29,24 @@ class EcoWeb {
 		this.activeEvents = [];
 
 		this.currentScenario = new Scenario(window.database.scenarios[i]);
-		web.build(this.currentScenario.species);
+		this.build(this.currentScenario.species);
 		this.maxTime = this.currentScenario.maxTime;
-		//web.build(this.scenarios[i]());
 
-		web.initWiggle();
-		//web.stabilize();
-		web.solve(this.maxTime);
+		for (const event of this.currentScenario.events) {
+			this.events.push(event);
+			if (event.type == "automatic") {
+				this.setEvent(event, event.autoTime);
+			}
+		}
+
+		//this.stabilize();
+		this.solve(this.maxTime);
 		updateChart();
 
 		if (!this.vue) {
-			this.vue = createGraphTools(this.species, this.scenarios);
+			this.vue = createGraphTools();
 		}
 		this.vue.species = this.species;
-		this.vue.scenarios = this.scenarios;
 	}
 
 	restart() {
@@ -107,6 +106,7 @@ class EcoWeb {
 			}
 		}
 
+		/*
 		this.events = [
 			new BaseEvent("Stödmata", "detrius",
 				`Stödmatar man så ser man till så att hjortdjuren i ett område får extra mat över vintern så att färre dör på grund av svält.
@@ -160,14 +160,14 @@ class EcoWeb {
 					console.log(this.r[r]);
 			}.bind(this)),
 		];
+		*/
 
 		this.reset();
 	}
 
 	refresh() {
-		web.build(this.species);
-		web.applyWiggle();
-		web.solve(this.maxTime);
+		this.build(this.species);
+		this.solve(this.maxTime);
 		updateChart();
 	}
 
@@ -180,63 +180,95 @@ class EcoWeb {
 		};
 	}
 
-	// Randomize interaction matrix (A) to get more interersting patterns
-	initWiggle() {
-		this.wiggle = [];
-		for (let i = 0; i < this.size; i++) {
-			this.wiggle[i] = [];
-			for (let j = 0; j < this.size; j++) {
-				this.wiggle[i][j] = randReal(0.9, 1.1);
-			}
-		}
-		this.applyWiggle();
-	}
-
-	applyWiggle() {
-		//for (let i = 0; i < this.size; i++) {
-		//	for (let j = 0; j < this.size; j++) {
-		//		this.A[i][j] *= this.wiggle[i][j];
-		//	}
-		//}
-	}
-
-	setEvent(time, event) {
-		for (var i = this.activeEvents.length - 1; i >= 0; i--) {
+	setEvent(event, time) {
+		/*for (var i = this.activeEvents.length - 1; i >= 0; i--) {
 			if (this.activeEvents[i].time == time) {
 				this.activeEvents.splice(i, 1);
 			}
-		}
+		}*/
 		if (event) {
-			this.activeEvents.push(new ActiveEvent(time, event));
+			this.activeEvents.push(new ActiveEvent(event, time));
 		}
 
-		this.refresh();
+		//this.refresh();
 	}
 
 	applyEvent(event) {
-		event.callback();
+		console.log("> Apply event:", event.name, event.effects);
+
+		for (const effect of event.effects) {
+			console.log(effect.node.name, effect.something);
+
+			let i = this.getSpeciesIndex(effect.node.name);
+			console.log(effect.node.name, i);
+			this.population[i] -= effect.something;
+			//this.A[r][d] = 0; // Ta bort rådjurs-dovhjorts straff
+		}
+	}
+
+	getActivityMap() {
+		let map = {};
+		for (let i = 0; i < this.species.length; i++) {
+			const id = this.species[i].id;
+			map[id] = [];
+
+			for (const activeEvent of this.activeEvents) {
+				if (activeEvent.active) {
+					for (const effect of activeEvent.event.effects) {
+						if (id == effect.node.id) {
+							effect.startTime = activeEvent.startTime;
+							map[id].push(effect);
+						}
+					}
+				}
+			}
+		}
+		return map;
 	}
 
 	solve(duration) {
-		this.activeEvents.sort((a,b) => (a.time > b.time) ? 1 : -1);
+		let timestamps = [];
+		for (const event of this.activeEvents) {
+			timestamps.push({
+				activeEvent: event,
+				time: event.startTime,
+				value: true
+			});
+			timestamps.push({
+				activeEvent: event,
+				time: event.endTime,
+				value: false
+			});
+		}
+		timestamps.sort((a,b) => (a.time > b.time) ? 1 : -1);
 
-		for (var i = 0; i < this.activeEvents.length; i++) {
-			if (this.activeEvents[i].time >= this.time) {
-				this.solveSection(this.activeEvents[i].time - this.time);
-				this.applyEvent(this.activeEvents[i].event);
+		for (var i = 0; i < timestamps.length; i++) {
+			const activeEvent = timestamps[i].activeEvent;
+			const time = timestamps[i].time;
+
+			if (time >= duration) {
+				break;
+			}
+
+			if (time >= this.time) {
+				this.solveSection(time - this.time, this.getActivityMap());
+				//this.applyEvent(this.activeEvents[i].event);
 			}
 			else {
-				console.warn("Event out of scope at", this.activeEvents[i].time);
+				console.warn("Event out of scope at", time);
 			}
+
+			console.log("> Turning " + (timestamps[i].value ? "on " : "off ") + activeEvent.event.name + " at " + time);
+			activeEvent.setActive(timestamps[i].value);
 		}
-		this.solveSection(duration - this.time);
+		this.solveSection(duration - this.time, this.getActivityMap());
 	}
 
-	solveSection(duration) {
-		if (duration == 0)
+	solveSection(duration, activityMap={}) {
+		if (duration <= 0)
 			return;
 
-		console.log("Solving", this.time, "-", (this.time+duration));
+		console.log("> Solving", this.time, "-", (this.time+duration));
 		// Lotka-Volterra equation (classical model for predator-prey interaction)
 		let f = function(t, pop) {
 			// Calculate interactions for diet
@@ -272,7 +304,6 @@ class EcoWeb {
 			for (let i = 0; i < pop.length; i++) {
 				for (let j = 0; j < pop.length; j++) {
 					matrix[i][j] += this.A[i][j];
-					//matrix[i][j] *= this.wiggle[i][j];
 				}
 			}
 
@@ -292,15 +323,32 @@ class EcoWeb {
 
 				// Impact on the environment resulting from consumption
 				//let I = pop[i] * this.K[i];
-				let I = this.K[i];
 
 				if (pop[i] < DEATH_THRESHOLD || pop[i] > 100) {
 					dPopList[i] = 0;
 				}
 				else {
-					dPopList[i] = pop[i] * ( this.r[i] + sum ) / I;
+					dPopList[i] = pop[i] * ( this.r[i] + sum );
+				}
+
+
+				if (this.species[i].popFuncDt) {
+					dPopList[i] = this.species[i].popFuncDt.evaluate({t});
+				}
+
+
+				// Events
+				let node = this.species[i];
+				if (activityMap[node.id]) {
+					for (const effect of activityMap[node.id]) {
+						const value = effect.derivative.evaluate({t: (t-effect.startTime) / effect.duration});
+						dPopList[i] += effect.something * value / effect.duration;
+						//const value = effect.derivative.evaluate({t: t-this.time});
+						//dPopList[i] += value;
+					}
 				}
 			}
+
 			return dPopList;
 		}
 
@@ -322,8 +370,7 @@ class EcoWeb {
 
 	stabilize() {
 		this.build(this.species);
-		this.applyWiggle();
-		this.solve(200);
+		this.solve(10 * this.maxTime);
 		for (let i = 0; i < this.size; i++) {
 			this.species[i].startPopulation = this.result.y[this.result.y.length-1][i];
 		}
@@ -520,18 +567,6 @@ const DEATH_THRESHOLD = 1E-3;
 //window.onload = function() {
 function initWeb() {
 	initChart();
-
-	web.setScenarios([
-		scenario_4,
-		scenario_1,
-		scenario_2,
-		scenario_3,
-	]);
-	//web.startScenario(0);
-
-	//web.build(scenario_4());
-	//web.initWiggle();
-	//web.solve(100);
 
 	// Global
 	window.database = new Database();

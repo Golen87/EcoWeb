@@ -4,16 +4,50 @@
 // --- Carnevore
 
 class Organism {
-	constructor(name, startPopulation, growthRate, selfCompetition, image, color, position) {
-		this.name = name;
-		this.image = image;
-		this.color = color;
-		this.x = position[0];
-		this.y = position[1];
-		this.startPopulation = startPopulation;
-		this.growthRate = growthRate;
-		this.selfCompetition = selfCompetition;
+	constructor(node, actor) {
+		this.id = node.id;
+		this.name = node.name;
+		this.image = node.image;
+		this.color = node.color;
+		this.x = actor.position[0];
+		this.y = actor.position[1];
+		this.visibility = actor.visibility;
+
+		// Simulation
+		this.startPopulation = 0;
+		this.growthRate = 0;
+		this.selfCompetition = 0;
+		this.popFunc = null;
+		this.popFuncDt = null;
 		this.carryingCapacity = 1.0;
+
+		if (isAbiotic(node.type)) {
+			const func = actor.popfunc;
+
+			if (func) {
+				this.popFunc = math.compile(func);
+				this.popFuncDt = math.derivative(func, 't').compile();
+				this.startPopulation = this.popFunc.evaluate({t: 0});
+			}
+		}
+		else {
+			this.startPopulation = actor.population;
+
+			// TODO: Improve (base values on weight/offspring/etc.)
+			if (node.type == "animal") {
+				this.growthRate = -0.05;
+				this.selfCompetition = -0.01;
+			}
+			else if (node.type == "plant") {
+				this.growthRate = 1.0;
+				this.selfCompetition = -1.0;
+			}
+			else if (node.type == "fungi") {
+				this.growthRate = 0.5;
+				this.selfCompetition = -0.5;
+			}
+		}
+
 
 		this.relationship = {};
 		//this.relationship[this] = selfCompetition;

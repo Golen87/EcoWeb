@@ -12,27 +12,7 @@ class Scenario {
 		for (let actor of data.actors) {
 			let node = window.database.getNodeById(actor.node_id);
 
-			// actor.visibility
-
-			let name = node.name;
-			let pop = actor.population;
-			let growth = 0;
-			let self = 0;
-			let image = node.image;
-			let color = node.color;
-			let position = actor.position;
-
-			// TODO: Improve
-			if (node.type == "animal") {
-				growth = -0.05;
-				self = -0.01;
-			}
-			else if (node.type == "plant") {
-				growth = 1.0;
-				self = -1.0;
-			}
-
-			let organism = new Organism(name, pop, growth, self, image, color, position);
+			let organism = new Organism(node, actor);
 
 			// node.animal.size
 			// node.animal.food
@@ -50,11 +30,11 @@ class Scenario {
 			}*/
 
 			let prefTot = 0;
-			for (let rel of node.relations) {
+			for (const rel of node.relations) {
 				prefTot += rel.preference;
 			}
 
-			for (let rel of node.relations) {
+			for (const rel of node.relations) {
 				if (rel.type == "node") {
 					let other = window.database.getNodeById(rel.node_id);
 					organism.diet[other.name] = rel.preference / prefTot;
@@ -83,7 +63,15 @@ class Scenario {
 			//organism.setDiet();
 			this.species.push(organism);
 		}
-		//data.events;
+
+		this.events = [];
+
+		for (let action of data.actions) {
+			let event = window.database.getEventById(action.event_id);
+
+			this.events.push(new BaseEvent(event, action));
+		}
+
 		return;
 		/*
 		//	var						name		pop		growth	self	image		color
