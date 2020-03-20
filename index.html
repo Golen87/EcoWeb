@@ -749,8 +749,8 @@
 				<!-- Event input section -->
 				<div class="input-section">
 
-					<!-- Input fields -->
-					<div class="input-fields col-md-9 col-lg-8 col-xl-6" style="display: flex; flex-direction: column;">
+					<!-- Input fields left -->
+					<div class="input-fields col-md-6" style="display: flex; flex-direction: column;">
 
 						<!-- Name -->
 						<div class="form-group row">
@@ -786,7 +786,21 @@
 							</div>
 						</div>
 
-						<hr>
+						<!-- Owner -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Owner</label>
+							<div class="col-sm-8">
+								<select v-model="event.owner_id" class="form-control" required>
+									<option v-bind:value="-1">No owner (automatic)</option>
+									<option disabled>──────────</option>
+									<option v-for="option in all_nodes" v-bind:value="option.id">{{ option.name }}</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- Input fields right -->
+					<div class="input-fields col-md-6" style="display: flex; flex-direction: column;">
 
 						<!-- Effects list -->
 						<div style="overflow-y: auto;">

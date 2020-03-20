@@ -9,6 +9,7 @@ class Organism {
 		this.name = node.name;
 		this.image = node.image;
 		this.color = node.color;
+		this.type = node.type;
 		this.x = actor.position[0];
 		this.y = actor.position[1];
 		this.visibility = actor.visibility;
@@ -21,7 +22,7 @@ class Organism {
 		this.popFuncDt = null;
 		this.carryingCapacity = 1.0;
 
-		if (isAbiotic(node.type)) {
+		if (isAbiotic(this.type)) {
 			const func = actor.popfunc;
 
 			if (func) {
@@ -34,15 +35,15 @@ class Organism {
 			this.startPopulation = actor.population;
 
 			// TODO: Improve (base values on weight/offspring/etc.)
-			if (node.type == "animal") {
+			if (this.type == "animal") {
 				this.growthRate = -0.05;
 				this.selfCompetition = -0.01;
 			}
-			else if (node.type == "plant") {
+			else if (this.type == "plant") {
 				this.growthRate = 1.0;
 				this.selfCompetition = -1.0;
 			}
-			else if (node.type == "fungi") {
+			else if (this.type == "fungi") {
 				this.growthRate = 0.5;
 				this.selfCompetition = -0.5;
 			}

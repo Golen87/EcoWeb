@@ -347,6 +347,7 @@ class Database {
 			"description": null,
 			"image": "missing",
 			"duration": 0,
+			"owner_id": -1,
 			"effects": []
 		};
 	}
@@ -389,6 +390,16 @@ class Database {
 		}
 		console.error("Could not find event with id '" + id + "'");
 		return this.newEvent();
+	}
+
+	getEventsByOwner(id) {
+		let results = [];
+		for (const event of this.events) {
+			if (event.owner_id == id) {
+				results.push(event);
+			}
+		}
+		return results;
 	}
 
 	cloneEvent(id) {

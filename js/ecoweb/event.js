@@ -5,6 +5,7 @@ class BaseEvent {
 		this.description = event.description;
 		this.image = event.image;
 		this.duration = event.duration;
+		this.owner_id = event.owner_id;
 
 		this.type = action.type;
 		this.cost = (this.type == "player") ? action.cost : null;
