@@ -49,6 +49,7 @@ class LevelScene2 extends Phaser.Scene {
 		this.cameras.main.scrollX = camX - this.cameraCenter.x;
 		this.cameras.main.scrollY = camY - this.cameraCenter.y;
 
+		this.dragEnabled = true;
 		this.drag = new Phaser.Math.Vector2(0, 0);
 		this.centerGoal = this.cameraCenter.clone();
 
@@ -90,16 +91,18 @@ class LevelScene2 extends Phaser.Scene {
 		this.timeController = new TimeController(this, this.W-165, this.H-90);
 		this.timeController.on('onChange', function() {
 			this.graph.draw(this.timeController.time);
+			this.updateNodePopulation();
 		}, this);
+		this.updateNodePopulation();
 
 
 		/* Testing */
 
-		console.log(this.scale.orientation);
-		this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
-			console.log('scroll', pointer.event);
+		// console.log(this.scale.orientation);
+		// this.input.on('wheel', function (pointer, gameObjects, deltaX, deltaY, deltaZ) {
+			// console.log('scroll', pointer.event);
 			//pointer.event.stopPropagation();
-		});
+		// });
 		this.input.keyboard.on('keydown-ONE', function (event) {
 			this.setCameraCenter(this.CX/2, this.CY);
 		}, this);
@@ -137,7 +140,7 @@ class LevelScene2 extends Phaser.Scene {
 
 		if (this.selectedNode && this.isDragging) {
 			var d = Phaser.Math.Distance.Between(this.selectedNode.x, this.selectedNode.y, this.cameras.main.scrollX+this.cameraCenter.x, this.cameras.main.scrollY+this.cameraCenter.y);
-			if (d > this.selectedNode.circle.width/2) {
+			if (d > 4 * this.selectedNode.circle.width/2) {
 				this.selectedNode.setSelected(false);
 				this.selectedNode = null;
 			}
@@ -149,7 +152,7 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	handleCamera() {
-		if (this.input.activePointer.isDown) {
+		if (this.dragEnabled && this.input.activePointer.isDown) {
 			if (this.origDragPoint) {
 				let drag = this.origDragPoint.clone();
 				drag.subtract(this.input.activePointer.position);
@@ -225,21 +228,39 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	clickNode(gameObject) {
-		if (!this.isDragging) {
+		if (this.dragEnabled && !this.isDragging) {
 			if (this.selectedNode) {
 				this.selectedNode.setSelected(false);
 			}
 			this.selectedNode = gameObject;
 			this.selectedNode.setSelected(true);
 			this.setCameraFocus(this.selectedNode.x, this.selectedNode.y);
+
+			if (this.selectedNode.visibility == "unexplored") {
+				this.dragEnabled = false;
+				this.addEvent(600, function() {
+					this.dragEnabled = true;
+					this.selectedNode.holdEasing = 1;
+					this.selectedNode.popEasing = 1;
+					this.selectedNode.setVisibility("explored");
+				});
+			}
 		}
 	}
 
 	updateNodePopulation(immediate=false) {
 		for (var i = this.nodes.length - 1; i >= 0; i--) {
-			let pop = web.getValueAt(i, this.slider.value * web.time);
+			let pop = web.getValueAt(i, this.timeController.time);
 			this.nodes[i].setPopulation(pop, immediate);
 		}
+	}
+
+	addEvent(delay, callback) {
+		return this.time.addEvent({
+			delay: delay,
+			callback: callback,
+			callbackScope: this
+		});
 	}
 
 
