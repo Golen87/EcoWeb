@@ -29,6 +29,14 @@ const NODE_IMAGES = [
 	{ value: "blåbär",				text: "assets/images/icons/Blåbär.png" },
 	{ value: "svamp",				text: "assets/images/icons/Svamp.png" },
 	{ value: "detrius",				text: "assets/images/icons/Detrius.png" },
+
+	{ value: "havsutter",			text: "assets/images/icons/Havsutter.png" },
+	{ value: "jättekelp",			text: "assets/images/icons/Jättekelp.png" },
+	{ value: "lax",					text: "assets/images/icons/Lax.png" },
+	{ value: "sjöelefant",			text: "assets/images/icons/Säl_Sjöelefant.png" },
+	{ value: "sjöborre",			text: "assets/images/icons/Sjöborre.png" },
+	{ value: "sjölejon",			text: "assets/images/icons/Sjölejon_California.png" },
+	{ value: "späckhuggare",		text: "assets/images/icons/Späckhuggare.png" },
 ];
 
 const ANIMAL_FOODS = [

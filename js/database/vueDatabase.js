@@ -675,9 +675,12 @@ function createDatabaseTools(database) {
 		}
 	});
 
-	//initNodeChart();
+	//databaseEditor.editTags();
+	databaseEditor.openScenarios();
 	//databaseEditor.openNodes();
+	//databaseEditor.openEvents();
+	scenarioList.editScenario(scenarioList.list[0]);
 	//nodeList.editTags();
-	//nodeList.editNode(nodeList.list[0]);
+	//nodeList.editNode(nodeList.list[26]);
 	//nodeEditor.setTab(2);
 }
