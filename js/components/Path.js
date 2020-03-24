@@ -33,7 +33,7 @@ class Path extends Phaser.GameObjects.Container {
 		this.speed *= this.curve.getLength() / 250;
 		this.dotCount = 2 + amount * 5;
 
-		this.drawBezier();
+		this.drawBezier(0);
 	}
 
 	getWidth() {
@@ -60,11 +60,48 @@ class Path extends Phaser.GameObjects.Container {
 
 			offset += 1/count;
 		}
+		/*
+		this.graphics.lineStyle(1, color);
+
+		circleRadius = 20;
+		minDistance = 40;
+		let savedPoints = [];
+
+		for (let d = 0; d <= 1; d += 0.001) {
+			let pos = this.curve.getPoint(d);
+
+			let collision = false;
+			for (let point of savedPoints) {
+				if (Phaser.Math.Distance.BetweenPoints(pos, point) < minDistance) {
+					collision = true;
+				}
+			}
+
+			if (!collision) {
+				this.graphics.strokeCircle(pos.x, pos.y, circleRadius);
+				savedPoints.push(pos);
+			}
+		}
+		*/
 	}
 
 	update(time, delta) {
-		this.alphaValue = Math.max(this.node1.hoverValue, this.node2.hoverValue) * Math.min(this.node1.aliveValue, this.node2.aliveValue);
+		let alive = Math.min(this.node1.aliveValue, this.node2.aliveValue);
+		let hover = Math.max(this.node1.hoverValue, this.node2.hoverValue);
+		let hover2 = Math.min(this.node1.hoverValue, this.node2.hoverValue);
+		let explored = (this.node1.visibility == "explored" || this.node2.visibility == "explored");
+		let visible = (this.node1.visibility == "explored" && this.node2.visibility == "explored");
+		this.alphaValue = (visible ? hover : hover2) * alive * explored;
 		this.setAlpha(this.alphaValue);
+
+		if (this.node1.visibility == "hidden" && this.node2.visibility == "explored") {
+			this.node1.setVisibility("unexplored");
+			this.node1.popEasing = 1;
+		}
+		if (this.node2.visibility == "hidden" && this.node1.visibility == "explored") {
+			this.node2.setVisibility("unexplored");
+			this.node2.popEasing = 1;
+		}
 
 		if (this.alpha > 0) {
 			this.drawBezier(time);

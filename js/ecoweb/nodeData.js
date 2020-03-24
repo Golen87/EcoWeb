@@ -73,7 +73,7 @@ const ACTOR_VISIBILITY = [
 	{ value: "hidden",		text: "Hidden" },
 ];
 
-const ACTION_TYPE = [
+const ACTION_TYPES = [
 	{ value: "player",		text: "Purchasable" },
 	{ value: "automatic",	text: "Automatic" },
 ];

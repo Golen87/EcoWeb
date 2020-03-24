@@ -28,7 +28,7 @@ class Graph extends Phaser.GameObjects.Container {
 
 		// Help grid
 		this.background.lineStyle(0.5, 0xffffff, 0.3);
-		for (var i = 0; i <= 1; i += 0.1) {
+		for (let i = 0; i <= 1; i += 0.1) {
 			const hy = PADDING + i * (HEIGHT - 2*PADDING);
 			const vx = PADDING + i * (WIDTH - 2*PADDING);
 
@@ -38,7 +38,7 @@ class Graph extends Phaser.GameObjects.Container {
 
 		// Axis steps
 		this.background.lineStyle(1.0, 0xffffff, 1.0);
-		for (var i = 0; i <= 1; i += 0.1) {
+		for (let i = 0; i <= 1; i += 0.1) {
 			const hx = PADDING / 2;
 			const hy = PADDING + i * (HEIGHT - 2*PADDING);
 			const vx = PADDING + i * (WIDTH - 2*PADDING);
@@ -69,7 +69,7 @@ class Graph extends Phaser.GameObjects.Container {
 		for (var s = 0; s < web.currentScenario.species.length; s += 1) {
 			let points = [];
 			for (var i = 0; i <= fac; i += 0.001) {
-				let value = web.getValueAt(s, i * web.time);
+				let value = Phaser.Math.Clamp(web.getValueAt(s, i * web.time), 0, 1);
 				points.push({
 					x: PADDING + i * (WIDTH - 2*PADDING),
 					y: PADDING + (1-value) * (HEIGHT - 2*PADDING)
