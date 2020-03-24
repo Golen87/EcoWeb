@@ -8,8 +8,6 @@ class Database {
 		this.customTags = [];
 
 		this.load();
-
-		createDatabaseTools(this);
 	}
 
 
@@ -19,10 +17,10 @@ class Database {
 		let data = JSON.parse(json);
 
 		if (data && isPlainObject(data) && data.version) {
-			this.loadNodes(data["nodes"]);
-			this.loadEvents(data["events"]);
-			this.loadScenarios(data["scenarios"]);
-			this.loadCustomTags(data["tags"]);
+			this.loadNodes(data.nodes);
+			this.loadEvents(data.events);
+			this.loadScenarios(data.scenarios);
+			this.loadCustomTags(data.tags);
 
 			this.updateUniqueId();
 		}
@@ -187,7 +185,7 @@ class Database {
 	}
 
 	cloneNode(id) {
-		let clone = { ...this.getNodeById(id) };
+		let clone = JSON.parse(JSON.stringify(this.getNodeById(id)));
 		if (clone) {
 			clone.id = this.getUniqueId();
 			clone.name = null;
@@ -403,7 +401,7 @@ class Database {
 	}
 
 	cloneEvent(id) {
-		let clone = { ...this.getEventById(id) };
+		let clone = JSON.parse(JSON.stringify(this.getEventById(id)));
 		if (clone) {
 			clone.id = this.getUniqueId();
 			clone.name = null;
@@ -505,7 +503,7 @@ class Database {
 	}
 
 	cloneScenario(id) {
-		let clone = { ...this.getScenarioById(id) };
+		let clone = JSON.parse(JSON.stringify(this.getScenarioById(id)));
 		if (clone) {
 			clone.id = this.getUniqueId();
 			clone.name = null;

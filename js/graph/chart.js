@@ -29,7 +29,7 @@ function initChart() {
 		}
 	};
 	window.chart = Chart.Scatter(ctx, config);
-};
+}
 
 function resetChart() {
 	chartData.datasets = [];
@@ -50,10 +50,6 @@ function addSpecies(name, color, showGraph, isAbiotic) {
 	});
 }
 
-/*function addData(species, x, y) {
-	chartData.datasets[species].data.push({x,y});
-}*/
-
 function updateChart() {
 	chartData.labels = [];
 
@@ -64,9 +60,6 @@ function updateChart() {
 
 	for (let j = 0; j < web.result.y[0].length; j++) {
 		chartData.datasets[j].data = [];
-		//let isDead = (web.result.y[0][j] == 0);
-		//if (isDead)
-		//	continue;
 
 		for (let i = 0; i < web.result.x.length; i++) {
 			let x = web.result.x[i];
@@ -77,52 +70,3 @@ function updateChart() {
 
 	window.chart.update();
 }
-
-
-var randomScalingFactor = function() {
-	return Math.round(Math.random() * 100);
-};
-function initNodeChart() {
-	let ctx = document.getElementById('nodeChart').getContext('2d');
-	let config = {
-		type: 'doughnut',
-		data: {
-			datasets: [{
-				data: [
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-					randomScalingFactor(),
-				],
-				backgroundColor: [
-					window.chartColors.red,
-					window.chartColors.orange,
-					window.chartColors.yellow,
-					window.chartColors.green,
-					window.chartColors.blue,
-				],
-				label: 'Dataset 1'
-			}],
-			labels: [
-				'Red',
-				'Orange',
-				'Yellow',
-				'Green',
-				'Blue'
-			]
-		},
-		options: {
-			responsive: true,
-			legend: {
-				position: 'top',
-			},
-			animation: {
-				animateScale: true,
-				animateRotate: true
-			}
-		}
-	};
-
-	window.nodeChart = new Chart(ctx, config);
-};

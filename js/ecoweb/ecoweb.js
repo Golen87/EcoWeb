@@ -62,10 +62,6 @@ class EcoWeb {
 		console.error("Unknown component:", name);
 	}
 
-	getComponent(name) {
-		this.species[this.getSpeciesIndex(name)];
-	}
-
 	build(species) {
 		this.species = species;
 
@@ -80,7 +76,7 @@ class EcoWeb {
 
 		for (let i = 0; i < species.length; i++) {
 			let s = species[i];
-			addSpecies(s.name, s.color, s.showGraph, isAbiotic(s.type));
+			addSpecies(s.name, s.color, s.showGraph && s.enable, isAbiotic(s.type));
 			this.startPop[i] = (s.enable ? s.startPopulation : 0);
 			this.r[i] = s.growthRate;
 			this.K[i] = s.carryingCapacity;
@@ -181,18 +177,12 @@ class EcoWeb {
 	}
 
 	setEvent(event, time) {
-		/*for (var i = this.activeEvents.length - 1; i >= 0; i--) {
-			if (this.activeEvents[i].time == time) {
-				this.activeEvents.splice(i, 1);
-			}
-		}*/
 		if (event) {
 			this.activeEvents.push(new ActiveEvent(event, time));
 		}
-
-		//this.refresh();
 	}
 
+	/*
 	applyEvent(event) {
 		console.log("> Apply event:", event.name, event.effects);
 
@@ -205,6 +195,7 @@ class EcoWeb {
 			//this.A[r][d] = 0; // Ta bort rådjurs-dovhjorts straff
 		}
 	}
+	*/
 
 	getActivityMap() {
 		let map = {};
@@ -215,9 +206,9 @@ class EcoWeb {
 			for (const activeEvent of this.activeEvents) {
 				if (activeEvent.active) {
 					for (const effect of activeEvent.event.effects) {
-						if (id == effect.node.id) {
 							effect.startTime = activeEvent.startTime;
 							map[id].push(effect);
+						if (id == effect.node_id) {
 						}
 					}
 				}
@@ -227,6 +218,10 @@ class EcoWeb {
 	}
 
 	solve(duration) {
+		for (const activeEvent of this.activeEvents) {
+			activeEvent.setActive(false);
+		}
+
 		let timestamps = [];
 		for (const event of this.activeEvents) {
 			timestamps.push({
@@ -242,7 +237,7 @@ class EcoWeb {
 		}
 		timestamps.sort((a,b) => (a.time > b.time) ? 1 : -1);
 
-		for (var i = 0; i < timestamps.length; i++) {
+		for (let i = 0; i < timestamps.length; i++) {
 			const activeEvent = timestamps[i].activeEvent;
 			const time = timestamps[i].time;
 
@@ -270,7 +265,7 @@ class EcoWeb {
 
 		console.log("> Solving", this.time, "-", (this.time+duration));
 		// Lotka-Volterra equation (classical model for predator-prey interaction)
-		let f = function(t, pop) {
+		const f = function(t, pop) {
 			// Calculate interactions for diet
 			let matrix = [];
 			for (let i = 0; i < pop.length; i++) {
@@ -310,6 +305,7 @@ class EcoWeb {
 			// Calculate population derivative
 			let dPopList = [];
 			for (let i = 0; i < pop.length; i++) {
+				let s = this.species[i];
 
 				let sum = 0;
 				for (let j = 0; j < pop.length; j++) {
@@ -332,6 +328,7 @@ class EcoWeb {
 				}
 
 
+				// Abiotic function
 				if (this.species[i].popFuncDt) {
 					dPopList[i] = this.species[i].popFuncDt.evaluate({t});
 				}
@@ -347,10 +344,14 @@ class EcoWeb {
 						//dPopList[i] += value;
 					}
 				}
+
+				if (!s.enable) {
+					dPopList[i] = 0;
+				}
 			}
 
 			return dPopList;
-		}
+		};
 
 		// ODE Solver
 		let start = this.time;
@@ -506,37 +507,37 @@ function scenario_4 () {
 		svamp,		0.2,
 		dovhjort,	0.2,
 		radjur,		0.2,
-		koltrast,	0.6,
+		koltrast,	0.6
 	);
 	lo.setDiet(
 		hare,		0.1,
 		dovhjort,	0.9,
 		radjur,		0.4,
-		koltrast,	0.2,
+		koltrast,	0.2
 	);
 	dovhjort.setDiet(
 		trad,	0.5,
 		orter,	0.6,
 		blabar,	0.4,
-		gras,	0.5,
+		gras,	0.5
 	);
 	radjur.setDiet(
 		orter,	1.0,
 		trad,	0.6,
 		svamp,	0.3,
 		blabar,	0.2,
-		gras,	0.1,
+		gras,	0.1
 	);
 	hare.setDiet(
 		orter,	1.0,
 		blabar,	0.7,
 		gras,	0.4,
-		trad,	0.2,
+		trad,	0.2
 	);
 	koltrast.setDiet(
 		trad,	1.0,
 		blabar,	0.6,
-		svamp,	0.6,
+		svamp,	0.6
 	);
 
 	//addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
@@ -561,7 +562,7 @@ function scenario_4 () {
 
 
 
-let web = new EcoWeb();
+const web = new EcoWeb();
 const DEATH_THRESHOLD = 1E-3;
 
 //window.onload = function() {
@@ -570,4 +571,5 @@ function initWeb() {
 
 	// Global
 	window.database = new Database();
+	createDatabaseTools(window.database);
 }

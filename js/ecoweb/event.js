@@ -24,7 +24,7 @@ class BaseEvent {
 
 				console.log(this.name, func);
 				this.effects.push({
-					"node": node,
+					"node_id": node.id,
 					"something": effect.something,
 					"duration": this.duration,
 					"derivative": math.derivative(func, "t").compile(),
