@@ -565,7 +565,7 @@ class Database {
 	addAction(scenario) {
 		let action = {
 			"event_id": -1,
-			"type": ACTION_TYPE[0].value,
+			"type": ACTION_TYPES[0].value,
 			"time": 0,
 			"cost": 0,
 		};

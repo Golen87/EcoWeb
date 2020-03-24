@@ -1,97 +1,62 @@
-function createGraphTools() {
-	return new Vue({
-		el: "#graphTools",
-		data: {
-			duration: 100,
-			species: [],
-			scenarios: [],
-			main: {show: false},
-			isActive: true
-		},
-		computed: {
-			total: function () {
-				return 10;
-			}
-		},
-		methods: {
-			//wiggle(event) {
-			//	web.initWiggle();
-			//	this.updateGraph();
-			//},
-			stabilize(event) {
-				web.stabilize();
-				this.updateGraph();
-			},
-			reset(event) {
-				web.restart();
-			},
-			// startScenario(id) {
-			// 	web.startScenario(id);
-			// },
-			updateValue(event, s, key) {
-				s[key] = parseFloat(event.target.value);
-				this.updateGraph();
-			},
-			updateDuration(event) {
-				this.duration = parseFloat(event.target.value);
-				web.maxTime = this.duration;
-				this.updateGraph();
-			},
-			updateGraph() {
-				web.refresh();
-			},
-			toggleShow(event, s) {
-				s.show = !s.show;
-			},
-			toggleEnable(event, s) {
-				s.enable = !s.enable;
-				this.updateGraph();
-			},
-			toggleShowGraph(event, s) {
-				s.showGraph = !s.showGraph;
-				this.updateGraph();
-			},
-		},
-	});
-}
-
 function createDatabaseTools(database) {
 
-	let databaseEditor = new Vue({
+	/* Shared functions */
+
+	function all_nodes() { return window.database.nodes; }
+	function all_events() { return window.database.events; }
+	function all_scenarios() { return window.database.scenarios; }
+	function all_tags() { return window.database.getAllTags(window.database.getCustomTags()); }
+	function all_custom_tags() { return window.database.getCustomTags(); }
+
+	function getImage(image) {
+		return getTextFromValue(NODE_IMAGES, image);
+	}
+
+	function getNode(actor) {
+		return window.database.getNodeById(actor.node_id);
+	}
+
+	function getEvent(action) {
+		return window.database.getEventById(action.event_id);
+	}
+
+	function checkAbiotic(actor) {
+		return isAbiotic(getNode(actor).type);
+	}
+
+
+	const databaseEditor = new Vue({
 		el: "#databaseEditor",
 		data: {
 			show: true,
 		},
 		computed: {
-			nodeCount: function () {
-				return database.nodes.length;
-			},
-			nodes: function () { return database.nodes; },
-			events: function () { return database.events; },
-			scenarios: function () { return database.scenarios; },
-			tags: function () { return database.getCustomTags(true); },
+			total_nodes() { return window.database.nodes.length; },
+			total_events() { return window.database.events.length; },
+			total_scenarios() { return window.database.scenarios.length; },
+			total_custom_tags() { return window.database.getCustomTags(true).length; },
 		},
 		methods: {
-			open: function () {
+			open() {
 				this.show = true;
 			},
-			openNodes: function () {
+			openNodes() {
 				this.show = false;
 				nodeList.open();
 			},
-			openEvents: function () {
+			openEvents() {
 				this.show = false;
 				eventList.open();
 			},
-			openScenarios: function () {
+			openScenarios() {
 				this.show = false;
 				scenarioList.open();
 			},
-			editTags: function () {
+			editTags() {
 				this.show = false;
 				tagEditor.open();
 			},
-			importFile: function () {
+			importFile() {
 				$("#importJsonInput").click();
 				$("#importJsonInput").change(function(event) {
 					event.stopImmediatePropagation();
@@ -117,7 +82,7 @@ function createDatabaseTools(database) {
 					reader.readAsText(this.files[0]);
 				});
 			},
-			exportFile: function () {
+			exportFile() {
 				let filename = "ecoweb-{0}.json".format(getDateAsString());
 
 				$("<a />", {
@@ -125,40 +90,37 @@ function createDatabaseTools(database) {
 					"href" : "data:application/json," + encodeURIComponent(database.exportJSON(true))
 				}).appendTo("body")
 				.click(function() {
-					$(this).remove()
+					$(this).remove();
 				})
 				.get(0).click();
 			},
 		},
 	});
 
-	let nodeList = new Vue({
+	const nodeList = new Vue({
 		el: "#nodeList",
 		data: {
 			show: false,
 			list: [],
 		},
 		methods: {
-			open: function () {
+			open() {
 				this.show = true;
 				this.list = database.nodes;
 			},
-			back: function () {
+			back() {
 				this.show = false;
 				databaseEditor.open();
 			},
-			getImage: function (image) {
-				return getTextFromValue(NODE_IMAGES, image);
-			},
-			editNode: function (node) {
+			editNode(node) {
 				this.show = false;
 				nodeEditor.open(database.getNodeById(node.id));
 			},
-			copyNode: function (node) {
+			copyNode(node) {
 				this.show = false;
 				nodeEditor.open(database.cloneNode(node.id));
 			},
-			deleteNode: function (node) {
+			deleteNode(node) {
 				warningModal.show(
 					"delete",
 					"Are you sure you want to permanently delete this node?",
@@ -168,37 +130,38 @@ function createDatabaseTools(database) {
 					}.bind(this)
 				);
 			},
-			addNode: function () {
+			addNode() {
 				this.show = false;
 				nodeEditor.open(database.newNode());
 			},
+			getImage,
 		},
 	});
 
-	let eventList = new Vue({
+	const eventList = new Vue({
 		el: "#eventList",
 		data: {
 			show: false,
 			list: [],
 		},
 		methods: {
-			open: function () {
+			open() {
 				this.show = true;
 				this.list = database.events;
 			},
-			back: function () {
+			back() {
 				this.show = false;
 				databaseEditor.open();
 			},
-			editEvent: function (event) {
+			editEvent(event) {
 				this.show = false;
 				eventEditor.open(database.getEventById(event.id));
 			},
-			copyEvent: function (event) {
+			copyEvent(event) {
 				this.show = false;
 				eventEditor.open(database.cloneEvent(event.id));
 			},
-			deleteEvent: function (event) {
+			deleteEvent(event) {
 				warningModal.show(
 					"delete",
 					"Are you sure you want to permanently delete this event?",
@@ -208,46 +171,44 @@ function createDatabaseTools(database) {
 					}.bind(this)
 				);
 			},
-			moveEvent: function (event, dir) {
+			moveEvent(event, dir) {
 				database.moveEvent(event.id, dir);
 				database.save();
 			},
-			addEvent: function () {
+			addEvent() {
 				this.show = false;
 				let event = database.newEvent();
 				database.addEffect(event, "node");
 				eventEditor.open(event);
 			},
-			getImage: function (image) {
-				return getTextFromValue(NODE_IMAGES, image);
-			},
+			getImage,
 		},
 	});
 
-	let scenarioList = new Vue({
+	const scenarioList = new Vue({
 		el: "#scenarioList",
 		data: {
 			show: false,
 			list: [],
 		},
 		methods: {
-			open: function () {
+			open() {
 				this.show = true;
 				this.list = database.scenarios;
 			},
-			back: function () {
+			back() {
 				this.show = false;
 				databaseEditor.open();
 			},
-			editScenario: function (scenario) {
+			editScenario(scenario) {
 				this.show = false;
 				scenarioEditor.open(database.getScenarioById(scenario.id));
 			},
-			copyScenario: function (scenario) {
+			copyScenario(scenario) {
 				this.show = false;
 				scenarioEditor.open(database.cloneScenario(scenario.id));
 			},
-			deleteScenario: function (scenario) {
+			deleteScenario(scenario) {
 				warningModal.show(
 					"delete",
 					"Are you sure you want to permanently delete this scenario?",
@@ -257,63 +218,43 @@ function createDatabaseTools(database) {
 					}.bind(this)
 				);
 			},
-			moveScenario: function (scenario, dir) {
+			moveScenario(scenario, dir) {
 				database.moveScenario(scenario.id, dir);
 				database.save();
 			},
-			addScenario: function () {
+			addScenario() {
 				this.show = false;
 				let scenario = database.newScenario();
 				scenarioEditor.open(scenario);
 			},
-			getNodeImage: function (actor) {
-				let image = database.getNodeById(actor.node_id).image;
-				return getTextFromValue(NODE_IMAGES, image);
-			},
-			getNodeColor: function (actor) {
-				return database.getNodeById(actor.node_id).color;
-			},
-			getNodeName: function (actor) {
-				return database.getNodeById(actor.node_id).name;
-			},
+			getImage,
+			getNode,
 		},
 	});
 
-	let nodeEditor = new Vue({
+	const nodeEditor = new Vue({
 		el: "#nodeEditor",
 		data: {
 			show: false,
 			tab: 1,
-			node: database.newNode()
+			node: database.newNode(),
+			ANIMAL_FOODS, ANIMAL_SIZES, NODE_TYPES, NODE_IMAGES, SERVICE_CATEGORIES, RELATION_INTERACTIONS,
 		},
 		computed: {
-			incoming_relations: function () {
-				return database.getIncomingRelations(this.node);
-			},
-			outgoing_relations: function () {
-				return database.getOutgoingRelations(this.node);
-			},
-			imagesrc: function () {
-				return getTextFromValue(NODE_IMAGES, this.node.image);
-			},
-			all_nodes: function () { return database.nodes; },
-			custom_tags: function () { return database.getCustomTags(); },
-			all_tags: function () { return database.getAllTags(database.getCustomTags()); },
-			node_types: function () { return NODE_TYPES; },
-			animal_foods: function () { return ANIMAL_FOODS; },
-			animal_sizes: function () { return ANIMAL_SIZES; },
-			node_images: function () { return NODE_IMAGES; },
-			service_categories: function () { return SERVICE_CATEGORIES; },
-			relation_interactions: function () { return RELATION_INTERACTIONS; },
-			form_changed: function () { return JSON.stringify(this.node) !== JSON.stringify(this.original); },
+			all_nodes,
+			all_tags,
+			all_custom_tags,
+			incoming_relations() { return window.database.getIncomingRelations(this.node); },
+			outgoing_relations() { return window.database.getOutgoingRelations(this.node); },
+			form_changed() { return JSON.stringify(this.node) !== JSON.stringify(this.original); },
 		},
 		methods: {
-			open: function (node) {
+			open(node) {
 				this.original = node;
 				this.node = JSON.parse(JSON.stringify(node));
 				this.show = true;
 			},
-			save: function (e) {
+			save(e) {
 				e.preventDefault();
 
 				let newNode = JSON.parse(JSON.stringify(this.node));
@@ -324,11 +265,11 @@ function createDatabaseTools(database) {
 				this.original = JSON.parse(JSON.stringify(this.node));
 				this.node = JSON.parse(JSON.stringify(newNode));
 			},
-			cancel: function () {
+			cancel() {
 				this.show = false;
 				nodeList.open();
 			},
-			redirect: function (node) {
+			redirect(node) {
 				if (this.form_changed) {
 					warningModal.show(
 						"save",
@@ -347,7 +288,7 @@ function createDatabaseTools(database) {
 					this.open(node);
 				}
 			},
-			setTab: function (tab) {
+			setTab(tab) {
 				let form = $(this.$el);
 				if(!form[0].checkValidity()) {
 					form.find(":submit").click();
@@ -356,52 +297,43 @@ function createDatabaseTools(database) {
 					this.tab = tab;
 				}
 			},
-			addRelation: function (type) {
+			addRelation(type) {
 				database.addRelation(this.node, type);
 			},
-			deleteRelation: function (index) {
+			deleteRelation(index) {
 				database.deleteRelation(this.node, index);
 			},
-			getImage: function (image) {
-				return getTextFromValue(NODE_IMAGES, image);
-			},
-			getPreference: function (relation) {
-				let perc = database.getRelationPreference(this.node, relation);
-				perc *= 100;
-				let rounded = Math.round(perc);
+			getPreference(relation) {
+				let perc = window.database.getRelationPreference(this.node, relation);
+				let rounded = Math.round(100 * perc);
 				return "~" + rounded + "%";
 			},
+			getStrippedPath(path) { return path.substring(path.lastIndexOf("/") + 1, path.length); },
+			getImage,
 		}
 	});
 
-	let eventEditor = new Vue({
+	const eventEditor = new Vue({
 		el: "#eventEditor",
 		data: {
 			show: false,
 			tab: 1,
-			event: database.newEvent()
+			event: database.newEvent(),
+			NODE_IMAGES,
 		},
 		computed: {
-			outgoing_effects: function () {
-				return database.getOutgoingRelations(this.event);
-			},
-			imagesrc: function () {
-				return getTextFromValue(NODE_IMAGES, this.event.image);
-			},
-			all_nodes: function () { return database.nodes; },
-			all_events: function () { return database.events; },
-			custom_tags: function () { return database.getCustomTags(); },
-			all_tags: function () { return database.getAllTags(database.getCustomTags()); },
-			node_images: function () { return NODE_IMAGES; },
-			form_changed: function () { return JSON.stringify(this.event) !== JSON.stringify(this.original); },
+			all_nodes,
+			all_events,
+			all_tags,
+			form_changed() { return JSON.stringify(this.event) !== JSON.stringify(this.original); },
 		},
 		methods: {
-			open: function (event) {
+			open(event) {
 				this.original = event;
 				this.event = JSON.parse(JSON.stringify(event));
 				this.show = true;
 			},
-			save: function (e) {
+			save(e) {
 				e.preventDefault();
 
 				let newEvent = JSON.parse(JSON.stringify(this.event));
@@ -413,44 +345,32 @@ function createDatabaseTools(database) {
 				this.event = JSON.parse(JSON.stringify(newEvent));
 				//this.cancel();
 			},
-			cancel: function () {
+			cancel() {
 				this.show = false;
 				eventList.open();
 			},
-			addEffect: function (type) {
+			addEffect(type) {
 				database.addEffect(this.event, type);
 			},
-			deleteEffect: function (index) {
+			deleteEffect(index) {
 				database.deleteEffect(this.event, index);
 			},
-			getImage: function (image) {
-				return getTextFromValue(EVENT_IMAGES, image);
-			},
-			getPreference: function (effect) {
-				let perc = database.getEffectPreference(this.event, effect);
-				perc *= 100;
-				let rounded = Math.round(perc);
-				return "~" + rounded + "%";
-			},
+			getImage,
 		},
 	});
 
-	let scenarioEditor = new Vue({
+	const scenarioEditor = new Vue({
 		el: "#scenarioEditor",
 		data: {
 			show: false,
 			tab: 1,
-			scenario: database.newScenario()
+			scenario: database.newScenario(),
+			ACTOR_VISIBILITY, ACTION_TYPES,
 		},
 		computed: {
-			//imagesrc: function () {
-			//	return getTextFromValue(NODE_IMAGES, this.scenario.image);
-			//},
-			all_nodes: function () { return database.nodes; },
-			all_actor_visibility: function () { return ACTOR_VISIBILITY; },
-			all_action_types: function () { return ACTION_TYPE; },
-			form_changed: function () { return JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
-			abiotic_functions_valid: function () {
+			all_nodes,
+			form_changed() { return JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
+			abiotic_functions_valid() {
 				for (const actor of this.scenario.actors) {
 					const type = database.getNodeById(actor.node_id).type;
 					if (isAbiotic(type)) {
@@ -463,12 +383,12 @@ function createDatabaseTools(database) {
 			},
 		},
 		methods: {
-			open: function (scenario) {
+			open(scenario) {
 				this.original = scenario;
 				this.scenario = JSON.parse(JSON.stringify(scenario));
 				this.show = true;
 			},
-			save: function (e) {
+			save(e) {
 				e.preventDefault();
 
 				for (const actor of this.scenario.actors) {
@@ -490,11 +410,11 @@ function createDatabaseTools(database) {
 				this.scenario = JSON.parse(JSON.stringify(newScenario));
 				//this.cancel();
 			},
-			cancel: function () {
+			cancel() {
 				this.show = false;
 				scenarioList.open();
 			},
-			setTab: function (tab) {
+			setTab(tab) {
 				var form = $(this.$el);
 				if(!form[0].checkValidity()) {
 					form.find(":submit").click();
@@ -503,7 +423,7 @@ function createDatabaseTools(database) {
 					this.tab = tab;
 				}
 			},
-			openNodeSelector: function () {
+			openNodeSelector() {
 				let idList = [];
 				for (const actor of this.scenario.actors) {
 					idList.push(actor.node_id);
@@ -515,7 +435,7 @@ function createDatabaseTools(database) {
 					this.setActors.bind(this)
 				);
 			},
-			openEventSelector: function () {
+			openEventSelector() {
 				let idList = [];
 				for (const action of this.scenario.actions) {
 					idList.push(action.event_id);
@@ -533,7 +453,7 @@ function createDatabaseTools(database) {
 			setActions(idList) {
 				database.setActions(this.scenario, idList);
 			},
-			run: function () {
+			run() {
 				let form = $(this.$el);
 				form.find(":submit").click();
 				if (form[0].checkValidity()) {
@@ -545,38 +465,18 @@ function createDatabaseTools(database) {
 					}
 				}
 			},
-			getNodeImage: function (actor) {
-				let image = database.getNodeById(actor.node_id).image;
-				return getTextFromValue(NODE_IMAGES, image);
-			},
-			getNodeColor: function (actor) {
-				return database.getNodeById(actor.node_id).color;
-			},
-			getNodeName: function (actor) {
-				return database.getNodeById(actor.node_id).name;
-			},
-			checkNodeAbiotic: function (actor) {
-				const type = database.getNodeById(actor.node_id).type;
-				return isAbiotic(type);
-			},
-			getEventImage: function (actor) {
-				let image = database.getEventById(actor.event_id).image;
-				return getTextFromValue(NODE_IMAGES, image);
-			},
-			getEventColor: function (actor) {
-				return database.getEventById(actor.event_id).color;
-			},
-			getEventName: function (actor) {
-				return database.getEventById(actor.event_id).name;
-			},
-			checkAbioticFunction: function (actor) {
+			getImage,
+			getNode,
+			getEvent,
+			checkAbiotic,
+			checkAbioticFunction(actor) {
 				try {
 					const result = math.evaluate(actor.popfunc, {t: 0});
 					if (typeof result != 'number') {
 						return false;
 					}
 				}
-				catch {
+				catch(error) {
 					return false;
 				}
 				return true;
@@ -584,7 +484,7 @@ function createDatabaseTools(database) {
 		},
 	});
 
-	let tagEditor = new Vue({
+	const tagEditor = new Vue({
 		el: "#tagEditor",
 		data: {
 			show: false,
@@ -592,10 +492,10 @@ function createDatabaseTools(database) {
 			tagMap: {}
 		},
 		computed: {
-			parsed_tags: function () {
+			parsed_tags() {
 				return database.parseTags(this.tags.split("\n"));
 			},
-			tag_warnings: function () {
+			tag_warnings() {
 				let tags = this.tags.split("\n");
 				tags = database.parseTags(tags);
 				tags = database.getAllTags(tags);
@@ -603,7 +503,7 @@ function createDatabaseTools(database) {
 			},
 		},
 		methods: {
-			open: function () {
+			open() {
 				const customTags = database.getCustomTags();
 				this.tags = customTags.join("\n");
 				this.show = true;
@@ -617,7 +517,7 @@ function createDatabaseTools(database) {
 					}
 				}
 			},
-			save: function (e) {
+			save(e) {
 				e.preventDefault();
 
 				if (this.tag_warnings.length > 0) {
@@ -632,7 +532,7 @@ function createDatabaseTools(database) {
 					this.confirmSave();
 				}
 			},
-			confirmSave: function () {
+			confirmSave() {
 				let tags = this.tags.split("\n");
 
 				for (const tag of tags) {
@@ -656,17 +556,17 @@ function createDatabaseTools(database) {
 
 				this.cancel();
 			},
-			cancel: function () {
+			cancel() {
 				this.show = false;
 				databaseEditor.open();
 			},
-			getNodeCountByTag: function (tag) {
+			getNodeCountByTag(tag) {
 				if (this.tagMap[tag]) {
 					return this.tagMap[tag].length;
 				}
 				return 0;
 			},
-			selectNodes: function (tag) {
+			selectNodes(tag) {
 				//let nodes = database.getNodesByTags([tag]);
 				//const nodeList = nodes.map(function(node) { return node.id; });
 				const idList = this.tagMap[tag];
@@ -678,14 +578,14 @@ function createDatabaseTools(database) {
 					this.setTagToNodes.bind(this, tag)
 				);
 			},
-			setTagToNodes: function (tag, idList) {
+			setTagToNodes(tag, idList) {
 				Vue.set(this.tagMap, tag, idList);
 				//Vue.set(this.tagMap, tag, this.getNodeCountByTag(tag));
 			}
 		},
 	});
 
-	let warningModal = new Vue({
+	const warningModal = new Vue({
 		el: "#warningModal",
 		data: {
 			titleText: "Warning",
@@ -697,7 +597,7 @@ function createDatabaseTools(database) {
 			denyCallback: null,
 		},
 		methods: {
-			show: function (type, text, acceptCallback=null, denyCallback=null) {
+			show(type, text, acceptCallback=null, denyCallback=null) {
 				this.type = type;
 				this.bodyText = text;
 				this.acceptCallback = acceptCallback;
@@ -714,16 +614,16 @@ function createDatabaseTools(database) {
 
 				$("#warningModal").modal("show");
 			},
-			hide: function () {
+			hide() {
 				$("#warningModal").modal("hide");
 			},
-			accept: function () {
+			accept() {
 				this.hide();
 				if (this.acceptCallback) {
 					this.acceptCallback();
 				}
 			},
-			deny: function () {
+			deny() {
 				this.hide();
 				if (this.denyCallback) {
 					this.denyCallback();
@@ -732,7 +632,7 @@ function createDatabaseTools(database) {
 		},
 	});
 
-	let nodeSelectorModal = new Vue({
+	const nodeSelectorModal = new Vue({
 		el: "#nodeSelectorModal",
 		data: {
 			selected: {},
@@ -744,7 +644,7 @@ function createDatabaseTools(database) {
 			callback: null,
 		},
 		methods: {
-			show: function (titleText, allNodes, nodeList=[], callback=null) {
+			show(titleText, allNodes, nodeList=[], callback=null) {
 				this.titleText = titleText;
 				this.allNodes = allNodes;
 				this.callback = callback;
@@ -755,10 +655,10 @@ function createDatabaseTools(database) {
 
 				$("#nodeSelectorModal").modal("show");
 			},
-			hide: function () {
+			hide() {
 				$("#nodeSelectorModal").modal("hide");
 			},
-			accept: function () {
+			accept() {
 				let nodeList = [];
 				for (const nodeId in this.selected) {
 					if (this.selected[nodeId]) {
@@ -771,9 +671,7 @@ function createDatabaseTools(database) {
 					this.callback(nodeList);
 				}
 			},
-			getImage: function (image) {
-				return getTextFromValue(NODE_IMAGES, image);
-			},
+			getImage,
 		}
 	});
 
@@ -783,8 +681,3 @@ function createDatabaseTools(database) {
 	//nodeList.editNode(nodeList.list[0]);
 	//nodeEditor.setTab(2);
 }
-
-$(document).ready(function() {
-	//Vue.component("vue-multiselect", window.VueMultiselect.default);
-	//$(".selectpicker").selectpicker();
-});

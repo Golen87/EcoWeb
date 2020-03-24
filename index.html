@@ -82,7 +82,7 @@
 		<script src="js/scenes/LevelScene.js"></script>
 		<script src="js/scenes/LevelScene2.js"></script>
 
-		<script src="js/graph/graphUtils.js"></script>
+		<script src="js/graph/vueGraphTools.js"></script>
 		<script src="js/graph/vue.js"></script>
 		<script src="js/graph/chart.js"></script>
 
@@ -267,10 +267,10 @@
 
 				<div class="d-flex justify-content-end">
 					<div>
-						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Nodes (' + nodes.length + ')'" v-on:click="openNodes()">
-						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Events (' + events.length + ')'" v-on:click="openEvents()">
-						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Scenarios (' + scenarios.length + ')'" v-on:click="openScenarios()">
-						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Tags (' + tags.length + ')'" v-on:click="editTags()">
+						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Nodes (' + total_nodes + ')'" v-on:click="openNodes()">
+						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Events (' + total_events + ')'" v-on:click="openEvents()">
+						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Scenarios (' + total_scenarios + ')'" v-on:click="openScenarios()">
+						<input type="button" class="btn btn-lg btn-primary" v-bind:value="'Tags (' + total_custom_tags + ')'" v-on:click="editTags()">
 					</div>
 				</div>
 
@@ -397,11 +397,11 @@
 								<td scope="row" class="align-middle d-none d-md-table-cell">
 									<img
 										v-for="actor in s.actors"
-										v-bind:src="getNodeImage(actor)"
+										v-bind:src="getImage(getNode(actor).image)"
 										class="img-thumbnail p-0 rounded-circle"
 										style="border: none; height: 40px;"
-										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getNodeColor(actor) }"
-										v-bind:title="getNodeName(actor)">
+										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getNode(actor).color }"
+										v-bind:title="getNode(actor).name">
 								</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
 									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editScenario(s)"><i class="fas fa-fw fa-edit"></i></button>
@@ -450,7 +450,7 @@
 				<div v-show="tab == 1" class="input-section">
 
 					<!-- Input fields -->
-					<div class="input-fields col-md-9 col-lg-8 col-xl-6">
+					<div class="input-fields col-md-8 col-xl-6">
 
 						<!-- Name -->
 						<div class="form-group row">
@@ -465,7 +465,7 @@
 							<label class="col-sm-4 col-form-label">Image</label>
 							<div class="col-sm-8">
 								<select v-model="node.image" class="form-control" required>
-									<option v-for="option in node_images" v-bind:value="option.value">{{ option.text }}</option>
+									<option v-for="option in NODE_IMAGES" v-bind:value="option.value">{{ getStrippedPath(option.text) }}</option>
 								</select>
 							</div>
 						</div>
@@ -485,7 +485,7 @@
 							<label class="col-sm-4 col-form-label">Type</label>
 							<div class="col-sm-8">
 								<select v-model="node.type" class="form-control" required>
-									<option v-for="option in node_types" v-bind:value="option.value">{{ option.text }}</option>
+									<option v-for="option in NODE_TYPES" v-bind:value="option.value">{{ option.text }}</option>
 								</select>
 							</div>
 						</div>
@@ -498,7 +498,7 @@
 								<label class="col-sm-4 col-form-label">Size</label>
 								<div class="col-sm-8">
 									<select v-model="node.animal.size" class="form-control" required>
-										<option v-for="option in animal_sizes" v-bind:value="option.value">{{ option.text }}</option>
+										<option v-for="option in ANIMAL_SIZES" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
 							</div>
@@ -508,7 +508,7 @@
 								<label class="col-sm-4 col-form-label">Food</label>
 								<div class="col-sm-8">
 									<select v-model="node.animal.food" class="form-control" required>
-										<option v-for="option in animal_foods" v-bind:value="option.value">{{ option.text }}</option>
+										<option v-for="option in ANIMAL_FOODS" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
 							</div>
@@ -566,7 +566,7 @@
 								<label class="col-sm-4 col-form-label">Category</label>
 								<div class="col-sm-8">
 									<select v-model="node.service.category" class="form-control" required>
-										<option v-for="option in service_categories" v-bind:value="option.value">{{ option.text }}</option>
+										<option v-for="option in SERVICE_CATEGORIES" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
 							</div>
@@ -579,7 +579,7 @@
 							<label class="col-sm-4 col-form-label">Tags</label>
 							<div class="col-sm-8">
 								<select v-model="node.tags" class="form-control" multiple>
-									<option v-for="option in custom_tags" v-bind:value="option" :disabled="option == ''">{{ option }}</option>
+									<option v-for="option in all_custom_tags" v-bind:value="option" :disabled="option == ''">{{ option }}</option>
 								</select>
 							</div>
 						</div>
@@ -595,9 +595,9 @@
 					</div>
 
 					<!-- Node image -->
-					<div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
+					<div class="input-fields col-md-4 col-xl-4 d-flex flex-column">
 						<img
-							v-bind:src="imagesrc"
+							v-bind:src="getImage(node.image)"
 							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
 							style="border: none"
 							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }"
@@ -608,7 +608,7 @@
 				<!-- Diet tab -->
 				<div v-show="tab == 2" class="input-section">
 					<!-- Relation list -->
-					<div class="input-fields col-md-9 col-lg-8 col-xl-6">
+					<div class="input-fields col-md-8 col-xl-6">
 
 						<!-- Relation -->
 						<div class="card bg-light mb-1" v-for="(relation, index) in node.relations">
@@ -644,7 +644,7 @@
 									<div class="col-sm-8">
 										<select v-model="relation.interaction" class="form-control" required>
 											<option value="" disabled hidden>Select interaction</option>
-											<option v-for="option in relation_interactions" v-bind:value="option.value">{{ option.text }}</option>
+											<option v-for="option in RELATION_INTERACTIONS" v-bind:value="option.value">{{ option.text }}</option>
 										</select>
 									</div>
 								</div>
@@ -678,19 +678,10 @@
 
 
 					<!-- Relation chart -->
-					<div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
-						<!--img
-							v-bind:src="imagesrc"
-							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
-							style="border: none"
-							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }"
-							v-bind:title="node.name"-->
-						<!--347-->
-						<!-- <canvas id="nodeChart" height="300"></canvas> -->
-
+					<div class="input-fields col-md-4 col-xl-4 d-flex flex-column">
 						<!-- Node image -->
 						<img
-							v-bind:src="imagesrc"
+							v-bind:src="getImage(node.image)"
 							class="img-thumbnail p-0 rounded-circle d-none d-md-block"
 							style="border: none"
 							v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + node.color }"
@@ -711,13 +702,12 @@
 										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + r.node.color }"
 										v-bind:title="r.node.name"
 										v-on:click="redirect(r.node)">
-									<small>by {{ r.relation.interaction }}</small>
+									<small>{{ r.relation.interaction }}</small>
 								</div>
 								<hr>
 								<h4 class="col-12">Affected by</h4>
 								<p v-if="incoming_relations.length == 0" class="col-12">None</p>
-								<div v-for="r in incoming_relations" class="col-6 text-left pb-1 px-1">
-									<small>{{ r.relation.interaction }} by</small>
+								<div v-for="r in incoming_relations" class="col-6 text-left pb-1 px-1" style="overflow: hidden; white-space: nowrap;">
 									<img
 										v-bind:src="getImage(r.node.image)"
 										class="img-thumbnail p-0 rounded-circle"
@@ -725,6 +715,7 @@
 										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + r.node.color }"
 										v-bind:title="r.node.name"
 										v-on:click="redirect(r.node)">
+									<small>{{ r.relation.interaction }}</small>
 								</div>
 							</div>
 						</div>
@@ -773,7 +764,7 @@
 							<label class="col-sm-4 col-form-label">Image</label>
 							<div class="col-sm-8">
 								<select v-model="event.image" class="form-control" required>
-									<option v-for="option in node_images" v-bind:value="option.value">{{ option.text }}</option>
+									<option v-for="option in NODE_IMAGES" v-bind:value="option.value">{{ option.text }}</option>
 								</select>
 							</div>
 						</div>
@@ -853,16 +844,6 @@
 					</div>
 				</div>
 
-				<!-- Scenario image -->
-				<!-- <div class="input-fields col-md-3 col-lg-4 col-xl-4 d-flex flex-column">
-					<img
-						v-bind:src="imagesrc"
-						class="img-thumbnail p-0 rounded-circle d-none d-md-block"
-						style="border: none"
-						v-bind:style="{ boxShadow: 'inset 0 0 0 3px ' + scenario.color }"
-						v-bind:title="scenario.name">
-				</div> -->
-
 				<!-- Save/Back buttons -->
 				<div class="row no-gutters d-flex justify-content-end">
 					<hr class="col-12">
@@ -882,7 +863,7 @@
 				<div class="input-section">
 
 					<!-- Input fields left -->
-					<div class="input-fields col-md-3 col-lg-4 col-xl-6" style="display: flex; flex-direction: column;">
+					<div class="input-fields col-md-6" style="display: flex; flex-direction: column;">
 						<!-- Name -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
@@ -938,11 +919,11 @@
 										<!-- Image -->
 										<td class="align-middle p-2" style="width: 1%;">
 											<img
-												v-bind:src="getEventImage(action)"
+												v-bind:src="getImage(getEvent(action).image)"
 												class="img-thumbnail p-0 rounded-circle"
 												style="border: none; max-width: 40px; max-height: 40px;"
-												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getEventColor(action) }"
-												v-bind:title="getEventName(action)">
+												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getEvent(action).color }"
+												v-bind:title="getEvent(action).name">
 										</td>
 
 										<!-- Type -->
@@ -950,7 +931,7 @@
 											<div class="" style="display: flex; justify-content: center; align-items: center;">
 												<select v-model="action.type" class="form-control" required>
 													<option value="" disabled hidden>Select tags...</option>
-													<option v-for="option in all_action_types" v-bind:value="option.value">{{ option.text }}</option>
+													<option v-for="option in ACTION_TYPES" v-bind:value="option.value">{{ option.text }}</option>
 												</select>
 											</div>
 										</td>
@@ -981,7 +962,7 @@
 					</div>
 
 					<!-- Input fields right -->
-					<div class="input-fields col-md-9 col-lg-8 col-xl-6" style="display: flex; flex-direction: column;">
+					<div class="input-fields col-md-6" style="display: flex; flex-direction: column;">
 
 						<!-- Actors list -->
 						<div class="editor-full-list">
@@ -999,22 +980,22 @@
 										<!-- Image -->
 										<td class="align-middle p-2" style="width: 1%;">
 											<img
-												v-bind:src="getNodeImage(actor)"
+												v-bind:src="getImage(getNode(actor).image)"
 												class="img-thumbnail p-0 rounded-circle"
 												style="border: none; max-width: 40px; max-height: 40px;"
-												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getNodeColor(actor) }"
-												v-bind:title="getNodeName(actor)">
+												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getNode(actor).color }"
+												v-bind:title="getNode(actor).name">
 										</td>
 
 										<!-- Population -->
-										<td class="align-middle p-2" v-if="!checkNodeAbiotic(actor)">
+										<td class="align-middle p-2" v-if="!checkAbiotic(actor)">
 											<div class="input-group">
 												<input v-model.number="actor.population" type="number" class="form-control" min="0" max="1" step="0.01" required>
 											</div>
 										</td>
 
 										<!-- Abiotic function -->
-										<td class="align-middle p-2" v-if="checkNodeAbiotic(actor)">
+										<td class="align-middle p-2" v-if="checkAbiotic(actor)">
 											<div class="input-group">
 												<input v-model="actor.popfunc" type="text" class="form-control is-valid" v-bind:class="{ 'is-invalid': !checkAbioticFunction(actor) }" maxlength="50" required>
 											</div>
@@ -1025,7 +1006,7 @@
 											<div class="" style="display: flex; justify-content: center; align-items: center;">
 												<select v-model="actor.visibility" class="form-control" required>
 													<option value="" disabled hidden>Select tags...</option>
-													<option v-for="option in all_actor_visibility" v-bind:value="option.value">{{ option.text }}</option>
+													<option v-for="option in ACTOR_VISIBILITY" v-bind:value="option.value">{{ option.text }}</option>
 												</select>
 											</div>
 										</td>

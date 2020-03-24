@@ -206,9 +206,12 @@ class EcoWeb {
 			for (const activeEvent of this.activeEvents) {
 				if (activeEvent.active) {
 					for (const effect of activeEvent.event.effects) {
-							effect.startTime = activeEvent.startTime;
-							map[id].push(effect);
 						if (id == effect.node_id) {
+							//effect.startTime = activeEvent.startTime;
+							map[id].push({
+								effect,
+								startTime: activeEvent.startTime
+							});
 						}
 					}
 				}
@@ -337,8 +340,10 @@ class EcoWeb {
 				// Events
 				let node = this.species[i];
 				if (activityMap[node.id]) {
-					for (const effect of activityMap[node.id]) {
-						const value = effect.derivative.evaluate({t: (t-effect.startTime) / effect.duration});
+					for (const group of activityMap[node.id]) {
+						const effect = group.effect;
+						const startTime = group.startTime;
+						const value = effect.derivative.evaluate({t: (t-startTime) / effect.duration});
 						dPopList[i] += effect.something * value / effect.duration;
 						//const value = effect.derivative.evaluate({t: t-this.time});
 						//dPopList[i] += value;
