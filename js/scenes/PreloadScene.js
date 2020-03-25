@@ -23,7 +23,7 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('bg_parallax_6', 'assets/images/background/parallax/6.png');
 
 
-		/* Menu */		
+		/* Menu */
 		this.load.image('menu_line', 'assets/images/ui/menu/Line.png');
 		this.load.image('menu_bar', 'assets/images/ui/menu/Bar.png');
 		this.load.image('menu_bar_hover', 'assets/images/ui/menu/BarMouseover.png');
@@ -65,6 +65,8 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('info_background', 'assets/images/ui/info_background.png');
 		this.load.image('info_scale', 'assets/images/ui/info_scale.png');
 		this.load.image('info_marker', 'assets/images/ui/info_marker.png');
+
+		this.load.spritesheet('player_icons', 'assets/images/ui/PlayerIcons.png', { frameWidth: 100, frameHeight: 100 });
 
 
 		/* Nodes */

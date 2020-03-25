@@ -14,7 +14,7 @@ class Node extends Button {
 		this.holdEasing = 0.0;
 
 		//this.WHITE = 0xe3e3d1;
-		this.WHITE = 0xffffff;
+		this.WHITE = 0xFFFFFF;
 		//this.BLACK = 0x332d24;
 		//this.BLACK = 0x474741;
 		//this.BLACK = 0x33312e;

@@ -66,18 +66,6 @@ class Organism {
 		return 1.0;
 	}
 
-	getGrowthRate() {
-		let max = this.growthRate;
-		for (var name in this.requirements) {
-			if (this.requirements.hasOwnProperty(name)) {
-				let component = web.getComponent(name);
-				let diff = this.requirements[name] - component.startPopulation;
-				max -= Math.abs(diff);
-			}
-		}
-		return max;
-	}
-
 
 	addPrey(prey, benefit) {
 		this.relationship[prey.name] = benefit;
@@ -95,10 +83,11 @@ class Organism {
 
 	setDiet() {
 		let total = 0;
-		for (var i = 0; i < arguments.length; i+=2)
+		for (let i = 0; i < arguments.length; i+=2) {
 			total += arguments[i+1];
+		}
 
-		for (var i = 0; i < arguments.length; i+=2) {
+		for (let i = 0; i < arguments.length; i+=2) {
 			let prey = arguments[i];
 			let amount = arguments[i+1];
 			this.diet[prey.name] = amount / total;

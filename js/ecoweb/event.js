@@ -22,7 +22,6 @@ class BaseEvent {
 				//const func = (effect.something / this.duration).toString() + " * t";
 				const func = "t * t * (3 - 2*t)";
 
-				console.log(this.name, func);
 				this.effects.push({
 					"node_id": node.id,
 					"something": effect.something,
@@ -31,8 +30,6 @@ class BaseEvent {
 				});
 			}
 		}
-
-		
 	}
 }
 
