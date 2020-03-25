@@ -13,12 +13,14 @@ class LevelScene2 extends Phaser.Scene {
 
 
 		this.bg = [];
-		for (let i = 0; i <= 8; i++) {
-			let k = 1.5;
-			let scrollFac = 0.5 * (Math.pow(8, -k) * Math.pow(i, k));
-			let bg = this.add.image(0, 0, 'firewatch'+i);
-			bg.setScale(3 * this.W / bg.width);
-			bg.originalScale = 3 * this.W / bg.width;
+		//const images = ['bg_parallax_2', 'bg_parallax_3', 'bg_parallax_4', 'bg_parallax_5', 'bg_parallax_6', 'bg_parallax_7', 'bg_parallax_1'];
+		const images = ['bg_parallax_6', 'bg_parallax_5', 'bg_parallax_4', 'bg_parallax_3', 'bg_parallax_2', 'bg_parallax_1'];
+
+		for (let i = 0; i < images.length; i++) {
+			let scrollFac = 0.05 + 0.5 * Math.pow(i / images.length, 1.2); // Slow incline from 0 to 0.5
+			let bg = this.add.image(0, 0, images[i]);
+			bg.originalScale = 1.5 * Math.max(this.W / bg.width, this.H / bg.height);
+			bg.setScale(bg.originalScale);
 			let scrollX = (bg.displayWidth > this.W) ? Math.min(((bg.displayWidth - this.W) / 2) / (size / 2), scrollFac) : 0;
 			let scrollY = (bg.displayHeight > this.H) ? Math.min(((bg.displayHeight - this.H) / 2) / (size / 2), scrollFac) : 0;
 			bg.setPosition(
