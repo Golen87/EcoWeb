@@ -7,6 +7,7 @@ class SymbolButton extends Button {
 		// 'symbol_menu'
 		this.image = scene.add.sprite(0, 0, image);
 		this.image.setScale(this.size / this.image.height);
+		this.image.setScrollFactor(0);
 		this.add(this.image);
 
 		this.bindInteractive(this.image);

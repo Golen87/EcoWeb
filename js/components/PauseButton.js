@@ -9,6 +9,7 @@ class PauseButton extends Button {
 		this.add(this.highlight);
 
 		this.button = scene.add.sprite(0, 0, 'pause_button');
+		this.button.setScrollFactor(0);
 		this.add(this.button);
 
 		this.button.setScale(HEIGHT / this.button.height);

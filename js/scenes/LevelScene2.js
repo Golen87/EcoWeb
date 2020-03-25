@@ -1,6 +1,18 @@
 class LevelScene2 extends Phaser.Scene {
 	constructor() {
 		super({key: 'LevelScene2'});
+
+		this.pauseOptions = [
+			["Spela Vidare", function() {
+				this.pauseWindow.hide();
+			}],
+			["Inställningar", function() {
+				console.log("Inställningar");
+			}],
+			["Gå Till Meny", function() {
+				this.scene.start("WorldScene");
+			}],
+		];
 	}
 
 	create() {
@@ -98,6 +110,22 @@ class LevelScene2 extends Phaser.Scene {
 		this.updateNodePopulation();
 
 
+		/* Pause menu */
+
+		const button_size = 0.075 * this.W;
+		this.back = new SymbolButton(this, button_size/2, button_size/2, 'symbol_menu', 0.8 * button_size, () => {
+			this.pauseWindow.show();
+		});
+		this.back.setScrollFactor(0);
+		this.add.existing(this.back);
+
+		this.pauseWindow = new PauseWindow(this, this.CX, this.CY, this.pauseOptions);
+		this.pauseWindow.setDepth(1000);
+		this.pauseWindow.hide();
+		this.pauseWindow.setScrollFactor(0);
+		this.add.existing(this.pauseWindow);
+
+
 		/* Testing */
 
 		// console.log(this.scale.orientation);
@@ -134,7 +162,7 @@ class LevelScene2 extends Phaser.Scene {
 		this.timeController.update(time, delta);
 		this.graph.update(time, delta);
 
-		for (var i = this.nodes.length - 1; i >= 0; i--) {
+		for (let i = this.nodes.length - 1; i >= 0; i--) {
 			//let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
 			//this.nodes[i].setWiggle(s);
 			this.nodes[i].update(delta);
@@ -148,7 +176,7 @@ class LevelScene2 extends Phaser.Scene {
 			}
 		}
 
-		for (var i = this.paths.length - 1; i >= 0; i--) {
+		for (let i = this.paths.length - 1; i >= 0; i--) {
 			this.paths[i].update(time, delta);
 		}
 	}
@@ -251,7 +279,7 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	updateNodePopulation(immediate=false) {
-		for (var i = this.nodes.length - 1; i >= 0; i--) {
+		for (let i = this.nodes.length - 1; i >= 0; i--) {
 			let pop = web.getValueAt(i, this.timeController.time);
 			this.nodes[i].setPopulation(pop, immediate);
 		}
