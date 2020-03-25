@@ -27,6 +27,7 @@ const NODE_IMAGES = [
 	{ value: "gräs",				text: "assets/images/icons/Gräs.png" },
 	{ value: "ört",					text: "assets/images/icons/Ört.png" },
 	{ value: "blåbär",				text: "assets/images/icons/Blåbär.png" },
+	{ value: "hasselnöt",			text: "assets/images/icons/Hasselnöt.png" },
 	{ value: "svamp",				text: "assets/images/icons/Svamp.png" },
 	{ value: "detrius",				text: "assets/images/icons/Detrius.png" },
 

@@ -96,8 +96,17 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('gräs', 'assets/images/icons/Gräs_128.png');
 		this.load.image('ört', 'assets/images/icons/Ört_128.png');
 		this.load.image('blåbär', 'assets/images/icons/Blåbär_128.png');
+		this.load.image('hasselnöt', 'assets/images/icons/Hasselnöt_128.png');
 		this.load.image('svamp', 'assets/images/icons/Svamp_128.png');
 		this.load.image('detrius', 'assets/images/icons/Detrius_128.png');
+
+		this.load.image('havsutter', 'assets/images/icons/Havsutter_128.png');
+		this.load.image('jättekelp', 'assets/images/icons/Jättekelp_128.png');
+		this.load.image('lax', 'assets/images/icons/Lax_128.png');
+		this.load.image('sjöelefant', 'assets/images/icons/Säl_Sjöelefant_128.png');
+		this.load.image('sjöborre', 'assets/images/icons/Sjöborre_128.png');
+		this.load.image('sjölejon', 'assets/images/icons/Sjölejon_California_128.png');
+		this.load.image('späckhuggare', 'assets/images/icons/Späckhuggare_128.png');
 
 
 		/* Audio */
