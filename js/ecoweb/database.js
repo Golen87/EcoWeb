@@ -52,7 +52,7 @@ class Database {
 			this.importJSON(localdata);
 		}
 		else {
-			console.warning("No localdata for database.");
+			console.warn("No localdata for database.");
 		}
 
 		this.save();
