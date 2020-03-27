@@ -129,6 +129,7 @@ function createDatabaseTools(database) {
 									databaseTabs.total_custom_tags
 								));
 								database.save();
+								location.reload();
 							}
 							else {
 								throw "Couldn't load old database.";
@@ -170,11 +171,11 @@ function createDatabaseTools(database) {
 			close,
 			editNode(node) {
 				this.show = false;
-				nodeEditor.open(database.getNodeById(node.id));
+				gotoNodeEditor(database.getNodeById(node.id));
 			},
 			copyNode(node) {
 				this.show = false;
-				nodeEditor.open(database.cloneNode(node.id));
+				gotoNodeEditor(database.cloneNode(node.id));
 			},
 			deleteNode(node) {
 				const response = confirm("Are you sure you want to permanently delete this node?");
@@ -185,7 +186,7 @@ function createDatabaseTools(database) {
 			},
 			addNode() {
 				this.show = false;
-				nodeEditor.open(database.newNode());
+				gotoNodeEditor(database.newNode());
 			},
 			getImage,
 		},
@@ -205,11 +206,11 @@ function createDatabaseTools(database) {
 			close,
 			editEvent(event) {
 				this.show = false;
-				eventEditor.open(database.getEventById(event.id));
+				gotoEventEditor(database.getEventById(event.id));
 			},
 			copyEvent(event) {
 				this.show = false;
-				eventEditor.open(database.cloneEvent(event.id));
+				gotoEventEditor(database.cloneEvent(event.id));
 			},
 			deleteEvent(event) {
 				const response = confirm("Are you sure you want to permanently delete this event?");
@@ -226,7 +227,7 @@ function createDatabaseTools(database) {
 				this.show = false;
 				let event = database.newEvent();
 				database.addEffect(event, "node");
-				eventEditor.open(event);
+				gotoEventEditor(event);
 			},
 			getImage,
 		},
@@ -246,11 +247,11 @@ function createDatabaseTools(database) {
 			close,
 			editScenario(scenario) {
 				this.show = false;
-				scenarioEditor.open(database.getScenarioById(scenario.id));
+				gotoScenarioEditor(database.getScenarioById(scenario.id));
 			},
 			copyScenario(scenario) {
 				this.show = false;
-				scenarioEditor.open(database.cloneScenario(scenario.id));
+				gotoScenarioEditor(database.cloneScenario(scenario.id));
 			},
 			deleteScenario(scenario) {
 				const response = confirm("Are you sure you want to permanently delete this scenario?");
@@ -266,7 +267,7 @@ function createDatabaseTools(database) {
 			addScenario() {
 				this.show = false;
 				let scenario = database.newScenario();
-				scenarioEditor.open(scenario);
+				gotoScenarioEditor(scenario);
 			},
 			getImage,
 			getNode,
