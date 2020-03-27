@@ -25,37 +25,91 @@ function createDatabaseTools(database) {
 	}
 
 
-	const databaseEditor = new Vue({
-		el: "#databaseEditor",
+	function open() {
+		this.show = true;
+	}
+
+	function close() {
+		if (this.form_changed && this.trySubmit) {
+			const response = confirm("Do you wish to save your changes?");
+			if (response) {
+				const success = this.trySubmit();
+				if (!success) {
+					throw "Invalid form";
+				}
+			}
+		}
+		this.show = false;
+	}
+
+	function trySubmit() {
+		const form = $(this.$el);
+		form.find(":submit").click();
+		if (form[0].checkValidity()) {
+			return true;
+		}
+		return false;
+	}
+
+
+	function resetTabs() {
+		nodeList.close();
+		eventList.close();
+		scenarioList.close();
+		nodeEditor.close();
+		eventEditor.close();
+		scenarioEditor.close();
+		tagEditor.close();
+	}
+
+	function gotoNodes() {
+		resetTabs();
+		nodeList.open();
+	}
+	function gotoEvents() {
+		resetTabs();
+		eventList.open();
+	}
+	function gotoScenarios() {
+		resetTabs();
+		scenarioList.open();
+	}
+	function gotoTags() {
+		resetTabs();
+		tagEditor.open();
+	}
+	function gotoNodeEditor(node) {
+		resetTabs();
+		nodeEditor.open(node);
+	}
+	function gotoEventEditor(event) {
+		resetTabs();
+		eventEditor.open(event);
+	}
+	function gotoScenarioEditor(scenario) {
+		resetTabs();
+		scenarioEditor.open(scenario);
+	}
+
+
+	/* Editors */
+
+	const databaseTabs = new Vue({
+		el: "#databaseTabs",
 		data: {
-			show: true,
+			database,
 		},
 		computed: {
-			total_nodes() { return window.database.nodes.length; },
-			total_events() { return window.database.events.length; },
-			total_scenarios() { return window.database.scenarios.length; },
-			total_custom_tags() { return window.database.getCustomTags(true).length; },
+			total_nodes() { return this.database.nodes.length; },
+			total_events() { return this.database.events.length; },
+			total_scenarios() { return this.database.scenarios.length; },
+			total_custom_tags() { return this.database.getCustomTags(true).length; },
 		},
 		methods: {
-			open() {
-				this.show = true;
-			},
-			openNodes() {
-				this.show = false;
-				nodeList.open();
-			},
-			openEvents() {
-				this.show = false;
-				eventList.open();
-			},
-			openScenarios() {
-				this.show = false;
-				scenarioList.open();
-			},
-			editTags() {
-				this.show = false;
-				tagEditor.open();
-			},
+			gotoNodes,
+			gotoEvents,
+			gotoScenarios,
+			gotoTags,
 			importFile() {
 				$("#importJsonInput").click();
 				$("#importJsonInput").change(function(event) {
@@ -68,7 +122,12 @@ function createDatabaseTools(database) {
 						try {
 							let success = database.importJSON(event.target.result);
 							if (success) {
-								alert("Success! Loaded ({0}) nodes.".format(database.nodes.length));
+								alert("Success! Loaded ({0}) nodes, ({1}) events, ({2}) scenarios, ({3}) tags.".format(
+									databaseTabs.total_nodes,
+									databaseTabs.total_events,
+									databaseTabs.total_scenarios,
+									databaseTabs.total_custom_tags
+								));
 								database.save();
 							}
 							else {
@@ -108,10 +167,7 @@ function createDatabaseTools(database) {
 				this.show = true;
 				this.list = database.nodes;
 			},
-			back() {
-				this.show = false;
-				databaseEditor.open();
-			},
+			close,
 			editNode(node) {
 				this.show = false;
 				nodeEditor.open(database.getNodeById(node.id));
@@ -121,14 +177,11 @@ function createDatabaseTools(database) {
 				nodeEditor.open(database.cloneNode(node.id));
 			},
 			deleteNode(node) {
-				warningModal.show(
-					"delete",
-					"Are you sure you want to permanently delete this node?",
-					function() {
-						database.deleteNode(node.id);
-						database.save();
-					}.bind(this)
-				);
+				const response = confirm("Are you sure you want to permanently delete this node?");
+				if (response) {
+					database.deleteNode(node.id);
+					database.save();
+				}
 			},
 			addNode() {
 				this.show = false;
@@ -149,10 +202,7 @@ function createDatabaseTools(database) {
 				this.show = true;
 				this.list = database.events;
 			},
-			back() {
-				this.show = false;
-				databaseEditor.open();
-			},
+			close,
 			editEvent(event) {
 				this.show = false;
 				eventEditor.open(database.getEventById(event.id));
@@ -162,14 +212,11 @@ function createDatabaseTools(database) {
 				eventEditor.open(database.cloneEvent(event.id));
 			},
 			deleteEvent(event) {
-				warningModal.show(
-					"delete",
-					"Are you sure you want to permanently delete this event?",
-					function() {
-						database.deleteEvent(event.id);
-						database.save();
-					}.bind(this)
-				);
+				const response = confirm("Are you sure you want to permanently delete this event?");
+				if (response) {
+					database.deleteEvent(event.id);
+					database.save();
+				}
 			},
 			moveEvent(event, dir) {
 				database.moveEvent(event.id, dir);
@@ -196,10 +243,7 @@ function createDatabaseTools(database) {
 				this.show = true;
 				this.list = database.scenarios;
 			},
-			back() {
-				this.show = false;
-				databaseEditor.open();
-			},
+			close,
 			editScenario(scenario) {
 				this.show = false;
 				scenarioEditor.open(database.getScenarioById(scenario.id));
@@ -209,14 +253,11 @@ function createDatabaseTools(database) {
 				scenarioEditor.open(database.cloneScenario(scenario.id));
 			},
 			deleteScenario(scenario) {
-				warningModal.show(
-					"delete",
-					"Are you sure you want to permanently delete this scenario?",
-					function() {
-						database.deleteScenario(scenario.id);
-						database.save();
-					}.bind(this)
-				);
+				const response = confirm("Are you sure you want to permanently delete this scenario?");
+				if (response) {
+					database.deleteScenario(scenario.id);
+					database.save();
+				}
 			},
 			moveScenario(scenario, dir) {
 				database.moveScenario(scenario.id, dir);
@@ -246,14 +287,17 @@ function createDatabaseTools(database) {
 			all_custom_tags,
 			incoming_relations() { return window.database.getIncomingRelations(this.node); },
 			outgoing_relations() { return window.database.getOutgoingRelations(this.node); },
-			form_changed() { return JSON.stringify(this.node) !== JSON.stringify(this.original); },
+			form_changed() { return this.show && JSON.stringify(this.node) !== JSON.stringify(this.original); },
 		},
 		methods: {
+			gotoNodes,
 			open(node) {
 				this.original = node;
 				this.node = JSON.parse(JSON.stringify(node));
 				this.show = true;
 			},
+			close,
+			trySubmit,
 			save(e) {
 				e.preventDefault();
 
@@ -265,29 +309,7 @@ function createDatabaseTools(database) {
 				this.original = JSON.parse(JSON.stringify(this.node));
 				this.node = JSON.parse(JSON.stringify(newNode));
 			},
-			cancel() {
-				this.show = false;
-				nodeList.open();
-			},
-			redirect(node) {
-				if (this.form_changed) {
-					warningModal.show(
-						"save",
-						"Do you wish to save your changes?",
-						function() {
-							let form = $(this.$el);
-							form.find(":submit").click();
-							if (form[0].checkValidity()) {
-								this.open(node);
-							}
-						}.bind(this),
-						this.open.bind(this, node)
-					);
-				}
-				else {
-					this.open(node);
-				}
-			},
+			gotoNodeEditor,
 			setTab(tab) {
 				let form = $(this.$el);
 				if(!form[0].checkValidity()) {
@@ -325,14 +347,17 @@ function createDatabaseTools(database) {
 			all_nodes,
 			all_events,
 			all_tags,
-			form_changed() { return JSON.stringify(this.event) !== JSON.stringify(this.original); },
+			form_changed() { return this.show && JSON.stringify(this.event) !== JSON.stringify(this.original); },
 		},
 		methods: {
+			gotoEvents,
 			open(event) {
 				this.original = event;
 				this.event = JSON.parse(JSON.stringify(event));
 				this.show = true;
 			},
+			close,
+			trySubmit,
 			save(e) {
 				e.preventDefault();
 
@@ -343,11 +368,6 @@ function createDatabaseTools(database) {
 				// Force form_changed to update
 				this.original = JSON.parse(JSON.stringify(this.event));
 				this.event = JSON.parse(JSON.stringify(newEvent));
-				//this.cancel();
-			},
-			cancel() {
-				this.show = false;
-				eventList.open();
 			},
 			addEffect(type) {
 				database.addEffect(this.event, type);
@@ -369,7 +389,7 @@ function createDatabaseTools(database) {
 		},
 		computed: {
 			all_nodes,
-			form_changed() { return JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
+			form_changed() { return this.show && JSON.stringify(this.scenario) !== JSON.stringify(this.original); },
 			abiotic_functions_valid() {
 				for (const actor of this.scenario.actors) {
 					const type = database.getNodeById(actor.node_id).type;
@@ -383,11 +403,14 @@ function createDatabaseTools(database) {
 			},
 		},
 		methods: {
+			gotoScenarios,
 			open(scenario) {
 				this.original = scenario;
 				this.scenario = JSON.parse(JSON.stringify(scenario));
 				this.show = true;
 			},
+			close,
+			trySubmit,
 			save(e) {
 				e.preventDefault();
 
@@ -408,11 +431,6 @@ function createDatabaseTools(database) {
 				// Force form_changed to update
 				this.original = JSON.parse(JSON.stringify(this.scenario));
 				this.scenario = JSON.parse(JSON.stringify(newScenario));
-				//this.cancel();
-			},
-			cancel() {
-				this.show = false;
-				scenarioList.open();
 			},
 			setTab(tab) {
 				var form = $(this.$el);
@@ -481,6 +499,8 @@ function createDatabaseTools(database) {
 				}
 				return true;
 			},
+			gotoNodeEditor,
+			gotoEventEditor,
 		},
 	});
 
@@ -489,7 +509,9 @@ function createDatabaseTools(database) {
 		data: {
 			show: false,
 			tags: "",
-			tagMap: {}
+			originalTags: "",
+			tagMap: {},
+			originalTagMap: {}
 		},
 		computed: {
 			parsed_tags() {
@@ -501,13 +523,16 @@ function createDatabaseTools(database) {
 				tags = database.getAllTags(tags);
 				return database.checkTagWarnings(tags);
 			},
+			form_changed() { return this.show && (JSON.stringify(this.tags) !== JSON.stringify(this.originalTags) || JSON.stringify(this.tagMap) !== JSON.stringify(this.originalTagMap)); },
 		},
 		methods: {
 			open() {
 				const customTags = database.getCustomTags();
 				this.tags = customTags.join("\n");
+				this.originalTags = JSON.parse(JSON.stringify(this.tags));
 				this.show = true;
 
+				this.tagMap = {};
 				for (const tag of customTags) {
 					Vue.set(this.tagMap, tag, []);
 					for (const node of database.nodes) {
@@ -516,17 +541,18 @@ function createDatabaseTools(database) {
 						}
 					}
 				}
+				this.originalTagMap = JSON.parse(JSON.stringify(this.tagMap));
 			},
+			close,
+			trySubmit,
 			save(e) {
 				e.preventDefault();
 
 				if (this.tag_warnings.length > 0) {
-					warningModal.show(
-						"save",
-						"Are you sure you wish to save? This will permanently delete tags from existing nodes and relations.",
-						this.confirmSave.bind(this),
-						this.cancel.bind(this)
-					);
+					const response = confirm("Are you sure you wish to save? This will permanently delete tags from existing nodes and relations.");
+					if (response) {
+						this.confirmSave();
+					}
 				}
 				else {
 					this.confirmSave();
@@ -537,7 +563,7 @@ function createDatabaseTools(database) {
 
 				for (const tag of tags) {
 					for (const node of database.nodes) {
-						if (this.tagMap[tag].includes(node.id)) {
+						if (this.tagMap[tag] && this.tagMap[tag].includes(node.id)) {
 							if (!node.tags.includes(tag)) {
 								node.tags.push(tag);
 							}
@@ -554,11 +580,8 @@ function createDatabaseTools(database) {
 				database.setCustomTags(tags, true);
 				database.save();
 
-				this.cancel();
-			},
-			cancel() {
-				this.show = false;
-				databaseEditor.open();
+				// Force form_changed to update
+				this.open();
 			},
 			getNodeCountByTag(tag) {
 				if (this.tagMap[tag]) {
@@ -585,52 +608,8 @@ function createDatabaseTools(database) {
 		},
 	});
 
-	const warningModal = new Vue({
-		el: "#warningModal",
-		data: {
-			titleText: "Warning",
-			bodyText: "Body",
-			acceptText: "Accept",
-			denyText: "Deny",
-			type: null,
-			acceptCallback: null,
-			denyCallback: null,
-		},
-		methods: {
-			show(type, text, acceptCallback=null, denyCallback=null) {
-				this.type = type;
-				this.bodyText = text;
-				this.acceptCallback = acceptCallback;
-				this.denyCallback = denyCallback;
 
-				if (type == "save") {
-					this.acceptText = "Save";
-					this.denyText = "Discard";
-				}
-				else if (type == "delete") {
-					this.acceptText = "Delete";
-					this.denyText = "Cancel";
-				}
-
-				$("#warningModal").modal("show");
-			},
-			hide() {
-				$("#warningModal").modal("hide");
-			},
-			accept() {
-				this.hide();
-				if (this.acceptCallback) {
-					this.acceptCallback();
-				}
-			},
-			deny() {
-				this.hide();
-				if (this.denyCallback) {
-					this.denyCallback();
-				}
-			},
-		},
-	});
+	/* Modals */
 
 	const nodeSelectorModal = new Vue({
 		el: "#nodeSelectorModal",
@@ -675,12 +654,8 @@ function createDatabaseTools(database) {
 		}
 	});
 
-	//databaseEditor.editTags();
-	databaseEditor.openScenarios();
-	//databaseEditor.openNodes();
-	//databaseEditor.openEvents();
-	scenarioList.editScenario(scenarioList.list[0]);
-	//nodeList.editTags();
-	//nodeList.editNode(nodeList.list[26]);
-	//nodeEditor.setTab(2);
+
+	/* Init */
+
+	gotoScenarios();
 }
