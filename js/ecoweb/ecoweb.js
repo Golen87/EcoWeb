@@ -220,7 +220,7 @@ class EcoWeb {
 		return map;
 	}
 
-	solve(duration) {
+	solve(duration, includeEvents=true) {
 		for (const activeEvent of this.activeEvents) {
 			activeEvent.setActive(false);
 		}
@@ -249,7 +249,7 @@ class EcoWeb {
 			}
 
 			if (time >= this.time) {
-				this.solveSection(time - this.time, this.getActivityMap());
+				this.solveSection(time - this.time, this.getActivityMap(), includeEvents);
 				//this.applyEvent(this.activeEvents[i].event);
 			}
 			else {
@@ -259,10 +259,10 @@ class EcoWeb {
 			console.log("> Turning " + (timestamps[i].value ? "on " : "off ") + activeEvent.event.name + " at " + time);
 			activeEvent.setActive(timestamps[i].value);
 		}
-		this.solveSection(duration - this.time, this.getActivityMap());
+		this.solveSection(duration - this.time, this.getActivityMap(), includeEvents);
 	}
 
-	solveSection(duration, activityMap={}) {
+	solveSection(duration, activityMap={}, includeEvents=false) {
 		if (duration <= 0)
 			return;
 
@@ -339,7 +339,7 @@ class EcoWeb {
 
 				// Events
 				let node = this.species[i];
-				if (activityMap[node.id]) {
+				if (activityMap[node.id] && includeEvents) {
 					for (const group of activityMap[node.id]) {
 						const effect = group.effect;
 						const startTime = group.startTime;
@@ -376,7 +376,7 @@ class EcoWeb {
 
 	stabilize() {
 		this.build(this.species);
-		this.solve(10 * this.maxTime);
+		this.solve(10 * this.maxTime, false);
 		for (let i = 0; i < this.size; i++) {
 			this.species[i].startPopulation = this.result.y[this.result.y.length-1][i];
 		}
