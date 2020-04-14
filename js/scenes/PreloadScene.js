@@ -21,6 +21,7 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('bg_parallax_4', 'assets/images/background/parallax/4.png');
 		this.load.image('bg_parallax_5', 'assets/images/background/parallax/5.png');
 		this.load.image('bg_parallax_6', 'assets/images/background/parallax/6.png');
+		this.load.image('bg_parallax_7', 'assets/images/background/parallax/7.png');
 
 
 		/* Menu */

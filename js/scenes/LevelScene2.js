@@ -16,7 +16,7 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	create() {
-		this.cameras.main.setBackgroundColor(0x294f8c);
+		this.cameras.main.setBackgroundColor(0xFF0000);
 
 		let size = 2 * 0.8 * Math.min(this.W, this.H);
 
@@ -26,15 +26,17 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.bg = [];
 		//const images = ['bg_parallax_2', 'bg_parallax_3', 'bg_parallax_4', 'bg_parallax_5', 'bg_parallax_6', 'bg_parallax_7', 'bg_parallax_1'];
-		const images = ['bg_parallax_6', 'bg_parallax_5', 'bg_parallax_4', 'bg_parallax_3', 'bg_parallax_2', 'bg_parallax_1'];
+		const images = ['bg_parallax_7', 'bg_parallax_6', 'bg_parallax_5', 'bg_parallax_4', 'bg_parallax_3', 'bg_parallax_2', 'bg_parallax_1'];
 
 		for (let i = 0; i < images.length; i++) {
-			let scrollFac = 0.05 + 0.5 * Math.pow(i / images.length, 1.2); // Slow incline from 0 to 0.5
+			let scrollFac = 0.0 + 0.5 * Math.pow(i / images.length, 1.5); // Slow incline from 0 to 0.5
 			let bg = this.add.image(0, 0, images[i]);
 			bg.originalScale = 1.5 * Math.max(this.W / bg.width, this.H / bg.height);
 			bg.setScale(bg.originalScale);
-			let scrollX = (bg.displayWidth > this.W) ? Math.min(((bg.displayWidth - this.W) / 2) / (size / 2), scrollFac) : 0;
-			let scrollY = (bg.displayHeight > this.H) ? Math.min(((bg.displayHeight - this.H) / 2) / (size / 2), scrollFac) : 0;
+			let scrollX = scrollFac;//(bg.displayWidth > this.W) ? Math.min(((bg.displayWidth - this.W) / 2) / (size / 2), scrollFac) : 0;
+			let scrollY = scrollFac;//(bg.displayHeight > this.H) ? Math.min(((bg.displayHeight - this.H) / 2) / (size / 2), scrollFac) : 0;
+			scrollX = Math.max(scrollX, scrollY);
+			scrollY = scrollX;
 			bg.setPosition(
 				this.CX*(1-scrollX),
 				this.CY*(1-scrollY)
@@ -44,6 +46,21 @@ class LevelScene2 extends Phaser.Scene {
 			//this.bg.setAlpha(0.2);
 			//this.bg.setScale(0.2 + 0.8*i/10);
 			//this.fitToScreen(this.bg);
+		}
+
+		const top = this.bg[this.bg.length-1];
+		const thickness = 1000;
+		this.borders = [];
+		this.borders[0] = this.add.rectangle(top.x, top.y-top.displayHeight/2, top.displayWidth+thickness, thickness, 0x23213d);
+		this.borders[0].setOrigin(0.5, 1.0);
+		this.borders[1] = this.add.rectangle(top.x, top.y+top.displayHeight/2, top.displayWidth+thickness, thickness, 0x23213d);
+		this.borders[1].setOrigin(0.5, 0.0);
+		this.borders[2] = this.add.rectangle(top.x-top.displayWidth/2, top.y, thickness, top.displayHeight+thickness, 0x23213d);
+		this.borders[2].setOrigin(1.0, 0.5);
+		this.borders[3] = this.add.rectangle(top.x+top.displayWidth/2, top.y, thickness, top.displayHeight+thickness, 0x23213d);
+		this.borders[3].setOrigin(0.0, 0.5);
+		for (let i in this.borders) {
+			this.borders[i].setScrollFactor(top.scrollFactorX, top.scrollFactorY);
 		}
 
 
@@ -170,7 +187,7 @@ class LevelScene2 extends Phaser.Scene {
 
 		if (this.selectedNode && this.isDragging) {
 			var d = Phaser.Math.Distance.Between(this.selectedNode.x, this.selectedNode.y, this.cameras.main.scrollX+this.cameraCenter.x, this.cameras.main.scrollY+this.cameraCenter.y);
-			if (d > 4 * this.selectedNode.circle.width/2) {
+			if (d > 2 * this.selectedNode.circle.width/2) {
 				this.selectedNode.setSelected(false);
 				this.selectedNode = null;
 			}
@@ -235,6 +252,10 @@ class LevelScene2 extends Phaser.Scene {
 			bg.setScale(bg.originalScale / (bg.scrollFactorX + this.cameras.main.zoom - bg.scrollFactorX*this.cameras.main.zoom));
 			//this['bg'+i].tilePositionX = this.cameras.main.scrollX * (i/200);
 			//this['bg'+i].tilePositionY = this.cameras.main.scrollY * (i/200);
+		}
+		const top = this.bg[this.bg.length-1];
+		for (const border of this.borders) {
+			border.setScale(top.scaleX);
 		}
 		this.timeController.setScale(1 / this.cameras.main.zoom);
 		this.graph.setScale(1 / this.cameras.main.zoom);
