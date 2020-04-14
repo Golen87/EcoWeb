@@ -1,9 +1,9 @@
 const NODE_TYPES = [
-	{ value: "animal",	text: "Consumer (animal)",		type: "biotic" },
-	{ value: "plant",	text: "Producer (plant)",		type: "biotic" },
-	{ value: "fungi",	text: "Decomposer (detrivore)",	type: "biotic" },
-	{ value: "abiotic",	text: "Abiotic (non-living)",	type: "abiotic" },
-	{ value: "service",	text: "Ecosystem services",		type: "abiotic" },
+	{ value: "animal",	text: "Consumer (animal)",		type: "biotic",		swedish: "Konsument" },
+	{ value: "plant",	text: "Producer (plant)",		type: "biotic",		swedish: "Producent" },
+	{ value: "fungi",	text: "Decomposer (detrivore)",	type: "biotic",		swedish: "Nedbrytare" },
+	{ value: "abiotic",	text: "Abiotic (non-living)",	type: "abiotic",	swedish: "Abiotisk" },
+	{ value: "service",	text: "Ecosystem services",		type: "abiotic",	swedish: "Ekosystemtjänst" },
 ];
 
 const NODE_IMAGES = [
@@ -41,10 +41,10 @@ const NODE_IMAGES = [
 ];
 
 const ANIMAL_FOODS = [
-	{ value: "carnivore",	text: "Carnivore" },
-	{ value: "omnivore",	text: "Omnivore" },
-	{ value: "herbivore",	text: "Herbivore" },
-	{ value: "detritivore",	text: "Detritivore" },
+	{ value: "carnivore",	text: "Carnivore",		swedish: "Köttätare" },
+	{ value: "omnivore",	text: "Omnivore",		swedish: "Allätare" },
+	{ value: "herbivore",	text: "Herbivore",		swedish: "Växtätare" },
+	{ value: "detritivore",	text: "Detritivore",	swedish: "Nedbrytare" },
 ];
 
 const ANIMAL_SIZES = [
@@ -95,26 +95,23 @@ const ANIMAL_SIZES_VALUES = ANIMAL_SIZES.map((x) => {return x.value;});
 const SERVICE_CATEGORIES_VALUES = SERVICE_CATEGORIES.map((x) => {return x.value;});
 
 
-function getTextFromValue(dataset, value) {
+function getFromDataset(dataset, input, output, value) {
 	for (const data of dataset) {
-		if (value == data.value) {
-			return data.text;
+		if (value == data[input]) {
+			return data[output];
 		}
 	}
+}
+
+function getTextFromValue(dataset, value) {
+	return getFromDataset(dataset, "value", "text", value);
 }
 
 function getValueFromText(dataset, text) {
-	for (const data of dataset) {
-		if (text == data.text) {
-			return data.value;
-		}
-	}
+	return getFromDataset(dataset, "text", "value", text);
 }
 
 function isAbiotic(value) {
-	for (const data of NODE_TYPES) {
-		if (value == data.value) {
-			return (data.type == "abiotic");
-		}
-	}
+	const type = getFromDataset(NODE_TYPES, "value", "type", value);
+	return (type == "abiotic");
 }

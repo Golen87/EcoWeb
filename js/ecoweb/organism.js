@@ -14,6 +14,8 @@ class Organism {
 		this.y = actor.position[1];
 		this.visibility = actor.visibility;
 
+		this.events = [];
+
 		// Simulation
 		this.startPopulation = 0;
 		this.growthRate = 0;
@@ -38,6 +40,14 @@ class Organism {
 			if (this.type == "animal") {
 				this.growthRate = -0.05;
 				this.selfCompetition = -0.01;
+
+				this.animal = {};
+				this.animal.size = node.animal.size;
+				this.animal.food = node.animal.food;
+				this.animal.consumption = node.animal.consumption;
+				this.animal.weight = node.animal.weight;
+				this.animal.age = node.animal.age;
+				this.animal.offspring = node.animal.offspring;
 			}
 			else if (this.type == "plant") {
 				this.growthRate = 1.0;
@@ -66,6 +76,10 @@ class Organism {
 		return 1.0;
 	}
 
+
+	addEvent(event) {
+		this.events.push(event);
+	}
 
 	addPrey(prey, benefit) {
 		this.relationship[prey.name] = benefit;

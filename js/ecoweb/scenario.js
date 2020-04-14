@@ -67,9 +67,15 @@ class Scenario {
 		this.events = [];
 
 		for (let action of data.actions) {
-			let event = window.database.getEventById(action.event_id);
+			let eventData = window.database.getEventById(action.event_id);
+			let event = new BaseEvent(eventData, action);
+			this.events.push(event);
 
-			this.events.push(new BaseEvent(event, action));
+			for (const organism of this.species) {
+				if (organism.id == event.owner_id) {
+					organism.addEvent(event);
+				}
+			}
 		}
 
 		return;
