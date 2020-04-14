@@ -6,7 +6,7 @@ class TextButton extends Button {
 		this.text = scene.add.text(0, 0, text, style);
 		this.add(this.text);
 
-		this.bindInteractive(this.text)
+		this.bindInteractive(this.text);
 	}
 
 

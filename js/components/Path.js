@@ -6,7 +6,7 @@ class Path extends Phaser.GameObjects.Container {
 		this.node1 = node1;
 		this.node2 = node2;
 		this.amount = Phaser.Math.Easing.Sine.Out(amount);
-		this.speed = (1300 - 700 * this.amount) * 4;
+		this.speed = (1300 - 600 * this.amount) * 4;
 
 		this.middle = new Phaser.Math.Vector2(
 			(node1.x + node2.x) / 2,
@@ -32,13 +32,13 @@ class Path extends Phaser.GameObjects.Container {
 
 
 		this.speed *= this.curve.getLength() / 250;
-		this.dotCount = 2 + amount * 4;
+		this.dotCount = 2 + amount * 3;
 
 		this.drawBezier(0);
 	}
 
 	getWidth() {
-		return (2 + 6 * this.amount) * this.alphaValue;
+		return (3 + 4 * this.amount) * this.alphaValue;
 	}
 
 	drawBezier(time) {

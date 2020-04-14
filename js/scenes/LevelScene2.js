@@ -116,15 +116,35 @@ class LevelScene2 extends Phaser.Scene {
 
 		/* Population graph */
 
-		this.graph = new Graph(this);
-		this.graph.setPosition(this.W-315, this.H-330);
+		const UI_SEP = 0.01 * this.H;
+		const UI_WIDTH = 0.26 * this.W;
+		const UI_HEIGHT = (this.H - 5 * UI_SEP) / 4;
 
-		this.timeController = new TimeController(this, this.W-165, this.H-90);
+		this.timeController = new TimeController(this, UI_WIDTH, UI_HEIGHT);
+		this.timeController.setPosition(
+			this.W - UI_WIDTH/2 - UI_SEP,
+			this.H - UI_HEIGHT/2 - UI_SEP
+		);
 		this.timeController.on('onChange', function() {
 			this.graph.draw(this.timeController.time);
 			this.updateNodePopulation();
 		}, this);
 		this.updateNodePopulation();
+
+		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
+		this.graph.setPosition(
+			this.W - UI_WIDTH/2 - UI_SEP,
+			this.H - UI_HEIGHT*3/2 - 2*UI_SEP
+		);
+
+		this.infoPanel = new InfoPanel(this, UI_WIDTH, 2*UI_HEIGHT + UI_SEP);
+		this.infoPanel.setPosition(
+			this.W - UI_WIDTH/2 - UI_SEP,
+			this.H - UI_HEIGHT*6/2 - 3.5*UI_SEP
+		);
+
+		this.budget = 0;
+		this.setBudget(web.currentScenario.budget);
 
 
 		/* Pause menu */
@@ -163,12 +183,14 @@ class LevelScene2 extends Phaser.Scene {
 			this.setCameraZoom(1);
 		}, this);
 		this.input.keyboard.on('keydown-FIVE', function (event) {
-			this.graph.setVisible(true);
 			this.timeController.setVisible(true);
+			this.graph.setVisible(true);
+			this.infoPanel.setVisible(true);
 		}, this);
 		this.input.keyboard.on('keydown-SIX', function (event) {
-			this.graph.setVisible(false);
 			this.timeController.setVisible(false);
+			this.graph.setVisible(false);
+			this.infoPanel.setVisible(false);
 		}, this);
 	}
 
@@ -190,6 +212,7 @@ class LevelScene2 extends Phaser.Scene {
 			if (d > 2 * this.selectedNode.circle.width/2) {
 				this.selectedNode.setSelected(false);
 				this.selectedNode = null;
+				this.infoPanel.selectNode(null);
 			}
 		}
 
@@ -296,6 +319,22 @@ class LevelScene2 extends Phaser.Scene {
 					this.selectedNode.setVisibility("explored");
 				});
 			}
+
+			this.infoPanel.selectNode(this.selectedNode.species);
+		}
+	}
+
+	setBudget(value) {
+		this.budget = value;
+		this.timeController.onBudgetUpdate(value);
+		this.infoPanel.onBudgetUpdate(value);
+	}
+
+	purchaseAction(event) {
+		if (this.budget >= event.cost) {
+			this.setBudget(this.budget - event.cost);
+			web.setEvent(event, this.timeController.time);
+			web.refresh();
 		}
 	}
 

@@ -32,18 +32,24 @@ class PauseButton extends Button {
 	}
 
 	onOver() {
-		super.onOver();
-		this.highlight.setVisible(true);
-		this.text.setTint(0xFFFFFF);
+		if (this.callback) {
+			super.onOver();
+			this.highlight.setVisible(true);
+			this.text.setTint(0xFFFFFF);
+		}
 	}
 
 	onDown() {
-		super.onDown();
-		this.text.setTint(0xAAAAAA);
+		if (this.callback) {
+			super.onDown();
+			this.text.setTint(0x888888);
+		}
 	}
 
 	onClick() {
 		this.text.setTint(0xFFFFFF);
-		this.callback();
+		if (this.callback) {
+			this.callback();
+		}
 	}
 }

@@ -56,17 +56,20 @@ class TimeControllerButton extends Phaser.GameObjects.Container {
 
 
 class TimeController extends Phaser.GameObjects.Container {
-	constructor(scene, x, y) {
-		super(scene, x, y);
+	constructor(scene, width, height) {
+		super(scene, 0, 0);
 		scene.add.existing(this);
+
+		this.width = width;
+		this.height = height;
 
 		this.setDepth(100);
 		this.setScrollFactor(0);
 
-		this.bg = scene.add.rectangle(0, 0, 300, 150, 0x222222);
-		this.bg.setScrollFactor(0);
-		//this.bg.setAlpha(0.5);
+		this.bg = scene.add.rectangle(0, 0, this.width, this.height, 0x666666);
+		this.bg2 = scene.add.rectangle(0, 0, this.width-5, this.height-5, 0x222222);
 		this.add(this.bg);
+		this.add(this.bg2);
 
 		const SEP = 65;
 
@@ -82,11 +85,17 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.forwardButton = new TimeControllerButton(scene, SEP*3/2, -30, 4, this.onForward.bind(this));
 		this.add(this.forwardButton);
 
-		this.text = scene.add.text(0, 30, "<time>", {
+		this.timeText = scene.add.text(0, 20, "<time>", {
 			font: "24px 'monospace'", fill: '#FFF'
 		});
-		this.text.setOrigin(0.5, 0.5);
-		this.add(this.text);
+		this.timeText.setOrigin(0.5, 0.5);
+		this.add(this.timeText);
+
+		this.budgetText = scene.add.text(0, 50, "<budget>", {
+			font: "24px 'monospace'", fill: '#FFF'
+		});
+		this.budgetText.setOrigin(0.5, 0.5);
+		this.add(this.budgetText);
 
 		this.time = null;
 		this.setTime(0);
@@ -110,8 +119,7 @@ class TimeController extends Phaser.GameObjects.Container {
 			this.onEventChange();
 
 			let value = Math.round(this.time);
-			this.text.setText("Time: " + value.toString());
-
+			this.timeText.setText("Time: " + value.toString());
 		}
 		if (time == 0 || time == web.currentScenario.maxTime) {
 			this.setSpeed(0);
@@ -130,6 +138,10 @@ class TimeController extends Phaser.GameObjects.Container {
 			this.playButton.setActive(true);
 			this.playButton.setFrame(1);
 		}
+	}
+
+	onBudgetUpdate(value) {
+		this.budgetText.setText("Budget: " + value.toString());
 	}
 
 
