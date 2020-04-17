@@ -9,7 +9,7 @@ function createDatabaseTools(database) {
 	function all_custom_tags() { return window.database.getCustomTags(); }
 
 	function getImage(image) {
-		return getTextFromValue(NODE_IMAGES, image);
+		return NODE_IMAGES_PATH + getTextFromValue(NODE_IMAGES, image);
 	}
 
 	function getNode(actor) {

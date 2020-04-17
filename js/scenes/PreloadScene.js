@@ -75,41 +75,9 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('pixel', 'assets/images/pixel.png');
 		this.load.image('dot', 'assets/images/dot.png');
 
-		this.load.image('missing', 'assets/images/icons/Missing_128.png');
-
-		this.load.image('räv', 'assets/images/icons/Räv_128.png');
-		this.load.image('lo', 'assets/images/icons/Lo_128.png');
-		this.load.image('duvhök', 'assets/images/icons/Duvhök_128.png');
-		this.load.image('kattuggla', 'assets/images/icons/Kattuggla_128.png');
-		this.load.image('snok', 'assets/images/icons/Snok_128.png');
-
-		this.load.image('dovhjort', 'assets/images/icons/Dovhjort_128.png');
-		this.load.image('rådjur', 'assets/images/icons/Rådjur_128.png');
-		this.load.image('hare', 'assets/images/icons/Hare_128.png');
-		this.load.image('skogssorkgråsiding', 'assets/images/icons/Skogssork_Grasiding_128.png');
-		this.load.image('norvacka', 'assets/images/icons/Norvacka_128.png');
-		this.load.image('koltrast', 'assets/images/icons/Koltrast_128.png');
-		this.load.image('vanliggroda', 'assets/images/icons/VanligGroda_128.png');
-
-		this.load.image('daggmask', 'assets/images/icons/Daggmask_128.png');
-		this.load.image('skalbagge', 'assets/images/icons/Skalbagge_128.png');
-		this.load.image('trädlevandeinsekt', 'assets/images/icons/TrädlevandeInsekt_128.png');
-
-		this.load.image('träd', 'assets/images/icons/Träd_128.png');
-		this.load.image('gräs', 'assets/images/icons/Gräs_128.png');
-		this.load.image('ört', 'assets/images/icons/Ört_128.png');
-		this.load.image('blåbär', 'assets/images/icons/Blåbär_128.png');
-		this.load.image('hasselnöt', 'assets/images/icons/Hasselnöt_128.png');
-		this.load.image('svamp', 'assets/images/icons/Svamp_128.png');
-		this.load.image('detrius', 'assets/images/icons/Detrius_128.png');
-
-		this.load.image('havsutter', 'assets/images/icons/Havsutter_128.png');
-		this.load.image('jättekelp', 'assets/images/icons/Jättekelp_128.png');
-		this.load.image('lax', 'assets/images/icons/Lax_128.png');
-		this.load.image('sjöelefant', 'assets/images/icons/Säl_Sjöelefant_128.png');
-		this.load.image('sjöborre', 'assets/images/icons/Sjöborre_128.png');
-		this.load.image('sjölejon', 'assets/images/icons/Sjölejon_California_128.png');
-		this.load.image('späckhuggare', 'assets/images/icons/Späckhuggare_128.png');
+		for (const data of NODE_IMAGES) {
+			this.load.image(data.value, NODE_IMAGES_PATH_SMALL + data.text);
+		}
 
 
 		/* Audio */
