@@ -459,6 +459,11 @@ class Database {
 			"position": [50,50],
 			"actors": [],
 			"actions": [],
+			"conditions": {
+				1: {},
+				2: {},
+				3: {},
+			}
 		};
 	}
 
@@ -477,6 +482,8 @@ class Database {
 						this.addActor(scenario);
 						this.transferObject(data.actors[r], scenario.actors[r]);
 					}
+
+					scenario.conditions = data.conditions;
 
 					if (JSON.stringify(scenario) !== JSON.stringify(data)) {
 						console.warn("Legacy scenario data updated");
@@ -588,6 +595,21 @@ class Database {
 				let action = this.addAction(scenario);
 				this.transferObject(data[event.id], action);
 				action.event_id = event.id;
+			}
+		}
+	}
+
+	setConditions(scenario, newConditions, activeList) {
+		for (const tier in scenario.conditions) {
+			scenario.conditions[tier] = {};
+
+			for (const id in newConditions[tier]) {
+				if (activeList[tier][id]) {
+					const range = newConditions[tier][id];
+					if (Array.isArray(range) && range[0] !== null && range[1] !== null) {
+						scenario.conditions[tier][id] = newConditions[tier][id];
+					}
+				}
 			}
 		}
 	}

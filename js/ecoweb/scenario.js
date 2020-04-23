@@ -7,6 +7,7 @@ class Scenario {
 		this.budget = data.budget;
 		this.description = data.description;
 		this.cameraPos = {x: data.position[0], y: data.position[1]};
+		this.conditions = data.conditions;
 
 
 		for (let actor of data.actors) {

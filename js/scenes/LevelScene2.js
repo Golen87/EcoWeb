@@ -321,6 +321,7 @@ class LevelScene2 extends Phaser.Scene {
 			}
 
 			this.infoPanel.selectNode(this.selectedNode.species);
+			this.infoPanel.onBudgetUpdate(this.budget);
 		}
 	}
 
@@ -343,6 +344,37 @@ class LevelScene2 extends Phaser.Scene {
 			let pop = web.getValueAt(i, this.timeController.time);
 			this.nodes[i].setPopulation(pop, immediate);
 		}
+
+		this.timeController.onRatingUpdate(this.checkConditions());
+	}
+
+	checkConditions() {
+		const cond = web.currentScenario.conditions;
+		for (let tier = 3; tier > 0; tier--) {
+			let success = true;
+
+			for (const id in cond[tier]) {
+				const range = cond[tier][id];
+				const min = range[0];
+				const max = range[1];
+
+				for (var s = 0; s < web.currentScenario.species.length; s += 1) {
+					const node = web.currentScenario.species[s];
+					if (node.id == id) {
+						const value = web.getValueAt(s, this.timeController.time);
+						if (value < min || value > max) {
+							success = false;
+							break;
+						}
+					}
+				}
+			}
+
+			if (success) {
+				return tier;
+			}
+		}
+		return 0;
 	}
 
 	addEvent(delay, callback) {

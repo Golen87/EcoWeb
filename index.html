@@ -1008,7 +1008,8 @@
 					<hr class="col-12">
 					<div>
 						<input type="button" class="btn btn-primary mr-1" value="Select events" v-on:click="openEventSelector()">
-						<input type="button" class="btn btn-primary" value="Select nodes" v-on:click="openNodeSelector()">
+						<input type="button" class="btn btn-primary mr-1" value="Select nodes" v-on:click="openNodeSelector()">
+						<input type="button" class="btn btn-primary" value="Set victory conditions" v-on:click="openConditionsEditor()">
 					</div>
 					<div style="flex-grow: 1;"></div>
 					<div>
@@ -1066,27 +1067,6 @@
 		</div>
 
 
-		<!-- Warning Modal -->
-		<div class="modal fade" id="warningModal" tabindex="-1" role="dialog" aria-labelledby="warningModalLabel" aria-hidden="true">
-			<div class="modal-dialog modal-dialog-centered" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title" id="warningModalLabel">{{ titleText }}</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
-							<span aria-hidden="true">&times;</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						{{ bodyText }}
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" v-on:click="deny()">{{ denyText }}</button>
-						<button type="button" class="btn" v-bind:class="{ 'btn-primary': type == 'save', 'btn-danger': type == 'delete' }" v-on:click="accept()">{{ acceptText }}</button>
-					</div>
-				</div>
-			</div>
-		</div>
-
 		<!-- Node Selector Modal -->
 		<div class="modal fade" id="nodeSelectorModal" tabindex="-1" role="dialog" aria-labelledby="nodeSelectorModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
@@ -1107,6 +1087,75 @@
 									v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + node.color }"
 									v-bind:title="node.name">
 								<span class="align-middle">{{ node.name }}</span>
+							</li>
+						</ul>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" v-on:click="accept()">OK</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Victory Conditions Editor Modal -->
+		<div class="modal fade" id="conditionsEditorModal" tabindex="-1" role="dialog" aria-labelledby="conditionsEditorModalLabel" aria-hidden="true">
+			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="conditionsEditorModalLabel" v-html="titleText"></h5>
+						<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+					</div>
+					<div class="modal-body row justify-content-center">
+						<!-- Stars -->
+						<ul v-for="tier in tiers" class="list-group col-12 col-sm-2" style="padding: 0.1rem;">
+							<li
+								class="list-group-item list-group-item-action pointer"
+								v-bind:class="{ 'active': selected == tier }"
+								v-on:click="selected = tier"
+							>
+								<span class="align-middle">
+									<i v-for="star in tier" class="fas fa-star"></i>
+								</span>
+							</li>
+						</ul>
+
+						<hr>
+
+						<!-- Nodes -->
+						<ul v-for="node in nodes" class="list-group col-12 col-sm-6 col-lg-4" style="padding: 0.1rem;">
+							<li
+								class="list-group-item list-group-item-action pointer"
+								style="padding: 0.75rem;"
+								v-bind:class="{ 'active': isActive(node.id) }"
+								v-on:click="toggleNode($event, node.id, true)"
+							>
+								<div class="form-group row my-0">
+									<img
+										v-if="node.id != 'budget'"
+										v-bind:src="getImage(node.image)"
+										class="img-thumbnail p-0 rounded-circle"
+										style="border: none; height: 40px;"
+										v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + node.color }"
+										v-bind:title="node.name"
+										v-on:click="toggleNode($event, node.id)"
+									>
+									<div v-else v-on:click="toggleNode($event, node.id)">
+										<i class="fas fa-fw fa-money-bill-wave" style="font-size: 30px; width: 40px; margin: 5px 0; vertical-align: middle;"></i>
+									</div>
+									<!-- <span v-else class="btn" style="width: 40px; padding: .375rem 0;">budget</span> -->
+
+									<div class="col pr-0">
+										<div v-if="isActive(node.id)" class="input-group">
+											<input v-model.number="conditions[selected][node.id][0]" type="number" class="form-control" min="0" max="1" step="0.01" placeholder="min">
+											<input v-model.number="conditions[selected][node.id][1]" type="number" class="form-control" min="0" max="1" step="0.01" placeholder="max">
+										</div>
+										<div v-else class="input-group">
+											<span class="btn" style="color: #AAAAAA;">Click to activate</span>
+										</div>
+									</div>
+								</div>
 							</li>
 						</ul>
 					</div>

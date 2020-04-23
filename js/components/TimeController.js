@@ -85,7 +85,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.forwardButton = new TimeControllerButton(scene, SEP*3/2, -30, 4, this.onForward.bind(this));
 		this.add(this.forwardButton);
 
-		this.timeText = scene.add.text(0, 20, "<time>", {
+		this.timeText = scene.add.text(-70, 20, "<time>", {
 			font: "24px 'monospace'", fill: '#FFF'
 		});
 		this.timeText.setOrigin(0.5, 0.5);
@@ -96,6 +96,12 @@ class TimeController extends Phaser.GameObjects.Container {
 		});
 		this.budgetText.setOrigin(0.5, 0.5);
 		this.add(this.budgetText);
+
+		this.ratingText = scene.add.text(70, 20, "<star>", {
+			font: "24px 'monospace'", fill: '#FFF'
+		});
+		this.ratingText.setOrigin(0.5, 0.5);
+		this.add(this.ratingText);
 
 		this.time = null;
 		this.setTime(0);
@@ -116,7 +122,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		time = Phaser.Math.Clamp(time, 0, web.currentScenario.maxTime);
 		if (this.time != time) {
 			this.time = time;
-			this.onEventChange();
+			this.onTimeChange();
 
 			let value = Math.round(this.time);
 			this.timeText.setText("Time: " + value.toString());
@@ -142,6 +148,10 @@ class TimeController extends Phaser.GameObjects.Container {
 
 	onBudgetUpdate(value) {
 		this.budgetText.setText("Budget: " + value.toString());
+	}
+
+	onRatingUpdate(value) {
+		this.ratingText.setText("Stars: " + value.toString());
 	}
 
 
@@ -191,7 +201,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		}
 	}
 
-	onEventChange() {
+	onTimeChange() {
 		this.emit('onChange');
 	}
 }

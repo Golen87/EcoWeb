@@ -466,11 +466,25 @@ function createDatabaseTools(database) {
 					this.setActions.bind(this)
 				);
 			},
+			openConditionsEditor() {
+				let idList = [];
+				for (const actor of this.scenario.actors) {
+					idList.push(actor.node_id);
+				}
+				conditionsEditorModal.show(
+					idList,
+					this.scenario.conditions,
+					this.setConditions.bind(this)
+				);
+			},
 			setActors(idList) {
 				database.setActors(this.scenario, idList);
 			},
 			setActions(idList) {
 				database.setActions(this.scenario, idList);
+			},
+			setConditions(conditions, active) {
+				database.setConditions(this.scenario, conditions, active);
 			},
 			run() {
 				let form = $(this.$el);
@@ -618,7 +632,6 @@ function createDatabaseTools(database) {
 			selected: {},
 			allNodes: [],
 			titleText: null,
-			bodyText: "Body",
 			acceptText: "Accept",
 			denyText: "Deny",
 			callback: null,
@@ -650,6 +663,84 @@ function createDatabaseTools(database) {
 				if (this.callback) {
 					this.callback(nodeList);
 				}
+			},
+			getImage,
+		}
+	});
+
+	const conditionsEditorModal = new Vue({
+		el: "#conditionsEditorModal",
+		data: {
+			titleText: "Set victory conditions",
+			tiers: [1, 2, 3],
+			conditions: {},
+			selected: 1,
+			nodes: [],
+			active: {},
+			callback: null,
+		},
+		computed: {
+			all_nodes,
+		},
+		methods: {
+			show(nodeList, newConditions, callback=null) {
+				this.callback = callback;
+				this.selected = 1;
+
+				const budgetNode = {
+					id: "budget",
+					name: "Budget",
+					color: "#777777",
+					image: "missing"
+				};
+
+				this.nodes = [budgetNode];
+
+				for (const tier of this.tiers) {
+					this.conditions[tier] = {};
+					Vue.set(this.active, tier, {});
+
+					this.conditions[tier][budgetNode.id] = [null, null];
+					Vue.set(this.active[tier], budgetNode.id, false);
+				}
+
+				for (const node of all_nodes()) {
+					if (nodeList.includes(node.id) || node.id == "budget") {
+						this.nodes.push(node);
+						for (const tier of this.tiers) {
+							this.conditions[tier][node.id] = [null, null];
+							Vue.set(this.active[tier], node.id, false);
+
+							if (newConditions[tier][node.id]) {
+								this.conditions[tier][node.id] = newConditions[tier][node.id];
+								Vue.set(this.active[tier], node.id, true);
+							}
+						}
+					}
+				}
+
+				$("#conditionsEditorModal").modal("show");
+			},
+			hide() {
+				$("#conditionsEditorModal").modal("hide");
+			},
+			accept() {
+				this.hide();
+				if (this.callback) {
+					this.callback(this.conditions, this.active);
+				}
+			},
+			isActive(id) {
+				return this.active[this.selected][id];
+			},
+			toggleNode(event, id, activeCheck=false) {
+				event.stopImmediatePropagation();
+				if (activeCheck) {
+					if (this.isActive(id)) {
+						return;
+					}
+				}
+				Vue.set(this.active[this.selected], id, !this.active[this.selected][id]);
 			},
 			getImage,
 		}
