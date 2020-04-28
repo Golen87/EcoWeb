@@ -26,12 +26,14 @@ class Node extends Button {
 		const LAYER_3 = 1.00 - 2 * 0.05;
 		const LAYER_4 = 1.00 - 1.8 * 0.05;
 
-		this.circle = scene.add.image(0, 0, 'circle');
+		const image = isAbiotic(species.type) ? "diamond" : "circle";
+
+		this.circle = scene.add.image(0, 0, image);
 		this.circle.setScale((LAYER_1 * this.size) / this.circle.height);
 		this.circle.setTint(this.BLACK);
 		this.add(this.circle);
 
-		this.innerCircle = scene.add.image(0, 0, 'circle');
+		this.innerCircle = scene.add.image(0, 0, image);
 		this.innerCircle.setScale((LAYER_3 * this.size) / this.innerCircle.height);
 		this.innerCircle.setTint(this.WHITE);
 		this.add(this.innerCircle);

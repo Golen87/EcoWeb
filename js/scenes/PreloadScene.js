@@ -72,6 +72,7 @@ class PreloadScene extends Phaser.Scene {
 
 		/* Nodes */
 		this.load.image('circle', 'assets/images/circle_128.png');
+		this.load.image('diamond', 'assets/images/diamond_128.png');
 		this.load.image('pixel', 'assets/images/pixel.png');
 		this.load.image('dot', 'assets/images/dot.png');
 
