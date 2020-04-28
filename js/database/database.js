@@ -483,7 +483,9 @@ class Database {
 						this.transferObject(data.actors[r], scenario.actors[r]);
 					}
 
-					scenario.conditions = data.conditions;
+					if (data.conditions) {
+						scenario.conditions = data.conditions;
+					}
 
 					if (JSON.stringify(scenario) !== JSON.stringify(data)) {
 						console.warn("Legacy scenario data updated");
