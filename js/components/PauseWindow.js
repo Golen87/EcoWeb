@@ -13,6 +13,7 @@ class PauseWindow extends Phaser.GameObjects.Container {
 		this.graphics.setInteractive({ hitArea: rect, hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true })
 			.on('pointerdown', this.onOutsideDown.bind(this))
 			.on('pointerup', this.onOutsideUp.bind(this));
+		this.graphics.setScrollFactor(0);
 
 		this.background = scene.add.sprite(0, 0, 'pause_window');
 		this.background.setScale(HEIGHT / this.background.height);

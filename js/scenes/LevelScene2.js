@@ -6,8 +6,9 @@ class LevelScene2 extends Phaser.Scene {
 			["Spela Vidare", function() {
 				this.pauseWindow.hide();
 			}],
-			["Inställningar", function() {
-				console.log("Inställningar");
+			["Visa Uppgift", function() {
+				this.pauseWindow.hide();
+				this.briefingWindow.show();
 			}],
 			["Gå Till Meny", function() {
 				this.scene.start("WorldScene");
@@ -145,6 +146,21 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.budget = 0;
 		this.setBudget(web.currentScenario.budget);
+
+
+		/* Briefing window */
+
+		this.briefingWindow = new BriefingWindow(this, 0.8 * this.W, 0.8 * this.H);
+		this.briefingWindow.setPosition(
+			this.W / 2,
+			this.H / 2
+		);
+		this.briefingWindow.setDepth(1000);
+		//this.briefingWindow.hide();
+		this.briefingWindow.setScrollFactor(0);
+		this.add.existing(this.briefingWindow);
+
+		this.briefingWindow.setText(web.currentScenario.name, web.currentScenario.description);
 
 
 		/* Pause menu */
