@@ -672,7 +672,7 @@ function createDatabaseTools(database) {
 		el: "#conditionsEditorModal",
 		data: {
 			titleText: "Set victory conditions",
-			tiers: [1, 2, 3],
+			tiers: [0, 1, 2, 3],
 			conditions: {},
 			selected: 1,
 			nodes: [],
@@ -701,6 +701,7 @@ function createDatabaseTools(database) {
 					Vue.set(this.active, tier, {});
 
 					this.conditions[tier][budgetNode.id] = [null, null];
+					this.conditions[tier].description = newConditions[tier].description;
 					Vue.set(this.active[tier], budgetNode.id, false);
 				}
 

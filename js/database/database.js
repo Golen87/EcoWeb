@@ -460,6 +460,7 @@ class Database {
 			"actors": [],
 			"actions": [],
 			"conditions": {
+				0: {},
 				1: {},
 				2: {},
 				3: {},
@@ -484,7 +485,11 @@ class Database {
 					}
 
 					if (data.conditions) {
-						scenario.conditions = data.conditions;
+						for (const tier in scenario.conditions) {
+							if (data.conditions[tier]) {
+								scenario.conditions[tier] = data.conditions[tier];
+							}
+						}
 					}
 
 					if (JSON.stringify(scenario) !== JSON.stringify(data)) {
@@ -613,6 +618,8 @@ class Database {
 					}
 				}
 			}
+
+			scenario.conditions[tier].description = newConditions[tier].description;
 		}
 	}
 

@@ -1110,22 +1110,31 @@
 					</div>
 					<div class="modal-body row justify-content-center">
 						<!-- Stars -->
-						<ul v-for="tier in tiers" class="list-group col-12 col-sm-2" style="padding: 0.1rem;">
+						<ul v-for="tier in tiers" class="list-group col-12 col-sm-3 col-lg-2" style="padding: 0.1rem;">
 							<li
 								class="list-group-item list-group-item-action pointer"
 								v-bind:class="{ 'active': selected == tier }"
 								v-on:click="selected = tier"
 							>
 								<span class="align-middle">
+									<i v-if="tier == 0" class="fas fa-skull-crossbones"></i>
 									<i v-for="star in tier" class="fas fa-star"></i>
 								</span>
 							</li>
 						</ul>
 
-						<hr>
+						<!-- Description -->
+						<div class="form-group col-12 col-sm-10 col-lg-8">
+							<label class="col-12 col-form-label">Debriefing text</label>
+							<div class="col-12">
+								<textarea v-if="conditions[selected]" v-model="conditions[selected].description" class="form-control" rows="3" maxlength="1000"></textarea>
+							</div>
+						</div>
+
+						<hr v-if="selected > 0">
 
 						<!-- Nodes -->
-						<ul v-for="node in nodes" class="list-group col-12 col-sm-6 col-lg-4" style="padding: 0.1rem;">
+						<ul v-if="selected > 0" v-for="node in nodes" class="list-group col-12 col-sm-6 col-lg-4" style="padding: 0.1rem;">
 							<li
 								class="list-group-item list-group-item-action pointer"
 								style="padding: 0.75rem;"

@@ -8,7 +8,7 @@ class LevelScene2 extends Phaser.Scene {
 			}],
 			["Visa Uppgift", function() {
 				this.pauseWindow.hide();
-				this.briefingWindow.show();
+				this.briefingWindow.show(web.currentScenario.name, web.currentScenario.description);
 			}],
 			["Gå Till Meny", function() {
 				this.scene.start("WorldScene");
@@ -160,7 +160,13 @@ class LevelScene2 extends Phaser.Scene {
 		this.briefingWindow.setScrollFactor(0);
 		this.add.existing(this.briefingWindow);
 
-		this.briefingWindow.setText(web.currentScenario.name, web.currentScenario.description);
+		this.briefingWindow.show(web.currentScenario.name, web.currentScenario.description);
+
+		this.timeController.on('onEnd', function() {
+			const tier = this.checkConditions();
+			const desc = web.currentScenario.conditions[tier].description;
+			this.briefingWindow.show("Utvärdering", desc);
+		}, this);
 
 
 		/* Pause menu */

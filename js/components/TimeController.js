@@ -127,8 +127,12 @@ class TimeController extends Phaser.GameObjects.Container {
 			let value = Math.round(this.time);
 			this.timeText.setText("Time: " + value.toString());
 		}
-		if (time == 0 || time == web.currentScenario.maxTime) {
+		if (time == 0) {
 			this.setSpeed(0);
+		}
+		if (time == web.currentScenario.maxTime) {
+			this.setSpeed(0);
+			this.onTimeEnd();
 		}
 	}
 
@@ -203,5 +207,9 @@ class TimeController extends Phaser.GameObjects.Container {
 
 	onTimeChange() {
 		this.emit('onChange');
+	}
+
+	onTimeEnd() {
+		this.emit('onEnd');
 	}
 }

@@ -77,7 +77,8 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		this.descText.setText(desc);
 	}
 
-	show() {
+	show(title, desc) {
+		this.setText(title, desc);
 		this.setActive(true);
 		this.setVisible(true);
 	}
