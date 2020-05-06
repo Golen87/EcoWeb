@@ -3,14 +3,14 @@ class LevelScene2 extends Phaser.Scene {
 		super({key: 'LevelScene2'});
 
 		this.pauseOptions = [
-			["Spela Vidare", function() {
+			["Spela Vidare", () => {
 				this.pauseWindow.hide();
 			}],
-			["Visa Uppgift", function() {
+			["Visa Uppgift", () => {
 				this.pauseWindow.hide();
-				this.briefingWindow.show(web.currentScenario.name, web.currentScenario.description);
+				this.showBriefing();
 			}],
-			["Gå Till Meny", function() {
+			["Gå Till Meny", () => {
 				this.scene.start("WorldScene");
 			}],
 		];
@@ -156,16 +156,14 @@ class LevelScene2 extends Phaser.Scene {
 			this.H / 2
 		);
 		this.briefingWindow.setDepth(1000);
-		//this.briefingWindow.hide();
+		this.briefingWindow.hide();
 		this.briefingWindow.setScrollFactor(0);
 		this.add.existing(this.briefingWindow);
 
-		this.briefingWindow.show(web.currentScenario.name, web.currentScenario.description);
+		this.showBriefing();
 
 		this.timeController.on('onEnd', function() {
-			const tier = this.checkConditions();
-			const desc = web.currentScenario.conditions[tier].description;
-			this.briefingWindow.show("Utvärdering", desc);
+			this.showDebriefing();
 		}, this);
 
 
@@ -397,6 +395,36 @@ class LevelScene2 extends Phaser.Scene {
 			}
 		}
 		return 0;
+	}
+
+	showBriefing() {
+		const name = web.currentScenario.name;
+		const desc = web.currentScenario.description;
+		const buttons = [
+			["OK", () => {
+				this.briefingWindow.hide();
+			}]
+		];
+
+		this.briefingWindow.show(name, desc, buttons);
+	}
+
+	showDebriefing() {
+		const name = "Utvärdering";
+		const tier = this.checkConditions();
+		const desc = web.currentScenario.conditions[tier].description;
+		const buttons = [
+			["Starta Om", () => {
+				web.restart();
+				this.timeController.onReset();
+				this.briefingWindow.hide();
+			}],
+			["Gå Till Meny", () => {
+				this.scene.start("WorldScene");
+			}]
+		];
+
+		this.briefingWindow.show(name, desc, buttons);
 	}
 
 	addEvent(delay, callback) {

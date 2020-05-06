@@ -63,13 +63,7 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 
 		/* Event buttons */
 
-		const y = 0.39 * this.height;
-		this.eventButton = new PauseButton(scene, 0, y, "OK", () => {
-			this.hide();
-		});
-		this.eventButton.setScale(0.75);
-		this.eventButton.setScrollFactor(0);
-		this.add(this.eventButton);
+		this.buttons = [];
 	}
 
 	setText(title, desc) {
@@ -77,10 +71,32 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		this.descText.setText(desc);
 	}
 
-	show(title, desc) {
+	show(title, desc, options) {
 		this.setText(title, desc);
 		this.setActive(true);
 		this.setVisible(true);
+
+		this.setButtons(options);
+	}
+
+	setButtons(options) {
+		for (const button of this.buttons) {
+			button.destroy();
+		}
+		this.buttons = [];
+
+		for (let i = 0; i < options.length; i++) {
+			const SEP = 0.45 * this.width;
+			const LEFT = (0.5 + i - options.length/2) * SEP;
+			const TOP = 0.39 * this.height;
+			const TEXT = options[i][0];
+			const FUNC = options[i][1];
+
+			this.buttons[i] = new PauseButton(this.scene, LEFT, TOP, TEXT, FUNC);
+			this.buttons[i].setScale(0.8);
+			this.buttons[i].setScrollFactor(0);
+			this.add(this.buttons[i]);
+		}
 	}
 
 	hide() {

@@ -30,7 +30,7 @@ class PauseWindow extends Phaser.GameObjects.Container {
 		for (let i = 0; i < options.length; i++) {
 			const TOP = (1 + i - options.length/2) * SEP;
 			const TEXT = options[i][0];
-			const FUNC = options[i][1].bind(scene);
+			const FUNC = options[i][1];
 
 			this.buttons[i] = new PauseButton(scene, 0, TOP, TEXT, FUNC);
 			this.add(this.buttons[i]);
