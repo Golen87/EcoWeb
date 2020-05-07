@@ -130,7 +130,6 @@ class LevelScene2 extends Phaser.Scene {
 			this.graph.draw(this.timeController.time);
 			this.updateNodePopulation();
 		}, this);
-		this.updateNodePopulation();
 
 		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
 		this.graph.setPosition(
@@ -143,9 +142,6 @@ class LevelScene2 extends Phaser.Scene {
 			this.W - UI_WIDTH/2 - UI_SEP,
 			this.H - UI_HEIGHT*6/2 - 3.5*UI_SEP
 		);
-
-		this.budget = 0;
-		this.setBudget(web.currentScenario.budget);
 
 
 		/* Briefing window */
@@ -181,6 +177,11 @@ class LevelScene2 extends Phaser.Scene {
 		this.pauseWindow.hide();
 		this.pauseWindow.setScrollFactor(0);
 		this.add.existing(this.pauseWindow);
+
+
+		this.budget = 0;
+		this.setBudget(web.currentScenario.budget);
+		this.updateNodePopulation();
 
 
 		/* Testing */
@@ -386,6 +387,14 @@ class LevelScene2 extends Phaser.Scene {
 							success = false;
 							break;
 						}
+					}
+				}
+
+				if (id == "budget") {
+					const value = this.budget;
+					if (value < min || value > max) {
+						success = false;
+						break;
 					}
 				}
 			}

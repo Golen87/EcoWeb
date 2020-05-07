@@ -700,9 +700,16 @@ function createDatabaseTools(database) {
 					this.conditions[tier] = {};
 					Vue.set(this.active, tier, {});
 
-					this.conditions[tier][budgetNode.id] = [null, null];
 					this.conditions[tier].description = newConditions[tier].description;
-					Vue.set(this.active[tier], budgetNode.id, false);
+
+					if (newConditions[tier].budget) {
+						this.conditions[tier][budgetNode.id] = newConditions[tier].budget;
+						Vue.set(this.active[tier], budgetNode.id, true);
+					}
+					else {
+						this.conditions[tier][budgetNode.id] = [null, null];
+						Vue.set(this.active[tier], budgetNode.id, false);
+					}
 				}
 
 				for (const node of all_nodes()) {
