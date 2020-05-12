@@ -343,6 +343,7 @@ class LevelScene2 extends Phaser.Scene {
 
 			this.infoPanel.selectNode(this.selectedNode.species);
 			this.infoPanel.onBudgetUpdate(this.budget);
+			this.graph.draw(this.timeController.time);
 		}
 	}
 
@@ -358,6 +359,12 @@ class LevelScene2 extends Phaser.Scene {
 			web.setEvent(event, this.timeController.time);
 			web.refresh();
 		}
+	}
+
+	toggleTracking(species) {
+		species.showGraph = !species.showGraph;
+		this.graph.draw(this.timeController.time);
+		this.infoPanel.onToggleUpdate();
 	}
 
 	updateNodePopulation(immediate=false) {

@@ -6,6 +6,8 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		this.width = width;
 		this.height = height;
 
+		this.species = null;
+
 		this.setDepth(100);
 		this.setScrollFactor(0);
 
@@ -99,6 +101,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 
 	selectNode(species) {
 		this.reset();
+		this.species = species;
 
 		if (species) {
 			this.image.setTexture(species.image);
@@ -122,6 +125,8 @@ class InfoPanel extends Phaser.GameObjects.Container {
 			for (let i = species.events.length - 1; i >= 0; i--) {
 				this.addEventButton(i, species.events[i]);
 			}
+
+			this.addGraphToggleButton(3);
 		}
 	}
 
@@ -143,12 +148,26 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		}
 	}
 
+	addGraphToggleButton(index) {
+		const button = this.eventButtons[index];
+		button.setAlpha(1.0);
+		button.text.setText(!this.species.showGraph ? "Följ i grafen" : "Följ inte i grafen");
+		button.callback = this.scene.toggleTracking.bind(this.scene, this.species);
+		button.cost = 0;
+	}
+
 	onBudgetUpdate(budget) {
 		for (const button of this.eventButtons) {
 			if (button.cost > budget) {
 				button.setAlpha(0.4);
 				button.callback = null;
 			}
+		}
+	}
+
+	onToggleUpdate() {
+		if (this.species) {
+			this.eventButtons[3].text.setText(!this.species.showGraph ? "Följ i grafen" : "Följ inte i grafen");
 		}
 	}
 }

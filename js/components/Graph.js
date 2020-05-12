@@ -13,6 +13,8 @@ class Graph extends Phaser.GameObjects.Container {
 		this.add(this.background);
 		this.foreground = scene.add.graphics({x: -this.width/2, y: -this.height/2});
 		this.add(this.foreground);
+		this.foregroundSelected = scene.add.graphics({x: -this.width/2, y: -this.height/2});
+		this.add(this.foregroundSelected);
 
 		this.drawBackground();
 		this.draw(0);
@@ -59,6 +61,7 @@ class Graph extends Phaser.GameObjects.Container {
 		const PADDING = 0.03 * this.width;
 
 		this.foreground.clear();
+		this.foregroundSelected.clear();
 
 
 		/* Nodes */
@@ -66,6 +69,8 @@ class Graph extends Phaser.GameObjects.Container {
 		let fac = Math.min(1, time / web.currentScenario.maxTime);
 
 		for (var s = 0; s < web.currentScenario.species.length; s += 1) {
+			const species = web.currentScenario.species[s];
+
 			let points = [];
 			for (var i = 0; i <= fac; i += 0.001) {
 				let value = Phaser.Math.Clamp(web.getValueAt(s, i * web.time), 0, 1);
@@ -75,17 +80,36 @@ class Graph extends Phaser.GameObjects.Container {
 				});
 			}
 
-			const color = Phaser.Display.Color.HexStringToColor(web.currentScenario.species[s].color).color;
-			this.foreground.lineStyle(2.0, color, 1.0);
-			this.foreground.strokePoints(points, false, false);
-
+			const color = Phaser.Display.Color.HexStringToColor(species.color).color;
 			const p = points[points.length-1];
-			this.foreground.fillStyle(color, 1.0);
-			this.foreground.fillCircle(p.x, p.y, 4);
+
+			if (species.showGraph) {
+				this.foreground.lineStyle(4.0, color, 1.0);
+				this.foreground.strokePoints(points, false, false);
+
+				this.foreground.fillStyle(color, 1.0);
+				this.foreground.fillCircle(p.x, p.y, 5);
+			}
+
+			if (this.scene.selectedNode) {
+				if (species == this.scene.selectedNode.species) {
+					this.foregroundSelected.lineStyle(4.0, 0xffffff, 1.0);
+					this.foregroundSelected.strokePoints(points, false, false);
+
+					this.foregroundSelected.fillStyle(0xffffff, 1.0);
+					this.foregroundSelected.fillCircle(p.x, p.y, 5);
+				}
+			}
 		}
 	}
 
 	update(time, delta) {
-		//...
+		if (this.scene.selectedNode) {
+			const showGraph = this.scene.selectedNode.species.showGraph;
+			this.foregroundSelected.setAlpha(0.5 + (0.25 + 0.25 * showGraph) * Math.sin(time/200));
+		}
+		else {
+			this.foregroundSelected.setAlpha(0);
+		}
 	}
 }

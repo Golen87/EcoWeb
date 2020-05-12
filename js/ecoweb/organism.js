@@ -68,7 +68,7 @@ class Organism {
 		this.diet = {};
 
 		this.enable = true;
-		this.showGraph = true;
+		this.showGraph = (this.visibility == "explored");
 		this.show = false;
 	}
 
