@@ -4,6 +4,7 @@ class Scenario {
 
 		this.name = data.name;
 		this.maxTime = data.time;
+		this.playSpeed = data.playspeed;
 		this.budget = data.budget;
 		this.description = data.description;
 		this.cameraPos = {x: data.position[0], y: data.position[1]};

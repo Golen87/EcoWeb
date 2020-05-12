@@ -856,6 +856,14 @@
 							</div>
 						</div>
 
+						<!-- Play speed -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Play speed</label>
+							<div class="col-sm-8">
+								<input v-model.number="scenario.playspeed" type="number" class="form-control" min="0" step="0.1" max="100" required>
+							</div>
+						</div>
+
 						<!-- Budget -->
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Budget</label>
@@ -874,67 +882,13 @@
 								</div>
 							</div>
 						</div>
-						<!-- <td class="align-middle p-2"> -->
-						<!-- </td> -->
 
 						<!-- Description -->
 						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Description</label>
+							<label class="col-sm-4 col-form-label">Briefing</label>
 							<div class="col-sm-8">
-								<textarea v-model="scenario.description" class="form-control" rows="3" maxlength="1000"></textarea>
+								<textarea v-model="scenario.description" class="form-control" rows="5" maxlength="1000"></textarea>
 							</div>
-						</div>
-
-						<hr>
-
-						<!-- Actions list -->
-						<div class="editor-full-list">
-							<table class="table">
-								<tbody>
-									<tr v-for="(action, index) in scenario.actions">
-										<!-- Image -->
-										<td class="align-middle p-2" style="width: 1%;">
-											<img
-												v-bind:src="getImage(getEvent(action).image)"
-												class="img-thumbnail p-0 rounded-circle pointer"
-												style="border: none; max-width: 40px; max-height: 40px;"
-												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + getEvent(action).color }"
-												v-bind:title="getEvent(action).name"
-												v-on:click="gotoEventEditor(getEvent(action))">
-										</td>
-
-										<!-- Type -->
-										<td class="align-middle p-2">
-											<div class="" style="display: flex; justify-content: center; align-items: center;">
-												<select v-model="action.type" class="form-control" required>
-													<option value="" disabled hidden>Select tags...</option>
-													<option v-for="option in ACTION_TYPES" v-bind:value="option.value">{{ option.text }}</option>
-												</select>
-											</div>
-										</td>
-
-										<!-- Cost -->
-										<td v-if="action.type == 'player'" class="align-middle p-2">
-											<div class="input-group input-lg">
-												<input v-model.number="action.cost" type="number" class="form-control" min="0" :max="scenario.budget" step="1" required>
-												<div class="input-group-append">
-													<div class="input-group-text">cost</div>
-												</div>
-											</div>
-										</td>
-
-										<!-- Time -->
-										<td v-if="action.type == 'automatic'" class="align-middle p-2">
-											<div class="input-group input-lg">
-												<input v-model.number="action.time" type="number" class="form-control" min="0" :max="scenario.time" step="1" required>
-												<div class="input-group-append">
-													<div class="input-group-text">time</div>
-												</div>
-											</div>
-										</td>
-									</tr>
-								</tbody>
-							</table>
 						</div>
 					</div>
 
@@ -946,7 +900,7 @@
 							<table class="table">
 								<thead>
 									<tr>
-										<td scope="col"></td>
+										<td scope="col" class="text-muted"></td>
 										<td scope="col" class="text-muted">Population</td>
 										<td scope="col" class="text-muted">Visibility</td>
 										<td scope="col" class="text-muted">Position</td>
@@ -999,6 +953,49 @@
 									</tr>
 								</tbody>
 							</table>
+
+							<!-- Actions list -->
+							<h5 class="float-left text-muted">Events</h5>
+							<table class="table">
+								<tbody>
+									<tr v-for="(action, index) in scenario.actions">
+										<!-- Image -->
+										<td class="align-middle p-2">
+											<label class="col-form-label pointer" v-on:click="gotoEventEditor(getEvent(action))">{{ getEvent(action).name }}</label>
+										</td>
+
+										<!-- Type -->
+										<td class="align-middle p-2">
+											<div class="" style="display: flex; justify-content: center; align-items: center;">
+												<select v-model="action.type" class="form-control" required>
+													<option value="" disabled hidden>Select tags...</option>
+													<option v-for="option in ACTION_TYPES" v-bind:value="option.value">{{ option.text }}</option>
+												</select>
+											</div>
+										</td>
+
+										<!-- Cost -->
+										<td v-if="action.type == 'player'" class="align-middle p-2">
+											<div class="input-group input-lg">
+												<input v-model.number="action.cost" type="number" class="form-control" min="0" :max="scenario.budget" step="1" required>
+												<div class="input-group-append">
+													<div class="input-group-text">cost</div>
+												</div>
+											</div>
+										</td>
+
+										<!-- Time -->
+										<td v-if="action.type == 'automatic'" class="align-middle p-2">
+											<div class="input-group input-lg">
+												<input v-model.number="action.time" type="number" class="form-control" min="0" :max="scenario.time" step="1" required>
+												<div class="input-group-append">
+													<div class="input-group-text">time</div>
+												</div>
+											</div>
+										</td>
+									</tr>
+								</tbody>
+							</table>
 						</div>
 
 					</div>
@@ -1008,9 +1005,9 @@
 				<div class="row no-gutters d-flex justify-content-end">
 					<hr class="col-12">
 					<div>
-						<input type="button" class="btn btn-primary mr-1" value="Select events" v-on:click="openEventSelector()">
 						<input type="button" class="btn btn-primary mr-1" value="Select nodes" v-on:click="openNodeSelector()">
-						<input type="button" class="btn btn-primary" value="Set victory conditions" v-on:click="openConditionsEditor()">
+						<input type="button" class="btn btn-primary mr-1" value="Select events" v-on:click="openEventSelector()">
+						<input type="button" class="btn btn-primary" value="Edit victory conditions" v-on:click="openConditionsEditor()">
 					</div>
 					<div style="flex-grow: 1;"></div>
 					<div>

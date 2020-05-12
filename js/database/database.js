@@ -454,6 +454,7 @@ class Database {
 			"id": this.getUniqueId(),
 			"name": null,
 			"time": 100,
+			"playspeed": 3,
 			"budget": 100,
 			"description": "",
 			"position": [50,50],

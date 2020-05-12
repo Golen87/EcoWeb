@@ -106,6 +106,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.time = null;
 		this.setTime(0);
 
+		this.speed = web.currentScenario.playSpeed;
 		this.playSpeed = null;
 		this.setSpeed(0);
 	}
@@ -173,7 +174,7 @@ class TimeController extends Phaser.GameObjects.Container {
 
 	onPlay() {
 		if (this.playSpeed == 0) {
-			this.setSpeed(3);
+			this.setSpeed(1 * this.speed);
 		}
 		else {
 			this.resetStates();
@@ -185,11 +186,11 @@ class TimeController extends Phaser.GameObjects.Container {
 		if (!this.rewindButton.active) {
 			this.rewindButton.setActive(true);
 			this.forwardButton.setActive(false);
-			this.setSpeed(-30);
+			this.setSpeed(-10 * this.speed);
 		}
 		else {
 			this.rewindButton.setActive(false);
-			this.setSpeed(3);
+			this.setSpeed(1 * this.speed);
 		}
 	}
 
@@ -197,11 +198,11 @@ class TimeController extends Phaser.GameObjects.Container {
 		if (!this.forwardButton.active) {
 			this.forwardButton.setActive(true);
 			this.rewindButton.setActive(false);
-			this.setSpeed(30);
+			this.setSpeed(10 * this.speed);
 		}
 		else {
 			this.forwardButton.setActive(false);
-			this.setSpeed(3);
+			this.setSpeed(1 * this.speed);
 		}
 	}
 
