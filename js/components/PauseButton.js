@@ -2,6 +2,7 @@ class PauseButton extends Button {
 	constructor(scene, x, y, text, callback) {
 		super(scene, x, y);
 		this.callback = callback;
+		this.active = true;
 
 		const HEIGHT = 60;
 
@@ -25,6 +26,11 @@ class PauseButton extends Button {
 	}
 
 
+	setActive(value) {
+		this.active = value;
+		this.setAlpha(value ? 1.0 : 0.4);
+	}
+
 	onOut() {
 		super.onOut();
 		this.highlight.setVisible(false);
@@ -32,7 +38,7 @@ class PauseButton extends Button {
 	}
 
 	onOver() {
-		if (this.callback) {
+		if (this.active && this.callback) {
 			super.onOver();
 			this.highlight.setVisible(true);
 			this.text.setTint(0xFFFFFF);
@@ -40,7 +46,7 @@ class PauseButton extends Button {
 	}
 
 	onDown() {
-		if (this.callback) {
+		if (this.active && this.callback) {
 			super.onDown();
 			this.text.setTint(0x888888);
 		}
@@ -48,7 +54,7 @@ class PauseButton extends Button {
 
 	onClick() {
 		this.text.setTint(0xFFFFFF);
-		if (this.callback) {
+		if (this.active && this.callback) {
 			this.callback();
 		}
 	}

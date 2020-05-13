@@ -207,10 +207,10 @@ class TimeController extends Phaser.GameObjects.Container {
 	}
 
 	onTimeChange() {
-		this.emit('onChange');
+		this.emit('onTimeChange');
 	}
 
 	onTimeEnd() {
-		this.emit('onEnd');
+		this.emit('onTimeEnd');
 	}
 }

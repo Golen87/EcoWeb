@@ -126,9 +126,10 @@ class LevelScene2 extends Phaser.Scene {
 			this.W - UI_WIDTH/2 - UI_SEP,
 			this.H - UI_HEIGHT/2 - UI_SEP
 		);
-		this.timeController.on('onChange', function() {
+		this.timeController.on('onTimeChange', function() {
 			this.graph.draw(this.timeController.time);
 			this.updateNodePopulation();
+			this.infoPanel.updateButtons(this.timeController.time, this.budget);
 		}, this);
 
 		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
@@ -158,7 +159,7 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.showBriefing();
 
-		this.timeController.on('onEnd', function() {
+		this.timeController.on('onTimeEnd', function() {
 			this.showDebriefing();
 		}, this);
 
@@ -342,7 +343,7 @@ class LevelScene2 extends Phaser.Scene {
 			}
 
 			this.infoPanel.selectNode(this.selectedNode.species);
-			this.infoPanel.onBudgetUpdate(this.budget);
+			this.infoPanel.updateButtons(this.timeController.time, this.budget);
 			this.graph.draw(this.timeController.time);
 		}
 	}
@@ -350,14 +351,15 @@ class LevelScene2 extends Phaser.Scene {
 	setBudget(value) {
 		this.budget = value;
 		this.timeController.onBudgetUpdate(value);
-		this.infoPanel.onBudgetUpdate(value);
+		this.infoPanel.updateButtons(this.timeController.time, this.budget);
 	}
 
 	purchaseAction(event) {
 		if (this.budget >= event.cost) {
-			this.setBudget(this.budget - event.cost);
 			web.setEvent(event, this.timeController.time);
 			web.refresh();
+			this.infoPanel.updateLockTime();
+			this.setBudget(this.budget - event.cost);
 		}
 	}
 

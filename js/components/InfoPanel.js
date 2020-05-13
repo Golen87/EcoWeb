@@ -7,6 +7,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		this.height = height;
 
 		this.species = null;
+		this.lockTime = 0;
 
 		this.setDepth(100);
 		this.setScrollFactor(0);
@@ -76,9 +77,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		let texts = ["Plantera", "Utrota", "Titta på", "Klappa"];
 		for (let i = 0; i < 4; i++) {
 			const y = (-0.03 + i/3 * 0.42) * this.height;
-			this.eventButtons[i] = new PauseButton(scene, 0, y, texts[i], () => {
-				console.log("CLICK");
-			});
+			this.eventButtons[i] = new PauseButton(scene, 0, y, texts[i], null);
 			this.eventButtons[i].setScale(0.55);
 			this.eventButtons[i].setScrollFactor(0);
 			this.add(this.eventButtons[i]);
@@ -102,6 +101,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 	selectNode(species) {
 		this.reset();
 		this.species = species;
+		this.lockTime = 0;
 
 		if (species) {
 			this.image.setTexture(species.image);
@@ -119,12 +119,13 @@ class InfoPanel extends Phaser.GameObjects.Container {
 				//species.animal.weight
 				//species.animal.age
 				//species.animal.offspring
-
 			}
 
 			for (let i = species.events.length - 1; i >= 0; i--) {
 				this.addEventButton(i, species.events[i]);
 			}
+
+			this.updateLockTime();
 
 			this.addGraphToggleButton(3);
 		}
@@ -132,7 +133,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 
 	clearEventButtons() {
 		for (const button of this.eventButtons) {
-			button.setAlpha(0.4);
+			button.setActive(false);
 			button.text.setText("");
 			button.callback = null;
 		}
@@ -141,7 +142,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 	addEventButton(index, event) {
 		const button = this.eventButtons[index];
 		if (event.type == "player") {
-			button.setAlpha(1.0);
+			button.setActive(true);
 			button.text.setText(event.name + " (" + event.cost + ")");
 			button.callback = this.scene.purchaseAction.bind(this.scene, event);
 			button.cost = event.cost;
@@ -156,11 +157,22 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		button.cost = 0;
 	}
 
-	onBudgetUpdate(budget) {
-		for (const button of this.eventButtons) {
-			if (button.cost > budget) {
-				button.setAlpha(0.4);
-				button.callback = null;
+	updateButtons(time, budget) {
+		if (this.species) {
+			for (let i = 0; i < this.eventButtons.length-1; i++) {
+				const button = this.eventButtons[i];
+				button.setActive(false);
+				if (button.callback && budget >= button.cost && time >= this.lockTime) {
+					button.setActive(true);
+				}
+			}
+		}
+	}
+
+	updateLockTime() {
+		for (const activeEvent of web.activeEvents) {
+			if (activeEvent.event.owner_id == this.species.id) {
+				this.lockTime = Math.max(this.lockTime, activeEvent.endTime);
 			}
 		}
 	}
