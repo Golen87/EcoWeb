@@ -432,9 +432,7 @@ class LevelScene2 extends Phaser.Scene {
 		const buttons = [
 			["Starta Om", () => {
 				web.restart();
-				this.setBudget(web.currentScenario.budget);
-				this.timeController.onReset();
-				this.briefingWindow.hide();
+				this.scene.restart();
 			}],
 			["Gå Till Meny", () => {
 				this.scene.start("WorldScene");
