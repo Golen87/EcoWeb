@@ -151,7 +151,7 @@ class InfoPanel extends Phaser.GameObjects.Container {
 
 	addGraphToggleButton(index) {
 		const button = this.eventButtons[index];
-		button.setAlpha(1.0);
+		button.setActive(true);
 		button.text.setText(!this.species.showGraph ? "Följ i grafen" : "Följ inte i grafen");
 		button.callback = this.scene.toggleTracking.bind(this.scene, this.species);
 		button.cost = 0;
