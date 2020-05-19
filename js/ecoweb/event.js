@@ -19,12 +19,13 @@ class BaseEvent {
 		for (const effect of event.effects) {
 			for (const node of window.database.getAffectedNodes(effect)) {
 
-				//const func = (effect.something / this.duration).toString() + " * t";
+				//const func = (effect.value / this.duration).toString() + " * t";
 				const func = "t * t * (3 - 2*t)";
 
 				this.effects.push({
 					"node_id": node.id,
-					"something": effect.something,
+					"method": effect.method,
+					"value": effect.value,
 					"duration": this.duration,
 					"derivative": math.derivative(func, "t").compile(),
 				});

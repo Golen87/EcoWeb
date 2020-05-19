@@ -342,7 +342,7 @@ function createDatabaseTools(database) {
 			show: false,
 			tab: 1,
 			event: database.newEvent(),
-			NODE_IMAGES,
+			NODE_IMAGES, EFFECT_METHODS,
 		},
 		computed: {
 			all_nodes,

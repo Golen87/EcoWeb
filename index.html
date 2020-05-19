@@ -796,11 +796,22 @@
 										</div>
 									</div>
 
-									<!-- Something -->
+									<!-- Method -->
 									<div class="form-group row">
-										<label class="col-sm-4 col-form-label">Something</label>
+										<label class="col-sm-4 col-form-label">Method</label>
 										<div class="col-sm-8 input-group">
-											<input v-model.number="effect.something" type="number" class="form-control" step="0.01" required>
+											<div v-for="option in EFFECT_METHODS" class="form-check form-check-inline">
+												<input class="form-check-input" type="radio" :id="'radio-' + option.value" v-bind:value="option.value" v-model="effect.method">
+												<label class="form-check-label" :for="'radio-' + option.value">{{ option.text }}</label>
+											</div>
+										</div>
+									</div>
+
+									<!-- Value -->
+									<div class="form-group row">
+										<label class="col-sm-4 col-form-label">Value</label>
+										<div class="col-sm-8 input-group">
+											<input v-model.number="effect.value" type="number" class="form-control" step="0.01" required>
 										</div>
 									</div>
 

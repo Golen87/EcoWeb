@@ -364,6 +364,10 @@ class Database {
 					for (const r in data.effects) {
 						this.addEffect(event, data.effects[r].type);
 						this.transferObject(data.effects[r], event.effects[r]);
+						// To be removed
+						if (data.effects[r].something) {
+							event.effects[r].value = data.effects[r].something;
+						}
 					}
 
 					if (JSON.stringify(event) !== JSON.stringify(data)) {
@@ -436,7 +440,8 @@ class Database {
 			"type": type,
 			"node_id": -1,
 			"tags": [],
-			"something": 0
+			"method": EFFECT_METHODS[0].value,
+			"value": 0
 		};
 		event.effects.push(effect);
 		return effect;

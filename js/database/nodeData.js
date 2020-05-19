@@ -104,6 +104,12 @@ const ACTION_TYPES = [
 	{ value: "automatic",	text: "Automatic" },
 ];
 
+const EFFECT_METHODS = [
+	{ value: "relative",	text: "Relative" },
+	{ value: "target",		text: "Target" },
+	{ value: "percentage",	text: "Percentage" },
+];
+
 
 const NODE_TYPES_VALUES = NODE_TYPES.map((x) => {return x.value;});
 const NODE_IMAGES_VALUES = NODE_IMAGES.map((x) => {return x.value;});
