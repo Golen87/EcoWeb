@@ -88,6 +88,7 @@ class Database {
 			"name": null,
 			"image": "missing",
 			"color": "#000000",
+			"description": null,
 			"type": null,
 			"tags": [],
 			"animal": {

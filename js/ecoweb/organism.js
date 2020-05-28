@@ -9,6 +9,7 @@ class Organism {
 		this.name = node.name;
 		this.image = node.image;
 		this.color = node.color;
+		this.description = node.description;
 		this.type = node.type;
 		this.x = actor.position[0];
 		this.y = actor.position[1];
