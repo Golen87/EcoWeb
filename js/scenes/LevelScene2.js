@@ -171,6 +171,21 @@ class LevelScene2 extends Phaser.Scene {
 		}, this);
 
 
+		/* Reward window */
+
+		this.rewardWindow = new RewardWindow(this, 0.55 * this.W, 0.95 * this.H);
+		this.rewardWindow.setPosition(
+			this.W / 2,
+			this.H / 2
+		);
+		this.rewardWindow.setDepth(1000);
+		this.rewardWindow.hide();
+		this.rewardWindow.setScrollFactor(0);
+		this.add.existing(this.rewardWindow);
+
+		//this.showReward(web.currentScenario.species[6]);
+
+
 		/* Pause menu */
 
 		const button_size = 0.075 * this.W;
@@ -233,7 +248,9 @@ class LevelScene2 extends Phaser.Scene {
 		let delta = deltaMs / 1000;
 		this.handleCamera();
 
-		this.timeController.update(time, delta);
+		if (!this.hasGUIOpen()) {
+			this.timeController.update(time, delta);
+		}
 		this.graph.update(time, delta);
 
 		for (let i = this.nodes.length - 1; i >= 0; i--) {
@@ -465,12 +482,26 @@ class LevelScene2 extends Phaser.Scene {
 		this.briefingWindow.show(name, desc, buttons);
 	}
 
+	showReward(species) {
+		const buttons = [
+			["OK", () => {
+				this.rewardWindow.hide();
+			}]
+		];
+
+		this.rewardWindow.show(species, buttons);
+	}
+
 	addEvent(delay, callback) {
 		return this.time.addEvent({
 			delay: delay,
 			callback: callback,
 			callbackScope: this
 		});
+	}
+
+	hasGUIOpen() {
+		return this.briefingWindow.visible || this.rewardWindow.visible || this.pauseWindow.visible;
 	}
 
 

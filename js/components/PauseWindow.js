@@ -7,7 +7,7 @@ class PauseWindow extends Phaser.GameObjects.Container {
 
 		this.graphics = scene.add.graphics();
 		this.add(this.graphics);
-		let rect = new Phaser.Geom.Rectangle(-scene.CX, -scene.CY, 2*scene.CX, 2*scene.CY);
+		let rect = new Phaser.Geom.Rectangle(-scene.CX, -1.1*scene.CY, 2*scene.CX, 1.1*2*scene.CY);
 		this.graphics.fillStyle(0x000000, 0.6);
 		this.graphics.fillRectShape(rect);
 		this.graphics.setInteractive({ hitArea: rect, hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true })
@@ -39,16 +39,43 @@ class PauseWindow extends Phaser.GameObjects.Container {
 		//this.close = new SymbolButton(scene, x, y, null, ()=>{console.log("click");});
 		//this.close.setScale(250 / this.close.image.height);
 		//this.add(this.close);
+
+		this.setActive(false);
+		this.setVisible(false);
 	}
 
 	show() {
 		this.setActive(true);
 		this.setVisible(true);
+
+		this.alpha = 0;
+		this.y += 10;
+		let tween = this.scene.tweens.add({
+			targets: this,
+			alpha: { from: 0, to: 1 },
+			y: '-=10',
+			ease: 'Cubic',
+			duration: 300,
+		});
 	}
 
 	hide() {
-		this.setActive(false);
-		this.setVisible(false);
+		if (this.active) {
+			this.alpha = 1;
+			let tween = this.scene.tweens.add({
+				targets: this,
+				alpha: { from: 1, to: 0 },
+				y: '+=10',
+				ease: 'Cubic',
+				duration: 300,
+			});
+
+			this.scene.addEvent(400, () => {
+				this.y -= 10;
+				this.setActive(false);
+				this.setVisible(false);
+			});
+		}
 	}
 
 	onOutsideDown() {

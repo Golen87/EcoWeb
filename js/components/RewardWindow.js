@@ -1,6 +1,7 @@
-class BriefingWindow extends Phaser.GameObjects.Container {
+class RewardWindow extends Phaser.GameObjects.Container {
 	constructor(scene, width, height) {
 		super(scene, 0, 0);
+		this.scene = scene;
 
 		this.width = width;
 		this.height = height;
@@ -8,18 +9,12 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		this.setDepth(100);
 		this.setScrollFactor(0);
 
-		this.bg = scene.add.rectangle(0, 0, this.width, this.height, 0x666666);
-		this.bg2 = scene.add.rectangle(0, 0, this.width-5, this.height-5, 0x222222);
-		this.add(this.bg);
-		this.add(this.bg2);
-
-
 		/* Faded background */
 
 		this.graphics = scene.add.graphics();
 		this.add(this.graphics);
 		let rect = new Phaser.Geom.Rectangle(-scene.CX, -1.1*scene.CY, 2*scene.CX, 1.1*2*scene.CY);
-		this.graphics.fillStyle(0x000000, 0.6);
+		this.graphics.fillStyle(0x000000, 0.65);
 		this.graphics.fillRectShape(rect);
 		this.graphics.setInteractive({ hitArea: rect, hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true })
 			.on('pointerdown', this.onOutsideDown.bind(this))
@@ -29,29 +24,49 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		this.graphics.setScrollFactor(0);
 
 
+		/* Background */
+
+		const BOX_HEIGHT = 1 * height;
+		this.bg = scene.add.rectangle(0, height/2 - BOX_HEIGHT/2, this.width, BOX_HEIGHT, 0x666666);
+		this.bg2 = scene.add.rectangle(0, height/2 - BOX_HEIGHT/2, this.width-5, BOX_HEIGHT-5, 0x222222);
+		this.add(this.bg);
+		this.add(this.bg2);
+
+
 		/* Image */
 
-		const SIZE = 100;
-		const SEP = 15;
-		const LAYER_1 = 1.00 - 0 * 0.05;
-		const LAYER_2 = 1.00 - 0 * 0.05;
-		const LAYER_3 = 1.00 - 2 * 0.05;
-		const LAYER_4 = 1.00 - 1.8 * 0.05;
-		const IMAGE_X = -width/2 + 0.5*SIZE + SEP;
+		const SIZE = 0.5 * height;
+		const SEP = 0.025 * height;
 		const IMAGE_Y = -height/2 + 0.5*SIZE + SEP;
+
+		const shape = "circle_hq";
+		this.circle = scene.add.image(0, IMAGE_Y, shape);
+		this.circle.setDisplaySize(SIZE, SIZE);
+		this.add(this.circle);
+
+		this.image = scene.add.image(0, IMAGE_Y, 'missing_hq');
+		this.image.setDisplaySize(SIZE, SIZE);
+		this.add(this.image);
+
+		this.tintImage = scene.add.image(0, IMAGE_Y, 'missing_hq');
+		this.tintImage.setDisplaySize(SIZE, SIZE);
+		this.tintImage.setTint(0xffffff);
+		this.tintImage.tintFill = true;
+		this.tintImage.setAlpha(0);
+		this.add(this.tintImage);
 
 
 		/* Text */
 
-		let textX = IMAGE_X + SIZE/2 + SEP;
-		let textY = IMAGE_Y - SIZE/2 + SEP;
+		let textX = -width/2 + 0.1*width;
+		let textY = 0.02 * height;
 
 		this.titleText = createText(scene, textX, textY, 45);
 		this.titleText.setOrigin(0);
 		this.add(this.titleText);
 
-		textY += 1.5 * 45;
-		this.descText = createText(scene, textX, textY, 30);
+		textY += 1.4 * 45;
+		this.descText = createText(scene, textX, textY, 25);
 		this.descText.setOrigin(0);
 		this.descText.setWordWrapWidth(-2*textX);
 		this.add(this.descText);
@@ -71,10 +86,25 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		this.descText.setText(desc);
 	}
 
-	show(title, desc, options) {
+	setImage(image) {
+		const size = this.image.displayWidth;
+		this.image.setTexture(image);
+		this.image.setDisplaySize(size, size);
+		this.tintImage.setTexture(image);
+		this.tintImage.setDisplaySize(size, size);
+	}
+
+	show(species, options) {
+		const title = species.name;
+		const desc = species.description || "Du har upptäckt en ny art!";
 		this.setText(title, desc);
+		this.setImage(species.image+"_hq");
 		this.setActive(true);
 		this.setVisible(true);
+
+		const shape = isAbiotic(species.type) ? "diamond" : "circle_hq";
+		this.circle.setTexture(shape);
+		this.circle.setDisplaySize(this.circle.displayWidth, this.circle.displayWidth);
 
 		this.setButtons(options);
 
@@ -117,12 +147,12 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		for (let i = 0; i < options.length; i++) {
 			const SEP = 0.45 * this.width;
 			const LEFT = (0.5 + i - options.length/2) * SEP;
-			const TOP = 0.39 * this.height;
+			const TOP = 0.43 * this.height;
 			const TEXT = options[i][0];
 			const FUNC = options[i][1];
 
 			this.buttons[i] = new PauseButton(this.scene, LEFT, TOP, TEXT, FUNC);
-			this.buttons[i].setScale(0.8);
+			this.buttons[i].setScale(0.7);
 			this.buttons[i].setScrollFactor(0);
 			this.add(this.buttons[i]);
 		}

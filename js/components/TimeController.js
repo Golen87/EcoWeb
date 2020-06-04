@@ -103,6 +103,8 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.speed = web.currentScenario.playSpeed;
 		this.playSpeed = null;
 		this.setSpeed(0);
+
+		this.onPlay();
 	}
 
 
