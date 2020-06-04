@@ -11,13 +11,18 @@ class LevelScene2 extends Phaser.Scene {
 				this.showBriefing();
 			}],
 			["Gå Till Meny", () => {
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.scene.start("WorldScene");
+				this.addEvent(100, function() {
+					this.soundSwoosh.play();
+				});
 			}],
 		];
 	}
 
 	create() {
 		this.cameras.main.setBackgroundColor(0xFF0000);
+		this.cameras.main.fadeEffect.start(false, 200, 0x00, 0x00, 0x00);
 
 		let size = 2 * 0.8 * Math.min(this.W, this.H);
 
@@ -157,7 +162,9 @@ class LevelScene2 extends Phaser.Scene {
 		this.briefingWindow.setScrollFactor(0);
 		this.add.existing(this.briefingWindow);
 
-		this.showBriefing();
+		this.addEvent(1000, () => {
+			this.showBriefing();
+		});
 
 		this.timeController.on('onTimeEnd', function() {
 			this.showDebriefing();
@@ -183,6 +190,12 @@ class LevelScene2 extends Phaser.Scene {
 		this.budget = 0;
 		this.setBudget(web.currentScenario.budget);
 		this.updateNodePopulation();
+
+
+		/* Sounds */
+
+		this.soundSwoosh = this.sound.add('ui_menu_swoosh');
+		this.soundSwoosh.setVolume(1.0);
 
 
 		/* Testing */
@@ -433,11 +446,19 @@ class LevelScene2 extends Phaser.Scene {
 		const desc = web.currentScenario.conditions[tier].description;
 		const buttons = [
 			["Starta Om", () => {
-				web.restart();
-				this.scene.restart();
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
+				this.soundSwoosh.play();
+				this.addEvent(100, function() {
+					web.restart();
+					this.scene.restart();
+				});
 			}],
 			["Gå Till Meny", () => {
-				this.scene.start("WorldScene");
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
+				this.soundSwoosh.play();
+				this.addEvent(100, function() {
+					this.scene.start("WorldScene");
+				});
 			}]
 		];
 

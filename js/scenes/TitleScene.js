@@ -4,12 +4,18 @@ class TitleScene extends Phaser.Scene {
 
 		this.options = [
 			["Nytt Spel", function() {
-				this.scene.start("WorldScene");
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
+				this.addEvent(100, function() {
+					this.scene.start("WorldScene");
+				});
 			}],
 			["Fortsätt", function() {
-				this.scene.start("WorldScene");
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
+				this.addEvent(100, function() {
+					this.scene.start("WorldScene");
+				});
 			}],
 			["Inställningar", function() {
 				console.log("Inställningar");
@@ -18,6 +24,8 @@ class TitleScene extends Phaser.Scene {
 	}
 
 	create() {
+		this.cameras.main.fadeEffect.start(false, 200, 0x00, 0x00, 0x00);
+
 		let bg = this.add.image(this.CX, this.CY, 'bg_1');
 		this.fitToScreen(bg);
 
@@ -57,9 +65,14 @@ class TitleScene extends Phaser.Scene {
 		//this.soundAmbience.play();
 	}
 
-	update(time, delta) {
-	}
 
+	addEvent(delay, callback) {
+		return this.time.addEvent({
+			delay: delay,
+			callback: callback,
+			callbackScope: this
+		});
+	}
 
 	get W() { return this.cameras.main.displayWidth; }
 	get H() { return this.cameras.main.displayHeight; }
