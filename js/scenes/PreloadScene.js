@@ -69,15 +69,21 @@ class PreloadScene extends Phaser.Scene {
 
 		this.load.spritesheet('player_icons', 'assets/images/ui/PlayerIcons.png', { frameWidth: 100, frameHeight: 100 });
 
+		this.load.image('search', 'assets/images/ui/search.png');
+
 
 		/* Nodes */
 		this.load.image('circle', 'assets/images/circle_128.png');
+		this.load.image('circle_hq', 'assets/images/circle.png');
 		this.load.image('diamond', 'assets/images/diamond_128.png');
 		this.load.image('pixel', 'assets/images/pixel.png');
 		this.load.image('dot', 'assets/images/dot.png');
 
 		for (const data of NODE_IMAGES) {
 			this.load.image(data.value, NODE_IMAGES_PATH_SMALL + data.text);
+		}
+		for (const data of NODE_IMAGES) {
+			this.load.image(data.value+"_hq", NODE_IMAGES_PATH + data.text);
 		}
 
 

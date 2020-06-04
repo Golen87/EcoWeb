@@ -95,14 +95,6 @@ class Path extends Phaser.GameObjects.Container {
 		this.alphaValue = (visible ? hover : hover2) * alive * explored;
 		this.setAlpha(this.alphaValue);
 
-		if (this.node1.visibility == "hidden" && this.node2.visibility == "explored") {
-			this.node1.setVisibility("unexplored");
-			this.node1.popEasing = 1;
-		}
-		if (this.node2.visibility == "hidden" && this.node1.visibility == "explored") {
-			this.node2.setVisibility("unexplored");
-			this.node2.popEasing = 1;
-		}
 
 		if (this.alpha > 0) {
 			this.drawBezier(time);

@@ -114,6 +114,8 @@ class LevelScene2 extends Phaser.Scene {
 					if (diet) {
 						let path = new Path(this, this.nodes[i], this.nodes[j], diet);
 						this.paths.push(path);
+						this.nodes[i].neighbours.push(this.nodes[j]);
+						this.nodes[j].neighbours.push(this.nodes[i]);
 					}
 				}
 			}
@@ -135,6 +137,10 @@ class LevelScene2 extends Phaser.Scene {
 			this.graph.draw(this.timeController.time);
 			this.updateNodePopulation();
 			this.infoPanel.updateButtons(this.timeController.time, this.budget);
+
+			for (const node of this.nodes) {
+				node.updateProgress(this.timeController.time);
+			}
 		}, this);
 
 		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
@@ -256,7 +262,7 @@ class LevelScene2 extends Phaser.Scene {
 		for (let i = this.nodes.length - 1; i >= 0; i--) {
 			//let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
 			//this.nodes[i].setWiggle(s);
-			this.nodes[i].update(delta);
+			this.nodes[i].update(time, delta);
 		}
 
 		if (this.selectedNode && this.isDragging) {
@@ -353,28 +359,25 @@ class LevelScene2 extends Phaser.Scene {
 		this.cameras.main.zoomTo(1-0.5*factor, 100);
 	}
 
-	clickNode(gameObject) {
+	clickNode(node) {
 		if (this.dragEnabled && !this.isDragging) {
-			if (this.selectedNode) {
-				this.selectedNode.setSelected(false);
+			if (node.canExplore()) {
+				this.exploreNode(node);
 			}
-			this.selectedNode = gameObject;
-			this.selectedNode.setSelected(true);
-			this.setCameraFocus(this.selectedNode.x, this.selectedNode.y);
+			else {
+				if (this.selectedNode) {
+					this.selectedNode.setSelected(false);
+				}
+				this.selectedNode = node;
+				this.selectedNode.setSelected(true);
+				this.setCameraFocus(this.selectedNode.x, this.selectedNode.y);
 
-			if (this.selectedNode.visibility == "unexplored") {
-				this.dragEnabled = false;
-				this.addEvent(600, function() {
-					this.dragEnabled = true;
-					this.selectedNode.holdEasing = 1;
-					this.selectedNode.popEasing = 1;
-					this.selectedNode.setVisibility("explored");
-				});
+				this.infoPanel.selectNode(this.selectedNode);
+				this.infoPanel.updateButtons(this.timeController.time, this.budget);
+				this.graph.draw(this.timeController.time);
+
+				this.exploreNode(node);
 			}
-
-			this.infoPanel.selectNode(this.selectedNode.species);
-			this.infoPanel.updateButtons(this.timeController.time, this.budget);
-			this.graph.draw(this.timeController.time);
 		}
 	}
 
@@ -390,6 +393,35 @@ class LevelScene2 extends Phaser.Scene {
 			web.refresh();
 			this.infoPanel.updateLockTime();
 			this.setBudget(this.budget - event.cost);
+		}
+	}
+
+	exploreNode(node) {
+		if (node.exploreState == "ready") {
+
+			this.dragEnabled = false;
+			this.addEvent(600, function() {
+				node.finishExploration();
+				this.toggleTracking(node.species);
+				this.infoPanel.selectNode(node);
+
+				// for (const other of this.nodes) {
+				// 	other.resetExploration(this.timeController.time);
+				// }
+				for (const neighbour of node.neighbours) {
+					neighbour.startExploration(this.timeController.time);
+				}
+
+				this.addEvent(500, function() {
+					this.dragEnabled = true;
+					this.showReward(node.species);
+				});
+			});
+
+
+		}
+		else {
+			node.startExploration(this.timeController.time);
 		}
 	}
 

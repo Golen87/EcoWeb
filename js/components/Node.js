@@ -13,6 +13,8 @@ class Node extends Button {
 		this.selected = false;
 		this.holdEasing = 0.0;
 
+		this.neighbours = [];
+
 		//this.WHITE = 0xe3e3d1;
 		this.WHITE = 0xFFFFFF;
 		//this.BLACK = 0x332d24;
@@ -26,27 +28,17 @@ class Node extends Button {
 		const LAYER_3 = 1.00 - 2 * 0.05;
 		const LAYER_4 = 1.00 - 1.8 * 0.05;
 
-		const image = isAbiotic(species.type) ? "diamond" : "circle";
+		const shape = isAbiotic(species.type) ? "diamond" : "circle";
 
-		this.circle = scene.add.image(0, 0, image);
+		this.circle = scene.add.image(0, 0, shape);
 		this.circle.setScale((LAYER_1 * this.size) / this.circle.height);
 		this.circle.setTint(this.BLACK);
 		this.add(this.circle);
 
-		this.innerCircle = scene.add.image(0, 0, image);
+		this.innerCircle = scene.add.image(0, 0, shape);
 		this.innerCircle.setScale((LAYER_3 * this.size) / this.innerCircle.height);
 		this.innerCircle.setTint(this.WHITE);
 		this.add(this.innerCircle);
-
-		//this.graphics = scene.add.graphics();
-		//this.graphics.fillStyle(this.WHITE);
-		//this.graphics.fillCircle(0, 0, LAYER_1 * this.size/2);
-		//this.graphics.fillStyle(this.BLACK);
-		//this.graphics.fillCircle(0, 0, LAYER_2 * this.size/2);
-		//this.graphics.fillStyle(this.WHITE);
-		//this.graphics.fillCircle(0, 0, LAYER_3 * this.size/2);
-		//this.graphics.setAlpha(0.0, 0.0, 1.0, 1.0);
-		//this.add(this.graphics);
 
 
 		if (this.species.image != "missing") {
@@ -61,13 +53,14 @@ class Node extends Button {
 		}
 		this.add(this.image);
 
+		this.unexplored = scene.add.image(0, 0, 'missing');
+		this.unexplored.setScale(LAYER_4 * this.size / Math.max(this.unexplored.width, this.unexplored.height));
+		this.add(this.unexplored);
 
-		this.visibility = null;
-		this.setVisibility(this.species.visibility);
 
-		let shape = scene.make.graphics({ fillStyle: { color: 0x000000 }, add: false });
-		let circle = new Phaser.Geom.Circle(0, 0, this.size*0.4);
-		shape.fillCircleShape(circle);
+		//let shape = scene.make.graphics({ fillStyle: { color: 0x000000 }, add: false });
+		//let circle = new Phaser.Geom.Circle(0, 0, this.size*0.4);
+		//shape.fillCircleShape(circle);
 		//let mask = shape.createGeometryMask();
 		//this.image.setMask(mask);
 
@@ -92,6 +85,49 @@ class Node extends Button {
 		this.popEasing = 0;
 		this.popEffect = scene.add.graphics();
 		this.add(this.popEffect);
+
+
+		const SEARCH_SIZE = 0.35 * this.size;
+		const SEARCH_X = 0.35 * this.size;
+		const SEARCH_Y = -0.35 * this.size;
+		this.searchContainer = scene.add.container(SEARCH_X, SEARCH_Y);
+		this.add(this.searchContainer);
+ 
+		this.searchBg = scene.add.image(0, 0, 'circle');
+		this.searchBg.setScale(SEARCH_SIZE / this.searchBg.height);
+		this.searchBg.setTint(this.WHITE);
+		this.searchContainer.add(this.searchBg);
+
+		//this.searchBg2 = scene.add.image(0, 0, 'circle');
+		//this.searchBg2.setScale(0.85 * SEARCH_SIZE / this.searchBg2.height);
+		//this.searchBg2.setTint(this.WHITE);
+		//this.searchContainer.add(this.searchBg2);
+
+		this.exploreState = null;
+		this.progressStart = 0;
+		this.progressLength = 20;
+		this.progressArc = scene.add.graphics();
+		//this.searchContainer.add(this.progressArc);
+		this.add(this.progressArc);
+		this.updateProgress(0);
+
+		this.bringToTop(this.searchContainer);
+
+
+		this.search = scene.add.image(0, 0, 'search');
+		this.search.setScale(0.75 * SEARCH_SIZE / Math.max(this.search.width, this.search.height));
+		this.search.setTint(0);
+		this.search.setTint(this.interpolateColor(this.BLACK, 0, 0.5));
+		this.searchContainer.add(this.search);
+
+
+		if (this.species.visibility == "unexplored") {
+			this.startExploration(0);
+			//this.updateProgress(9999);
+		}
+
+		this.visibility = null;
+		this.setVisibility(this.species.visibility);
 	}
 
 
@@ -125,16 +161,28 @@ class Node extends Button {
 		if (value == "explored") {
 			this.setVisible(true);
 			this.setAlpha(1.0);
+			this.image.setVisible(true);
+			this.unexplored.setVisible(false);
 			this.image.setTint(0xffffff);
 			this.circle.setTint(this.BLACK);
 			this.circle.setAlpha(1.0);
 			this.innerCircle.setAlpha(0.75, 0.75, 1.0, 1.0);
+			this.searchContainer.setVisible(false);
 		}
 		else if (value == "unexplored") {
 			this.setVisible(true);
 			this.setAlpha(1.0);
+			if (this.exploreState == "ready") {
+				this.image.setVisible(true);
+				this.unexplored.setVisible(false);
+			}
+			else {
+				this.image.setVisible(false);
+				this.unexplored.setVisible(true);
+			}
 			this.image.setTint(0x000000);
 			this.circle.setAlpha(0.7);
+			this.circle.setAlpha(1);
 			this.innerCircle.setAlpha(1);
 			this.innerCircle.setAlpha(0.25, 0.25, 1.0, 1.0);
 
@@ -145,20 +193,25 @@ class Node extends Button {
 			color = Phaser.Display.Color.ObjectToColor(color);
 			color = color.color;
 			this.circle.setTint(color);
+			this.searchContainer.setVisible(true);
 		}
 		else if (value == "hidden") {
 			this.setVisible(true);
 			this.setAlpha(0.2);
+			this.image.setVisible(false);
+			this.unexplored.setVisible(true);
 			this.image.setTint(0x000000);
-			this.innerCircle.setAlpha(0);
-			this.circle.setAlpha(0);
+			this.innerCircle.setAlpha(0.2);
+			this.circle.setAlpha(0.2);
 			this.circle.setTint(0x777777);
+			this.searchContainer.setVisible(false);
 		}
 	}
 
 
 	updateScale() {
 		this.setScale(this.getScale());
+		this.searchContainer.setScale(1/this.getScale());
 		//this.image.setAlpha(0.5 + 0.5*this.aliveValue);
 
 		//this.updateArrow(pop);
@@ -247,7 +300,7 @@ class Node extends Button {
 	}
 
 
-	update(delta) {
+	update(time, delta) {
 		this.updateScale();
 
 		let speed = 2.0;
@@ -287,5 +340,82 @@ class Node extends Button {
 			this.popEffect.strokeCircle(0, 0, (3 - 2*Math.pow(this.popEasing, 4)) * this.size / 2);
 			this.popEasing -= 2 * delta;
 		}
+
+
+		// Progress bar blinking
+		if (this.exploreState == "loading") {
+			this.progressArc.setAlpha(1);
+		}
+		else if (this.exploreState == "ready") {
+			this.search.setAlpha(0.66 + (0.33) * Math.sin(time/150));
+			this.progressArc.setAlpha(1);
+		}
+		else {
+			this.progressArc.clear();
+		}
+	}
+
+	canExplore() {
+		return (this.visibility != "explored" && !this.exploreState);
+	}
+
+	startExploration(time) {
+		if (this.canExplore()) {
+			this.setVisibility("unexplored");
+			this.exploreState = "loading";
+			this.progressStart = time;
+		}
+	}
+
+	resetExploration(time) {
+		if (this.visibility == "unexplored") {
+			this.exploreState = "loading";
+			this.progressStart = time;
+		}
+	}
+
+	finishExploration() {
+		this.setVisibility("explored");
+		this.exploreState = "done";
+		this.holdEasing = 1;
+		this.popEasing = 1;
+	}
+
+	updateProgress(time) {
+		if (this.exploreState == "loading") {
+			this.progress = (time - this.progressStart) / this.progressLength;
+			this.progress = Phaser.Math.Clamp(this.progress, 0, 1);
+			this.progressArc.clear();
+
+			this.searchContainer.setVisible(false);
+
+			if (this.progress > 0) {
+				const thick = 0.08;
+				const size = this.circle.displayWidth * (1 + thick/2);
+				this.progressArc.beginPath();
+				this.progressArc.lineStyle(thick * size, this.WHITE);
+				this.progressArc.arc(this.searchBg.x, this.searchBg.y, (1 - thick) * size / 2,
+					Phaser.Math.DegToRad(-90+360 * this.progress),
+					Phaser.Math.DegToRad(-90),
+				true, 0.0);
+				this.progressArc.strokePath();
+				this.progressArc.closePath();
+			}
+
+			if (this.progress >= 1) {
+				this.exploreState = "ready";
+				this.setVisibility(this.visibility);
+			}
+		}
+	}
+
+
+	interpolateColor(color1, color2, value) {
+		return Phaser.Display.Color.ObjectToColor(
+			Phaser.Display.Color.Interpolate.ColorWithColor(
+				Phaser.Display.Color.ColorToRGBA(color1),
+				Phaser.Display.Color.ColorToRGBA(color2),
+			100, value * 100)
+		).color;
 	}
 }

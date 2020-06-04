@@ -46,7 +46,7 @@ function addSpecies(name, color, showGraph, isAbiotic) {
 		tension: 0,
 		showLine: true,
 		borderDash: isAbiotic ? [3,6] : [],
-		hidden: !showGraph
+		//hidden: !showGraph
 	});
 }
 

@@ -84,6 +84,9 @@ class InfoPanel extends Phaser.GameObjects.Container {
 	reset() {
 		this.circle.setTint(0x777777);
 		this.image.setTexture('missing');
+		const SIZE = 100;
+		const LAYER_4 = 1.00 - 1.8 * 0.05;
+		this.image.setScale(LAYER_4 * SIZE / Math.max(this.image.width, this.image.height));
 
 		this.nameText.setText('');
 		this.typeText.setText('');
@@ -92,36 +95,51 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		this.clearEventButtons();
 	}
 
-	selectNode(species) {
+	selectNode(node) {
 		this.reset();
-		this.species = species;
+		this.species = null;
 		this.lockTime = 0;
 
-		if (species) {
+		if (node) {
+			const species = node.species;
+			this.species = species;
 			this.image.setTexture(species.image);
+			const SIZE = 100;
+			const LAYER_4 = 1.00 - 1.8 * 0.05;
+			this.image.setScale(LAYER_4 * SIZE / Math.max(this.image.width, this.image.height));
 			const color = Phaser.Display.Color.HexStringToColor(species.color).color;
 			this.circle.setTint(color);
 
-			this.nameText.setText(species.name);
-			this.typeText.setText(getFromDataset(NODE_TYPES, "value", "swedish", species.type));
+			if (node.visibility != "unexplored") {
+				this.nameText.setText(species.name);
+				this.typeText.setText(getFromDataset(NODE_TYPES, "value", "swedish", species.type));
+			}
 
 			if (species.animal) {
 				//species.animal.size
 				const text = getFromDataset(ANIMAL_FOODS, "value", "swedish", species.animal.food);
-				this.foodText.setText(text);
+				if (node.visibility != "unexplored") {
+					this.foodText.setText(text);
+				}
 				//species.animal.consumption
 				//species.animal.weight
 				//species.animal.age
 				//species.animal.offspring
 			}
 
-			for (let i = species.events.length - 1; i >= 0; i--) {
-				this.addEventButton(i, species.events[i]);
+			if (node.visibility != "unexplored") {
+				this.image.setTint(0xffffff);
+				for (let i = species.events.length - 1; i >= 0; i--) {
+					this.addEventButton(i, species.events[i]);
+				}
+				this.addGraphToggleButton(3);
+			}
+			else {
+				this.image.setTint(0);
+				//this.addExploreButton(0, node);
 			}
 
 			this.updateLockTime();
-
-			this.addGraphToggleButton(3);
 		}
 	}
 
@@ -141,6 +159,14 @@ class InfoPanel extends Phaser.GameObjects.Container {
 			button.callback = this.scene.purchaseAction.bind(this.scene, event);
 			button.cost = event.cost;
 		}
+	}
+
+	addExploreButton(index, node) {
+		const button = this.eventButtons[index];
+		button.setActive(true);
+		button.text.setText("Utforska art");
+		button.callback = this.scene.exploreNode.bind(this.scene, node);
+		button.cost = 0;
 	}
 
 	addGraphToggleButton(index) {
