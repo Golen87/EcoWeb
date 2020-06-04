@@ -31,14 +31,12 @@ class TitleScene extends Phaser.Scene {
 
 		const LEFT = this.W / 8;
 
-		let title = this.add.text(LEFT+30, 0.13*this.H, "EcoWeb", {
-			font: "60px 'Crete Round'"
-		});
+		let title = createText(this, LEFT+30, 0.18*this.H, 120, "#FFF", "EcoWeb");
 		title.setOrigin(0, 0.5);
 
 		for (let i = 0; i < this.options.length; i++) {
 			const SEP = 90;
-			const TOP = 0.3*this.H + i*SEP;
+			const TOP = 0.4*this.H + i*SEP;
 			const TEXT = this.options[i][0];
 			const FUNC = this.options[i][1].bind(this);
 			//const LEFT_OFFSET = 30;

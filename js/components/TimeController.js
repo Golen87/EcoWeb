@@ -85,21 +85,15 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.forwardButton = new TimeControllerButton(scene, SEP*3/2, -30, 4, this.onForward.bind(this));
 		this.add(this.forwardButton);
 
-		this.timeText = scene.add.text(-70, 20, "<time>", {
-			font: "24px 'monospace'", fill: '#FFF'
-		});
+		this.timeText = createText(scene, -70, 20, 24, "#FFF", "<time>");
 		this.timeText.setOrigin(0.5, 0.5);
 		this.add(this.timeText);
 
-		this.budgetText = scene.add.text(0, 50, "<budget>", {
-			font: "24px 'monospace'", fill: '#FFF'
-		});
+		this.budgetText = createText(scene, 0, 50, 24, "#FFF", "<budget>");
 		this.budgetText.setOrigin(0.5, 0.5);
 		this.add(this.budgetText);
 
-		this.ratingText = scene.add.text(70, 20, "<star>", {
-			font: "24px 'monospace'", fill: '#FFF'
-		});
+		this.ratingText = createText(scene, 70, 20, 24, "#FFF", "<star>");
 		this.ratingText.setOrigin(0.5, 0.5);
 		this.add(this.ratingText);
 

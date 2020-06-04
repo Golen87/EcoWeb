@@ -20,9 +20,7 @@ class PauseWindow extends Phaser.GameObjects.Container {
 		this.background.setInteractive();
 		this.add(this.background);
 
-		this.text = scene.add.text(0, (-options.length/2) * SEP, "Paus", {
-			font: "40px 'Crete Round'", fill: '#FFF'
-		});
+		this.text = createText(scene, 0, (-options.length/2) * SEP, 40, "#FFF", "Paus");
 		this.text.setOrigin(0.5, 0.5);
 		this.add(this.text);
 

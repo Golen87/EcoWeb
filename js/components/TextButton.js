@@ -1,9 +1,9 @@
 class TextButton extends Button {
-	constructor(scene, x, y, text, style, callback) {
-		super(scene, x, y, text, style);
+	constructor(scene, x, y, text, size, callback) {
+		super(scene, x, y);
 		this.callback = callback;
 
-		this.text = scene.add.text(0, 0, text, style);
+		this.text = createText(scene, 0, 0, size, "#FFF", text);
 		this.add(this.text);
 
 		this.bindInteractive(this.text);

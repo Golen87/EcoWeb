@@ -9,9 +9,7 @@ class WorldScene extends Phaser.Scene {
 		let bg = this.add.image(this.CX, this.CY, 'bg_3');
 		this.fitToScreen(bg);
 
-		let title = this.add.text(this.CX, 0.07*this.H, "Nivåer", {
-			font: "50px 'Crete Round'"
-		});
+		let title = createText(this, this.CX, 0.07*this.H, 50, "#FFF", "Nivåer");
 		title.setOrigin(0.5);
 
 		for (let i in window.database.scenarios) {
@@ -30,9 +28,7 @@ class WorldScene extends Phaser.Scene {
 			this.add.existing(this.button);
 		}
 
-		let button = new TextButton(this, this.cameras.main.displayWidth-20, this.cameras.main.displayHeight-20, 'Tillbaka', {
-			font: "30px 'Crete Round'"
-		}, () => {
+		let button = new TextButton(this, this.cameras.main.displayWidth-20, this.cameras.main.displayHeight-20, 'Tillbaka', 30, () => {
 			this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 			this.soundSwoosh.play();
 			this.addEvent(100, function() {

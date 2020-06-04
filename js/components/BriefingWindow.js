@@ -46,16 +46,12 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		let textX = IMAGE_X + SIZE/2 + SEP;
 		let textY = IMAGE_Y - SIZE/2 + SEP;
 
-		this.titleText = scene.add.text(textX, textY, 'Title', {
-			font: "45px 'Crete Round'", fill: '#FFF'
-		});
+		this.titleText = createText(scene, textX, textY, 45);
 		this.titleText.setOrigin(0);
 		this.add(this.titleText);
 
 		textY += 1.5 * 45;
-		this.descText = scene.add.text(textX, textY, 'Description', {
-			font: "30px 'Crete Round'", fill: '#FFF'
-		});
+		this.descText = createText(scene, textX, textY, 30);
 		this.descText.setOrigin(0);
 		this.descText.setWordWrapWidth(-2*textX);
 		this.add(this.descText);

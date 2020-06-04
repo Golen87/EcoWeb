@@ -16,9 +16,7 @@ class MenuButton extends Button {
 		this.background.setScale(HEIGHT / this.background.height);
 		this.highlight.setScale(HEIGHT / this.background.height);
 
-		this.text = scene.add.text(30, 0, text, {
-			font: "30px 'Crete Round'", fill: '#FFF'
-		});
+		this.text = createText(scene, 30, 0, 30, "#FFF", text);
 		this.text.setOrigin(0, 0.5);
 		this.add(this.text);
 

@@ -55,10 +55,7 @@ class Node extends Button {
 		}
 		else {
 			let name = this.species.name;
-			this.image = scene.add.text(0, 0, name, {
-				font: "50px 'Crete Round'",
-				color: "#000000"
-			});
+			this.image = createText(scene, 0, 0, 50, "#000", name);
 			this.image.setOrigin(0.5);
 			this.image.setScale(0.9 * LAYER_4 * this.size / Math.max(this.image.width, this.image.height));
 		}

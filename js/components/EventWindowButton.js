@@ -17,9 +17,7 @@ class EventWindowButton extends Button {
 		this.button.setScale(HEIGHT / this.button.height);
 		this.highlight.setScale(HEIGHT / this.button.height);
 
-		this.text = scene.add.text(0, 0, text, {
-			font: "30px 'Crete Round'", fill: '#FFF'
-		});
+		this.text = createText(scene, 0, 0, 30, "#FFF", text);
 		this.text.setOrigin(0.5, 0.5);
 		this.add(this.text);
 

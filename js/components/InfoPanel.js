@@ -49,23 +49,17 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		let textX = IMAGE_X + SIZE/2 + SEP;
 		let textY = IMAGE_Y - SIZE/2;
 
-		this.nameText = scene.add.text(textX, textY, '???', {
-			font: "30px 'Crete Round'", fill: '#FFF'
-		});
+		this.nameText = createText(scene, textX, textY, 30);
 		this.nameText.setOrigin(0);
 		this.add(this.nameText);
 
 		textY += 1.25 * 30;
-		this.typeText = scene.add.text(textX, textY, '???', {
-			font: "20px 'Crete Round'", fill: '#FFF'
-		});
+		this.typeText = createText(scene, textX, textY, 20);
 		this.typeText.setOrigin(0);
 		this.add(this.typeText);
 
 		textY += 1.25 * 20;
-		this.foodText = scene.add.text(textX, textY, '???', {
-			font: "20px 'Crete Round'", fill: '#FFF'
-		});
+		this.foodText = createText(scene, textX, textY, 20);
 		this.foodText.setOrigin(0);
 		this.add(this.foodText);
 
@@ -91,9 +85,9 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		this.circle.setTint(0x777777);
 		this.image.setTexture('missing');
 
-		this.nameText.setText('???');
-		this.typeText.setText('???');
-		this.foodText.setText('???');
+		this.nameText.setText('');
+		this.typeText.setText('');
+		this.foodText.setText('');
 
 		this.clearEventButtons();
 	}
