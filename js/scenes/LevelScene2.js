@@ -13,7 +13,7 @@ class LevelScene2 extends Phaser.Scene {
 			["Gå Till Meny", () => {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.scene.start("WorldScene");
-				this.addEvent(100, function() {
+				this.addEvent(150, function() {
 					this.soundSwoosh.play();
 				});
 			}],
@@ -497,7 +497,7 @@ class LevelScene2 extends Phaser.Scene {
 			["Starta Om", () => {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
-				this.addEvent(100, function() {
+				this.addEvent(150, function() {
 					web.restart();
 					this.scene.restart();
 				});
@@ -505,7 +505,7 @@ class LevelScene2 extends Phaser.Scene {
 			["Gå Till Meny", () => {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
-				this.addEvent(100, function() {
+				this.addEvent(150, function() {
 					this.scene.start("WorldScene");
 				});
 			}]

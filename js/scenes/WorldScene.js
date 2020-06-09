@@ -20,7 +20,7 @@ class WorldScene extends Phaser.Scene {
 			this.button = new PauseButton(this, x, y, scenario.name, () => {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
-				this.addEvent(100, function() {
+				this.addEvent(150, function() {
 					web.startScenario(i);
 					this.scene.start("LevelScene2");
 				});
@@ -31,7 +31,7 @@ class WorldScene extends Phaser.Scene {
 		let button = new TextButton(this, this.cameras.main.displayWidth-20, this.cameras.main.displayHeight-20, 'Tillbaka', 30, () => {
 			this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 			this.soundSwoosh.play();
-			this.addEvent(100, function() {
+			this.addEvent(150, function() {
 				this.scene.start("TitleScene");
 			});
 		});

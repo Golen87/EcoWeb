@@ -6,14 +6,14 @@ class TitleScene extends Phaser.Scene {
 			["Nytt Spel", function() {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
-				this.addEvent(100, function() {
+				this.addEvent(150, function() {
 					this.scene.start("WorldScene");
 				});
 			}],
 			["Fortsätt", function() {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
-				this.addEvent(100, function() {
+				this.addEvent(150, function() {
 					this.scene.start("WorldScene");
 				});
 			}],
