@@ -6,7 +6,11 @@ class PreloadScene extends Phaser.Scene {
 	preload() {
 		initWeb();
 
-		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { font: "20px Lato" });
+		this.loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", {
+			fontFamily: game.font,
+			fontSize: "20px",
+			fill: "#fff"
+		});
 		this.loading.setOrigin(0.5);
 
 		this.load.image('bg_title', 'assets/images/background/BgTitel.png');
