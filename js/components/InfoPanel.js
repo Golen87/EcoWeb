@@ -136,7 +136,6 @@ class InfoPanel extends Phaser.GameObjects.Container {
 			}
 			else {
 				this.image.setTint(0);
-				//this.addExploreButton(0, node);
 			}
 
 			this.updateLockTime();
@@ -159,14 +158,6 @@ class InfoPanel extends Phaser.GameObjects.Container {
 			button.callback = this.scene.purchaseAction.bind(this.scene, event);
 			button.cost = event.cost;
 		}
-	}
-
-	addExploreButton(index, node) {
-		const button = this.eventButtons[index];
-		button.setActive(true);
-		button.text.setText("Utforska art");
-		button.callback = this.scene.exploreNode.bind(this.scene, node);
-		button.cost = 0;
 	}
 
 	addGraphToggleButton(index) {

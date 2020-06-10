@@ -459,8 +459,13 @@ class Database {
 		return {
 			"id": this.getUniqueId(),
 			"name": null,
-			"time": 100,
-			"playspeed": 3,
+			"time": {
+				"start": 50,
+				"end": 50,
+				"sections": 5,
+				"length": 40,
+				"playspeed": 5,
+			},
 			"budget": 100,
 			"description": "",
 			"position": [50,50],
@@ -799,8 +804,11 @@ class Database {
 				if (isPlainObject(data[key])) {
 					this.transferObject(data[key], obj[key]);
 				}
-				else {
+				else if ((typeof obj[key] === typeof data[key] || (!isNaN(obj[key]) && !isNaN(data[key]))) || obj[key] === null) {
 					obj[key] = data[key];
+				}
+				else {
+					console.warn("Type changed variable discarded:", obj[key], data[key]);
 				}
 			}
 		}

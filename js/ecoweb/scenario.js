@@ -3,8 +3,14 @@ class Scenario {
 		this.species = [];
 
 		this.name = data.name;
-		this.maxTime = data.time;
-		this.playSpeed = data.playspeed;
+	
+		this.maxTime = data.time.start + data.time.sections * data.time.length + data.time.end;
+		this.timeStart = data.time.start;
+		this.timeEnd = data.time.end;
+		this.sectionCount = data.time.sections;
+		this.sectionLength = data.time.length;
+		this.playSpeed = data.time.playspeed;
+	
 		this.budget = data.budget;
 		this.description = data.description;
 		this.cameraPos = {x: data.position[0], y: data.position[1]};
