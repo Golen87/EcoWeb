@@ -207,20 +207,20 @@ class Database {
 				return 1;
 			}
 		}
-		if (a.type == "animal") {
-			if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) < ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
-				return -1;
-			}
-			if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) > ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
-				return 1;
-			}
-			if (a.animal.weight > b.animal.weight) {
-				return -1;
-			}
-			if (a.animal.weight < b.animal.weight) {
-				return 1;
-			}
-		}
+		// if (a.type == "animal") {
+		// 	if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) < ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
+		// 		return -1;
+		// 	}
+		// 	if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) > ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
+		// 		return 1;
+		// 	}
+		// 	if (a.animal.weight > b.animal.weight) {
+		// 		return -1;
+		// 	}
+		// 	if (a.animal.weight < b.animal.weight) {
+		// 		return 1;
+		// 	}
+		// }
 		if (a.type == "service") {
 			if (SERVICE_CATEGORIES_VALUES.indexOf(a.service.category) < SERVICE_CATEGORIES_VALUES.indexOf(b.service.category)) {
 				return -1;
