@@ -122,7 +122,7 @@ class LevelScene2 extends Phaser.Scene {
 		}
 
 
-		/* Population graph */
+		/* UI windows */
 
 		const UI_SEP = 0.01 * this.H;
 		const UI_WIDTH = 0.26 * this.W;
@@ -135,6 +135,7 @@ class LevelScene2 extends Phaser.Scene {
 		);
 		this.timeController.on('onTimeChange', function() {
 			this.graph.draw(this.timeController.time);
+			this.timeAxis.draw(this.timeController.time);
 			this.updateNodePopulation();
 			this.infoPanel.updateButtons(this.timeController.time, this.budget);
 
@@ -153,6 +154,16 @@ class LevelScene2 extends Phaser.Scene {
 		this.infoPanel.setPosition(
 			this.W - UI_WIDTH/2 - UI_SEP,
 			this.H - UI_HEIGHT*6/2 - 3.5*UI_SEP
+		);
+
+		const UI_BUTTON_SIZE = 0.075 * this.W;
+		const UI_AXIS_WIDTH = 0.5 * this.W;
+		const UI_AXIS_HEIGHT = 0.5 * 0.8 * UI_BUTTON_SIZE;
+
+		this.timeAxis = new TimeAxis(this, UI_AXIS_WIDTH, UI_AXIS_HEIGHT);
+		this.timeAxis.setPosition(
+			UI_BUTTON_SIZE + (this.W - UI_WIDTH - 2*UI_SEP - UI_BUTTON_SIZE) / 2,
+			UI_AXIS_HEIGHT/2 + UI_SEP
 		);
 
 
@@ -194,8 +205,7 @@ class LevelScene2 extends Phaser.Scene {
 
 		/* Pause menu */
 
-		const button_size = 0.075 * this.W;
-		this.back = new SymbolButton(this, button_size/2, button_size/2, 'symbol_menu', 0.8 * button_size, () => {
+		this.back = new SymbolButton(this, UI_BUTTON_SIZE/2, UI_BUTTON_SIZE/2, 'symbol_menu', 0.8 * UI_BUTTON_SIZE, () => {
 			this.pauseWindow.show();
 		});
 		this.back.setScrollFactor(0);
@@ -242,11 +252,13 @@ class LevelScene2 extends Phaser.Scene {
 			this.timeController.setVisible(true);
 			this.graph.setVisible(true);
 			this.infoPanel.setVisible(true);
+			this.timeAxis.setVisible(true);
 		}, this);
 		this.input.keyboard.on('keydown-SIX', function (event) {
 			this.timeController.setVisible(false);
 			this.graph.setVisible(false);
 			this.infoPanel.setVisible(false);
+			this.timeAxis.setVisible(false);
 		}, this);
 	}
 
@@ -258,6 +270,7 @@ class LevelScene2 extends Phaser.Scene {
 			this.timeController.update(time, delta);
 		}
 		this.graph.update(time, delta);
+		this.timeAxis.update(time, delta);
 
 		for (let i = this.nodes.length - 1; i >= 0; i--) {
 			//let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);

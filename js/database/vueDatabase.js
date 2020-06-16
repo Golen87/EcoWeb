@@ -517,7 +517,7 @@ function createDatabaseTools(database) {
 			gotoNodeEditor,
 			gotoEventEditor,
 			getTotalTime() {
-				return this.scenario.time.start + this.scenario.time.sections * this.scenario.time.length + this.scenario.time.end;
+				return this.scenario.time.intro + this.scenario.time.sections * this.scenario.time.length + this.scenario.time.outro;
 			},
 		},
 	});

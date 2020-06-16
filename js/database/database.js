@@ -460,8 +460,8 @@ class Database {
 			"id": this.getUniqueId(),
 			"name": null,
 			"time": {
-				"start": 50,
-				"end": 50,
+				"intro": 50,
+				"outro": 50,
 				"sections": 5,
 				"length": 40,
 				"playspeed": 5,

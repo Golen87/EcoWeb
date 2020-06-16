@@ -79,7 +79,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.rewindButton = new TimeControllerButton(scene, -SEP*1/2, -30, 3, this.onRewind.bind(this));
 		this.add(this.rewindButton);
 
-		this.playButton = new TimeControllerButton(scene, SEP*1/2, -30, 0, this.onPlay.bind(this));
+		this.playButton = new TimeControllerButton(scene, SEP*1/2, -30, 0, this.onContinue.bind(this));
 		this.add(this.playButton);
 
 		this.forwardButton = new TimeControllerButton(scene, SEP*3/2, -30, 4, this.onForward.bind(this));
@@ -104,7 +104,9 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.playSpeed = null;
 		this.setSpeed(0);
 
-		this.onPlay();
+		this.section = null;
+		this.running = false;
+		this.onContinue(web.currentScenario.sections[0]);
 	}
 
 
@@ -118,6 +120,12 @@ class TimeController extends Phaser.GameObjects.Container {
 	setTime(time) {
 		time = Phaser.Math.Clamp(time, 0, web.currentScenario.maxTime);
 		if (this.time != time) {
+			if (this.section && time >= this.section.end) {
+				time = this.section.end;
+				this.running = false;
+				this.onPlay(false);
+			}
+
 			this.time = time;
 			this.onTimeChange();
 
@@ -156,6 +164,30 @@ class TimeController extends Phaser.GameObjects.Container {
 	}
 
 
+	startSection(section) {
+		this.setTime(section.start);
+		this.section = section;
+		this.running = true;
+		this.onPlay(true);
+	}
+
+	onContinue() {
+		const sections = web.currentScenario.sections;
+
+		if (this.running) {
+			this.onPlay();
+		}
+		else if (this.section) {
+			const index = sections.indexOf(this.section);
+			if (index < sections.length) {
+				this.startSection(sections[index+1]);
+			}
+		}
+		else {
+			this.startSection(sections[0]);
+		}
+	}
+
 	resetStates() {
 		this.playButton.setActive(false);
 		this.rewindButton.setActive(false);
@@ -168,8 +200,8 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.setSpeed(0);
 	}
 
-	onPlay() {
-		if (this.playSpeed == 0) {
+	onPlay(state=null) {
+		if ((state !== null && state) || (state === null && this.playSpeed == 0)) {
 			this.setSpeed(1 * this.speed);
 		}
 		else {

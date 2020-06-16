@@ -79,6 +79,7 @@
 		<script src="js/components/InfoPanel.js"></script>
 		<script src="js/components/Graph.js"></script>
 		<script src="js/components/TimeController.js"></script>
+		<script src="js/components/TimeAxis.js"></script>
 
 		<script src="js/scenes/ExampleScene1.js"></script>
 		<script src="js/scenes/ExampleScene2.js"></script>
@@ -891,8 +892,8 @@
 							<label class="col-sm-4 col-form-label">Intro &ndash; Outro</label>
 							<div class="col-sm-8">
 								<div class="input-group">
-									<input v-model.number="scenario.time.start" type="number" class="form-control" min="0" step="1" max="1000" required>
-									<input v-model.number="scenario.time.end" type="number" class="form-control" min="0" step="1" max="1000" required>
+									<input v-model.number="scenario.time.intro" type="number" class="form-control" min="0" step="1" max="1000" required>
+									<input v-model.number="scenario.time.outro" type="number" class="form-control" min="0" step="1" max="1000" required>
 								</div>
 							</div>
 						</div>

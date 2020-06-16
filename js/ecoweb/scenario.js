@@ -4,17 +4,30 @@ class Scenario {
 
 		this.name = data.name;
 	
-		this.maxTime = data.time.start + data.time.sections * data.time.length + data.time.end;
-		this.timeStart = data.time.start;
-		this.timeEnd = data.time.end;
+		this.maxTime = data.time.intro + data.time.sections * data.time.length + data.time.outro;
+		this.timeIntro = data.time.intro;
+		this.timeOutro = data.time.outro;
 		this.sectionCount = data.time.sections;
 		this.sectionLength = data.time.length;
 		this.playSpeed = data.time.playspeed;
-	
+
 		this.budget = data.budget;
 		this.description = data.description;
 		this.cameraPos = {x: data.position[0], y: data.position[1]};
 		this.conditions = data.conditions;
+
+		// Create time sections list
+		this.sections = [];
+		let t = this.timeIntro;
+		this.sections.push({ start: 0, end: this.timeIntro });
+		for (let i = 0; i < this.sectionCount; i++) {
+			this.sections.push({
+				start: t,
+				end: t + this.sectionLength
+			});
+			t += this.sectionLength;
+		}
+		this.sections.push({ start: this.maxTime - this.timeOutro, end: this.maxTime });
 
 
 		for (let actor of data.actors) {
