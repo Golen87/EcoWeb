@@ -1,3 +1,5 @@
+const DATABASE_VERSION = 2;
+
 class Database {
 	constructor() {
 		this.uniqueIdCounter = 1;
@@ -16,7 +18,7 @@ class Database {
 	importJSON(json) {
 		let data = JSON.parse(json);
 
-		if (data && isPlainObject(data) && data.version) {
+		if (data && isPlainObject(data) && data.version == DATABASE_VERSION) {
 			this.loadNodes(data.nodes);
 			this.loadEvents(data.events);
 			this.loadScenarios(data.scenarios);
@@ -35,7 +37,7 @@ class Database {
 
 	exportJSON(prettyprint=false) {
 		let data = {
-			"version": 1,
+			"version": DATABASE_VERSION,
 			"nodes": this.nodes,
 			"events": this.events,
 			"scenarios": this.scenarios,
