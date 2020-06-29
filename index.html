@@ -911,9 +911,12 @@
 
 						<!-- Play speed -->
 						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Play speed</label>
+							<label class="col-sm-4 col-form-label">Play speed &ndash; Fast</label>
 							<div class="col-sm-8">
-								<input v-model.number="scenario.time.playspeed" type="number" class="form-control" min="0" step="0.1" max="100" required>
+								<div class="input-group">
+									<input v-model.number="scenario.time.playspeed" type="number" class="form-control" min="0" step="0.1" max="1000" required>
+									<input v-model.number="scenario.time.fastspeed" type="number" class="form-control" min="0" step="0.1" max="1000" required>
+								</div>
 							</div>
 						</div>
 
@@ -921,9 +924,23 @@
 
 						<!-- Budget -->
 						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Budget</label>
+							<label class="col-sm-4 col-form-label">Budget &ndash; Gain</label>
 							<div class="col-sm-8">
-								<input v-model.number="scenario.budget" type="number" class="form-control" min="0" step="1" max="1000" required>
+								<div class="input-group">
+									<input v-model.number="scenario.budget" type="number" class="form-control" min="0" step="1" max="1000" required>
+									<input v-model.number="scenario.budgetreward" type="number" class="form-control" min="0" step="1" max="1000" required>
+								</div>
+							</div>
+						</div>
+
+						<!-- Research -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Research &ndash; Gain</label>
+							<div class="col-sm-8">
+								<div class="input-group">
+									<input v-model.number="scenario.research" type="number" class="form-control" min="0" step="1" max="1000" required>
+									<input v-model.number="scenario.researchreward" type="number" class="form-control" min="0" step="1" max="1000" required>
+								</div>
 							</div>
 						</div>
 

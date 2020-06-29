@@ -143,6 +143,10 @@ class LevelScene2 extends Phaser.Scene {
 				node.updateProgress(this.timeController.time);
 			}
 		}, this);
+		this.timeController.on('onSectionComplete', function() {
+			this.setBudget(this.budget + web.currentScenario.budgetReward);
+			this.setResearch(this.research + web.currentScenario.researchReward);
+		}, this);
 
 		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
 		this.graph.setPosition(
@@ -220,6 +224,8 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.budget = 0;
 		this.setBudget(web.currentScenario.budget);
+		this.research = 0;
+		this.setResearch(web.currentScenario.research);
 		this.updateNodePopulation();
 
 
@@ -389,7 +395,10 @@ class LevelScene2 extends Phaser.Scene {
 				this.infoPanel.updateButtons(this.timeController.time, this.budget);
 				this.graph.draw(this.timeController.time);
 
-				this.exploreNode(node);
+				if (this.research > 0) {
+					this.exploreNode(node);
+					this.setResearch(this.research - 1);
+				}
 			}
 		}
 	}
@@ -398,6 +407,11 @@ class LevelScene2 extends Phaser.Scene {
 		this.budget = value;
 		this.timeController.onBudgetUpdate(value);
 		this.infoPanel.updateButtons(this.timeController.time, this.budget);
+	}
+
+	setResearch(value) {
+		this.research = value;
+		this.timeController.onResearchUpdate(value);
 	}
 
 	purchaseAction(event) {

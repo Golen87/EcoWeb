@@ -10,8 +10,12 @@ class Scenario {
 		this.sectionCount = data.time.sections;
 		this.sectionLength = data.time.length;
 		this.playSpeed = data.time.playspeed;
+		this.fastSpeed = data.time.fastspeed;
 
 		this.budget = data.budget;
+		this.budgetReward = data.budgetreward;
+		this.research = data.research;
+		this.researchReward = data.researchreward;
 		this.description = data.description;
 		this.cameraPos = {x: data.position[0], y: data.position[1]};
 		this.conditions = data.conditions;
