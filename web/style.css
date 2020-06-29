@@ -9,6 +9,17 @@ canvas {
 	#transform: scale(0.5);
 }
 
+#myChartWrapper {
+	flex-grow: 1;
+	flex-basis: 0;
+	width: 100%;
+}
+@media only screen and (min-width: 600px) {
+	#myChartWrapper {
+		min-width: 600px;
+	}
+}
+
 #graphTools {
 	display: grid;
 	grid-template-columns: repeat(auto-fill, 255px);
@@ -63,6 +74,16 @@ select:invalid { color: #AAAAAA; }
 /*.nav-tabs .nav-link { color: #007bff; }*/
 /*.nav-tabs .nav-link.active { color: #495057; }*/
 
+#databaseWrapper {
+	height: 800px;
+}
+@media only screen and (max-width: 768px) {
+	#databaseWrapper {
+		height: unset;
+		min-height: 800px;
+	}
+}
+
 .editor-container {
 	display: flex;
 	flex-direction: column;
@@ -107,4 +128,8 @@ select:invalid { color: #AAAAAA; }
 
 .list-edit-button-small {
 	padding: 0.375rem 0.15rem;
+}
+
+.pointer {
+	cursor: pointer;
 }

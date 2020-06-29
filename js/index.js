@@ -1,13 +1,12 @@
 var config = {
-	type: Phaser.AUTO,
-	width: 800,
-	height: 600,
+	type: Phaser.WEBGL,
+	width: 16*70,
+	height: 9*70,
 	parent: 'game',
-	//scale: {
-	//	width: "100%",
-	//	height: "100%",
-	//	mode: Phaser.Scale.ScaleModes.FIT
-	//},
+	scale: {
+		mode: Phaser.Scale.FIT
+		//mode: Phaser.Scale.RESIZE
+	},
 	physics: {
 		default: 'arcade',
 		arcade: {
@@ -19,6 +18,7 @@ var config = {
 		TitleScene,
 		WorldScene,
 		LevelScene,
+		LevelScene2,
 
 		ExampleScene1,
 		ExampleScene2,
@@ -28,3 +28,5 @@ var config = {
 };
 
 var game = new Phaser.Game(config);
+
+game.font = "Mukta";

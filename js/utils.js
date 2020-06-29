@@ -60,10 +60,7 @@ if ( !String.prototype.format ) {
 	String.prototype.format = function() {
 		var args = arguments;
 		return this.replace( /{(\d+)}/g, function( match, number ) { 
-			return typeof args[number] != 'undefined'
-				? args[number]
-				: match
-			;
+			return typeof args[number] != 'undefined' ? args[number] : match;
 		} );
 	};
 }
@@ -106,4 +103,13 @@ function getDateAsString() {
 // Check if variable is Object
 function isPlainObject(obj) {
 	return Object.prototype.toString.call(obj) === '[object Object]';
-};
+}
+
+// Creates Phaser text object
+function createText(scene, x=0, y=0, size=20, color="#FFF", text="") {
+	return scene.add.text(x, y, text, {
+		fontFamily: game.font,
+		fontSize: size + "px",
+		fill: color
+	});
+}

@@ -31,7 +31,6 @@ class Button extends Phaser.GameObjects.Container {
 
 	onOver() {
 		this.hover = true;
-		this.hold = false;
 		this.soundHover.play();
 	}
 

@@ -20,29 +20,37 @@ class EcoWeb {
 			y: []
 		};
 
-		this.scenarios = [];
 		this.events = [];
 		this.activeEvents = [];
 	}
 
-	setScenarios(scenarios) {
-		this.scenarios = scenarios;
-	}
-
 	startScenario(i) {
+		this.currentScenarioIndex = i;
 		this.activeEvents = [];
 
-		web.build(this.scenarios[i]());
-		web.initWiggle();
-		web.stabilize();
-		web.solve(this.maxTime);
+		this.currentScenario = new Scenario(window.database.scenarios[i]);
+		this.build(this.currentScenario.species);
+		this.maxTime = this.currentScenario.maxTime;
+
+		for (const event of this.currentScenario.events) {
+			this.events.push(event);
+			if (event.type == "automatic") {
+				this.setEvent(event, event.autoTime);
+			}
+		}
+
+		//this.stabilize();
+		this.solve(this.maxTime);
 		updateChart();
 
 		if (!this.vue) {
-			this.vue = createGraphTools(this.species, this.scenarios);
+			this.vue = createGraphTools();
 		}
 		this.vue.species = this.species;
-		this.vue.scenarios = this.scenarios;
+	}
+
+	restart() {
+		this.startScenario(this.currentScenarioIndex);
 	}
 
 	getSpeciesIndex(name) {
@@ -52,10 +60,6 @@ class EcoWeb {
 			}
 		}
 		console.error("Unknown component:", name);
-	}
-
-	getComponent(name) {
-		this.species[this.getSpeciesIndex(name)];
 	}
 
 	build(species) {
@@ -72,7 +76,7 @@ class EcoWeb {
 
 		for (let i = 0; i < species.length; i++) {
 			let s = species[i];
-			addSpecies(s.name, s.color, s.showGraph);
+			addSpecies(s.name, s.color, s.showGraph && s.enable, isAbiotic(s.type));
 			this.startPop[i] = (s.enable ? s.startPopulation : 0);
 			this.r[i] = s.growthRate;
 			this.K[i] = s.carryingCapacity;
@@ -98,6 +102,7 @@ class EcoWeb {
 			}
 		}
 
+		/*
 		this.events = [
 			new BaseEvent("Stödmata", "detrius",
 				`Stödmatar man så ser man till så att hjortdjuren i ett område får extra mat över vintern så att färre dör på grund av svält.
@@ -151,14 +156,14 @@ class EcoWeb {
 					console.log(this.r[r]);
 			}.bind(this)),
 		];
+		*/
 
 		this.reset();
 	}
 
 	refresh() {
-		web.build(this.species);
-		web.applyWiggle();
-		web.solve(this.maxTime);
+		this.build(this.species);
+		this.solve(this.maxTime);
 		updateChart();
 	}
 
@@ -171,65 +176,96 @@ class EcoWeb {
 		};
 	}
 
-	// Randomize interaction matrix (A) to get more interersting patterns
-	initWiggle() {
-		this.wiggle = [];
-		for (let i = 0; i < this.size; i++) {
-			this.wiggle[i] = [];
-			for (let j = 0; j < this.size; j++) {
-				this.wiggle[i][j] = randReal(0.9, 1.1);
-			}
-		}
-		this.applyWiggle();
-	}
-
-	applyWiggle() {
-		//for (let i = 0; i < this.size; i++) {
-		//	for (let j = 0; j < this.size; j++) {
-		//		this.A[i][j] *= this.wiggle[i][j];
-		//	}
-		//}
-	}
-
-	setEvent(time, event) {
-		for (var i = this.activeEvents.length - 1; i >= 0; i--) {
-			if (this.activeEvents[i].time == time) {
-				this.activeEvents.splice(i, 1);
-			}
-		}
+	setEvent(event, time) {
 		if (event) {
-			this.activeEvents.push(new ActiveEvent(time, event));
+			this.activeEvents.push(new ActiveEvent(event, time));
+		}
+	}
+
+	getActivityMap() {
+		let map = {};
+		for (let i = 0; i < this.species.length; i++) {
+			const id = this.species[i].id;
+			map[id] = [];
+
+			for (const activeEvent of this.activeEvents) {
+				if (activeEvent.active) {
+					for (const effect of activeEvent.event.effects) {
+						if (id == effect.node_id) {
+
+							let slope = 0;
+							if (effect.method == EFFECT_METHODS[0].value) {
+								slope = effect.value;
+							}
+							else if (effect.method == EFFECT_METHODS[1].value) {
+								slope = effect.value - this.population[i];
+							}
+							else if (effect.method == EFFECT_METHODS[2].value) {
+								slope = (effect.value - 1) * this.population[i];
+							}
+
+							map[id].push({
+								effect,
+								slope,
+								startTime: activeEvent.startTime
+							});
+						}
+					}
+				}
+			}
+		}
+		return map;
+	}
+
+	solve(duration, includeEvents=true) {
+		for (const activeEvent of this.activeEvents) {
+			activeEvent.setActive(false);
 		}
 
-		this.refresh();
-	}
+		let timestamps = [];
+		for (const event of this.activeEvents) {
+			timestamps.push({
+				activeEvent: event,
+				time: event.startTime,
+				value: true
+			});
+			timestamps.push({
+				activeEvent: event,
+				time: event.endTime,
+				value: false
+			});
+		}
+		timestamps.sort((a,b) => (a.time > b.time) ? 1 : -1);
 
-	applyEvent(event) {
-		event.callback();
-	}
+		for (let i = 0; i < timestamps.length; i++) {
+			const activeEvent = timestamps[i].activeEvent;
+			const time = timestamps[i].time;
 
-	solve(duration) {
-		this.activeEvents.sort((a,b) => (a.time > b.time) ? 1 : -1);
+			if (time >= duration) {
+				break;
+			}
 
-		for (var i = 0; i < this.activeEvents.length; i++) {
-			if (this.activeEvents[i].time >= this.time) {
-				this.solveSection(this.activeEvents[i].time - this.time);
-				this.applyEvent(this.activeEvents[i].event);
+			if (time >= this.time) {
+				this.solveSection(time - this.time, this.getActivityMap(), includeEvents);
+				//this.applyEvent(this.activeEvents[i].event);
 			}
 			else {
-				console.warn("Event out of scope at", this.activeEvents[i].time);
+				console.warn("Event out of scope at", time);
 			}
+
+			console.log("> Turning " + (timestamps[i].value ? "on " : "off ") + activeEvent.event.name + " at " + time);
+			activeEvent.setActive(timestamps[i].value);
 		}
-		this.solveSection(duration - this.time);
+		this.solveSection(duration - this.time, this.getActivityMap(), includeEvents);
 	}
 
-	solveSection(duration) {
-		if (duration == 0)
+	solveSection(duration, activityMap={}, includeEvents=false) {
+		if (duration <= 0)
 			return;
 
-		console.log("Solving", this.time, "-", (this.time+duration));
+		console.log("> Solving", this.time, "-", (this.time+duration));
 		// Lotka-Volterra equation (classical model for predator-prey interaction)
-		let f = function(t, pop) {
+		const f = function(t, pop) {
 			// Calculate interactions for diet
 			let matrix = [];
 			for (let i = 0; i < pop.length; i++) {
@@ -263,13 +299,13 @@ class EcoWeb {
 			for (let i = 0; i < pop.length; i++) {
 				for (let j = 0; j < pop.length; j++) {
 					matrix[i][j] += this.A[i][j];
-					//matrix[i][j] *= this.wiggle[i][j];
 				}
 			}
 
 			// Calculate population derivative
 			let dPopList = [];
 			for (let i = 0; i < pop.length; i++) {
+				let s = this.species[i];
 
 				let sum = 0;
 				for (let j = 0; j < pop.length; j++) {
@@ -283,17 +319,43 @@ class EcoWeb {
 
 				// Impact on the environment resulting from consumption
 				//let I = pop[i] * this.K[i];
-				let I = this.K[i];
 
 				if (pop[i] < DEATH_THRESHOLD || pop[i] > 100) {
 					dPopList[i] = 0;
 				}
 				else {
-					dPopList[i] = pop[i] * ( this.r[i] + sum ) / I;
+					dPopList[i] = pop[i] * ( this.r[i] + sum );
+				}
+
+
+				// Abiotic function
+				if (this.species[i].popFuncDt) {
+					dPopList[i] = this.species[i].popFuncDt.evaluate({t});
+				}
+
+
+				// Events
+				let node = this.species[i];
+				if (activityMap[node.id] && includeEvents) {
+					for (const group of activityMap[node.id]) {
+						const effect = group.effect;
+						const startTime = group.startTime;
+						const value = effect.derivative.evaluate({t: (t-startTime) / effect.duration});
+						const slope = group.slope;
+
+						dPopList[i] += slope * value / effect.duration;
+						//const value = effect.derivative.evaluate({t: t-this.time});
+						//dPopList[i] += value;
+					}
+				}
+
+				if (!s.enable) {
+					dPopList[i] = 0;
 				}
 			}
+
 			return dPopList;
-		}
+		};
 
 		// ODE Solver
 		let start = this.time;
@@ -313,8 +375,7 @@ class EcoWeb {
 
 	stabilize() {
 		this.build(this.species);
-		this.applyWiggle();
-		this.solve(200);
+		this.solve(10 * this.maxTime, false);
 		for (let i = 0; i < this.size; i++) {
 			this.species[i].startPopulation = this.result.y[this.result.y.length-1][i];
 		}
@@ -357,172 +418,14 @@ class EcoWeb {
 }
 
 
-function scenario_1 () {
-	//	var						name		pop		growth	self	color
-	let grass	= new Organism( "Grass",	1.0,	1.00,	-1.0,	'gräs',		'#8BC34A' );
-	let berry	= new Organism( "Berry",	1.0,	1.00,	-1.0,	'blåbär',	'#4CAF50' );
-	let rabbit	= new Organism( "Rabbit",	0.1,	-0.01,	-0.1,	'hare',		'#2196F3' );
-	let deer	= new Organism( "Deer",		0.1,	-0.01,	-0.1,	'rådjur',	'#3F51B5' );
-	let fox		= new Organism( "Fox",		0.1,	-0.01,	-0.1,	'räv',		'#F44336' );
-
-	addRelationship( rabbit,	0.1,	grass,	-1.0 );
-	addRelationship( rabbit,	0.1,	berry,	-1.0 );
-	addRelationship( deer,		0.1,	grass,	-1.0 );
-	addRelationship( fox,		0.1,	rabbit,	-1.0 );
-	addRelationship( fox,		0.02,	deer,	-0.2 );
-
-	return [grass, berry, rabbit, deer, fox];
-}
-
-function scenario_2 () {
-	//	var						name		pop		growth	self	color
-	let blabar	= new Organism( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE');
-	let orter	= new Organism( "Örter",	1.0,	1.0,	-1.0,	'ört',		'#26A69A');
-	let gras	= new Organism( "Gräs",		1.0,	1.0,	-1.0,	'gräs',		'#66BB6A');
-	let svamp	= new Organism( "Svamp",	1.0,	1.0,	-1.0,	'svamp',	'#AFB42B');
-	let hare	= new Organism( "Hare",		0.1,	-0.01,	-0.1,	'hare',		'#FFD54F');
-	let radjur	= new Organism( "Rådjur",	0.1,	-0.05,	-0.1,	'rådjur',	'#FFA726');
-	let rav		= new Organism( "Räv",		0.1,	-0.05,	-0.1,	'räv',		'#FF3D00');
-
-	const S = 1/40;
-	const M = 2/40;
-	const L = 3/40;
-
-	hare.eats	( blabar,	S );
-	hare.eats	( orter,	L );
-	hare.eats	( gras,		L );
-	radjur.eats	( blabar,	M );
-	radjur.eats	( orter,	L );
-	radjur.eats	( gras,		S );
-	radjur.eats	( svamp,	M );
-	rav.eats	( blabar,	S );
-	rav.eats	( hare,		L );
-	rav.eats	( radjur,	M );
-
-	addEqualCompetition([blabar, orter, gras, svamp], -0.05);
-
-	return [blabar, orter, gras, svamp, hare, radjur, rav];
-}
-
-function scenario_3 () {
-	//	var						name			pop		growth	self	color
-	let sur		= new Organism(	"Sur växt",		1.0,	1.0,	-1.0,	'gräs',		'#FF3D00',	"plant" );
-	let normal	= new Organism(	"Normal växt",	1.0,	1.0,	-1.0,	'gräs',		'#66BB6A',	"plant" );
-	let basisk	= new Organism(	"Basisk växt",	1.0,	1.0,	-1.0,	'gräs',		'#536DFE',	"plant" );
-	let ph		= new Organism(	"PH värde",		0.01,	0.1,	-0.1,	'missing',	'#9E9E9E',	"component" );
-
-	// target value, healthy range, decay range
-	sur.requires	( ph, normRange(0.4, 0.1, 0.5) );
-	normal.requires	( ph, normRange(0.5, 0.1, 0.5) );
-	basisk.requires	( ph, normRange(0.6, 0.1, 0.5) );
-
-	addEqualCompetition([sur, normal, basisk], -0.05);
-
-	return [sur, normal, basisk, ph];
-}
-
-function scenario_4 () {
-	//	var						name		pop		growth	self	image		color
-	let rodrav	= new Carnivore( "Rödräv",	0.1,	-0.05,	-0.01,	'räv',		'#FF3D00' );
-	let lo		= new Carnivore( "Lo",		0.0,	-0.05,	-0.01,	'lo',		'#FF7D00' );
-
-	let hare	= new Herbivore( "Hare",	0.1,	-0.05,	-0.01,	'hare',		'#FFD54F' );
-	let radjur	= new Herbivore( "Rådjur",	0.1,	-0.05,	-0.01,	'rådjur',	'#FFA726' );
-	let dovhjort= new Herbivore( "Dovhjort",0.1,	-0.05,	-0.01,	'dovhjort',	'#FB8C00' );
-	let koltrast= new Herbivore( "Koltrast",0.1,	-0.05,	-0.01,	'koltrast',	'#FFF176' );
-
-	let blabar	= new Plant( "Blåbär",	1.0,	1.0,	-1.0,	'blåbär',	'#536DFE' );
-	let trad	= new Plant( "Träd",	1.0,	0.1,	-0.01,	'träd',		'#795548' );
-	let gras	= new Plant( "Gräs",	1.0,	1.0,	-1.0,	'gräs',		'#66BB6A' );
-	let orter	= new Plant( "Örter",	1.0,	1.0,	-1.0,	'ört',		'#26A69A' );
-	let svamp	= new Plant( "Svamp",	1.0,	1.0,	-1.0,	'svamp',	'#AFB42B' );
-
-	// namn			ålder	mat		barn
-	// Dovhjort		14.0	3.5		1.2
-	// Rådjur 		10.0	3.0		2.0
-	// Hare			3.5		2.5		12.0
-	// Koltrast		3.0		0.3		10.0
-	// Räv			3.5		1.0		4.0
-
-	rodrav.setDiet(
-		hare,		0.5,
-		blabar,		0.4,
-		svamp,		0.2,
-		dovhjort,	0.2,
-		radjur,		0.2,
-		koltrast,	0.6,
-	);
-	lo.setDiet(
-		hare,		0.1,
-		dovhjort,	0.9,
-		radjur,		0.4,
-		koltrast,	0.2,
-	);
-	dovhjort.setDiet(
-		trad,	0.5,
-		orter,	0.6,
-		blabar,	0.4,
-		gras,	0.5,
-	);
-	radjur.setDiet(
-		orter,	1.0,
-		trad,	0.6,
-		svamp,	0.3,
-		blabar,	0.2,
-		gras,	0.1,
-	);
-	hare.setDiet(
-		orter,	1.0,
-		blabar,	0.7,
-		gras,	0.4,
-		trad,	0.2,
-	);
-	koltrast.setDiet(
-		trad,	1.0,
-		blabar,	0.6,
-		svamp,	0.6,
-	);
-
-	//addEqualCompetition([hare, radjur, dovhjort, koltrast], -0.01);
-	//addEqualCompetition([blabar, gras, orter], -0.05);
-
-	addRelationship( dovhjort,	0.0,	radjur,	-0.05 );
-
-	blabar.requires(trad, normRange(0.7, 0.2, 0.4));
-	svamp.requires(trad, normRange(0.7, 0.3, 0.5));
-
-	return [rodrav, lo, hare, radjur, dovhjort, koltrast, blabar, trad, gras, orter, svamp];
-}
-
-// TVÅ NYA SCENARIER
-// Kattuggla – skogssork – hasselbuskar
-// Problem: Under förra vintern låg snön djup under en lång tid. Det innebar att kattugglepopulationen minskade kraftigt. Du vill återigen ha fler kattugglor i din skog. Hur kan du få dess population att öka?
-// Lösning: Genom att öppna upp kring hasselsnåren (buskar) så kan du öka antalet hasselnötter som bildas. Skogssorken är kattugglans huvudföda och skogssorkens huvudföda är hasselnötter. Fler hasselnötter kommer att ge fler kattugglor. 
-
-// Räv – dovhjort – träd
-// Problem: För några år sen planterade du ett fint bestånd aspar i skogen.  Under senare år har antalet dovhjortar ökat kraftigt och de äter på de små asparna och gör så de dör. Hur kan du få populationen dovhjort att minska?
-// Lösning: Du har ett fint bergigt parti i din skog som skulle passa för lodjur. En orienteringsklubb brukar springa mycket där och därför slår sig inte lodjuren ner där. Du erbjuder föreningen en annan (bättre!) plats att träna och då kn lodjuren flytta in. Lodjuren äter mycket dovhjort och på så sätt gåt deras population ner och asparna kan återhämta sig. 
-
-
-
-let web = new EcoWeb();
+const web = new EcoWeb();
 const DEATH_THRESHOLD = 1E-3;
 
 //window.onload = function() {
 function initWeb() {
 	initChart();
 
-	web.setScenarios([
-		scenario_4,
-		scenario_1,
-		scenario_2,
-		scenario_3,
-	]);
-	//web.startScenario(0);
-
-	//web.build(scenario_4());
-	//web.initWiggle();
-	//web.solve(100);
-
-	let database = new Database();
+	// Global
+	window.database = new Database();
+	createDatabaseTools(window.database);
 }

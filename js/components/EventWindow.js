@@ -67,15 +67,12 @@ class EventWindow extends Phaser.GameObjects.Container {
 			this.add(this.buttons[i]);
 		}
 
-		this.title = scene.add.text(this.toX(1341+100), this.toY(347+100), "<name>", {
-			font: "40px 'Crete Round'", fill: '#FFF'
-		});
+		this.title = createText(scene, this.toX(1341+100), this.toY(347+100), 40);
 		this.title.setOrigin(0, 0);
 		this.add(this.title);
 
-		this.desc = scene.add.text(this.toX(1341+100), this.toY(347+100)+60, "<description>", {
-			font: "20px 'Crete Round'", fill: '#FFF', wordWrap: { width: 2400 * this.background.scaleX }
-		});
+		this.desc = createText(scene, this.toX(1341+100), this.toY(347+100)+60, 20);
+		this.desc.setWordWrapWidth(2400 * this.background.scaleX);
 		this.desc.setOrigin(0, 0);
 		this.desc.setAlpha(0.6);
 		this.add(this.desc);

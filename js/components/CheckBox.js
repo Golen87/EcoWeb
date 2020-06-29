@@ -12,9 +12,7 @@ class CheckBox extends Button {
 		this.checkmark.setVisible(state);
 		this.add(this.checkmark);
 
-		this.label = scene.add.text(50, 0, text, {
-			font: "40px 'Crete Round'"
-		});
+		this.label = createText(scene, 50, 0, 40);
 		this.label.setOrigin(0, 0.5);
 		this.add(this.label);
 

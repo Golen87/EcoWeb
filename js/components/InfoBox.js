@@ -21,7 +21,7 @@ class InfoBox extends Phaser.GameObjects.Container {
 			const HEIGHT = (this.background.height-36) * this.background.scaleY;
 			const TOP = (0.2 + 0.6 * i / (this.values.length - 1)) * HEIGHT;
 
-			this.text = scene.add.text(LEFT + 5, TOP, this.values[i], { fontSize: 15 + "px", fontFamily: "Crete Round" });
+			this.text = createText(scene, LEFT + 5, TOP, 15, "#FFF", this.values[i]);
 			this.text.setOrigin(0.0, 0.5);
 			//this.text.setFontSize(16);
 			this.add(this.text);

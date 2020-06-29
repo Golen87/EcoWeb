@@ -4,15 +4,62 @@
 // --- Carnevore
 
 class Organism {
-	constructor(name, startPopulation, growthRate, selfCompetition, image, color, type) {
-		this.name = name;
-		this.type = type;
-		this.image = image;
-		this.color = color;
-		this.startPopulation = startPopulation;
-		this.growthRate = growthRate;
-		this.selfCompetition = selfCompetition;
+	constructor(node, actor) {
+		this.id = node.id;
+		this.name = node.name;
+		this.image = node.image;
+		this.color = node.color;
+		this.description = node.description;
+		this.type = node.type;
+		this.x = actor.position[0];
+		this.y = actor.position[1];
+		this.visibility = actor.visibility;
+
+		this.events = [];
+
+		// Simulation
+		this.startPopulation = 0;
+		this.growthRate = 0;
+		this.selfCompetition = 0;
+		this.popFunc = null;
+		this.popFuncDt = null;
 		this.carryingCapacity = 1.0;
+
+		if (isAbiotic(this.type)) {
+			const func = actor.popfunc;
+
+			if (func) {
+				this.popFunc = math.compile(func);
+				this.popFuncDt = math.derivative(func, 't').compile();
+				this.startPopulation = this.popFunc.evaluate({t: 0});
+			}
+		}
+		else {
+			this.startPopulation = actor.population;
+
+			// TODO: Improve (base values on weight/offspring/etc.)
+			if (this.type == "animal") {
+				this.growthRate = -0.05;
+				this.selfCompetition = -0.01;
+
+				this.animal = {};
+				this.animal.size = node.animal.size;
+				this.animal.food = node.animal.food;
+				this.animal.consumption = node.animal.consumption;
+				this.animal.weight = node.animal.weight;
+				this.animal.age = node.animal.age;
+				this.animal.offspring = node.animal.offspring;
+			}
+			else if (this.type == "plant") {
+				this.growthRate = 1.0;
+				this.selfCompetition = -1.0;
+			}
+			else if (this.type == "fungi") {
+				this.growthRate = 0.5;
+				this.selfCompetition = -0.5;
+			}
+		}
+
 
 		this.relationship = {};
 		//this.relationship[this] = selfCompetition;
@@ -22,7 +69,7 @@ class Organism {
 		this.diet = {};
 
 		this.enable = true;
-		this.showGraph = true;
+		this.showGraph = (this.visibility == "explored");
 		this.show = false;
 	}
 
@@ -30,18 +77,10 @@ class Organism {
 		return 1.0;
 	}
 
-	getGrowthRate() {
-		let max = this.growthRate;
-		for (var name in this.requirements) {
-			if (this.requirements.hasOwnProperty(name)) {
-				let component = web.getComponent(name);
-				let diff = this.requirements[name] - component.startPopulation;
-				max -= Math.abs(diff);
-			}
-		}
-		return max;
-	}
 
+	addEvent(event) {
+		this.events.push(event);
+	}
 
 	addPrey(prey, benefit) {
 		this.relationship[prey.name] = benefit;
@@ -59,10 +98,11 @@ class Organism {
 
 	setDiet() {
 		let total = 0;
-		for (var i = 0; i < arguments.length; i+=2)
+		for (let i = 0; i < arguments.length; i+=2) {
 			total += arguments[i+1];
+		}
 
-		for (var i = 0; i < arguments.length; i+=2) {
+		for (let i = 0; i < arguments.length; i+=2) {
 			let prey = arguments[i];
 			let amount = arguments[i+1];
 			this.diet[prey.name] = amount / total;

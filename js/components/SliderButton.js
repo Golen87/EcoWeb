@@ -22,7 +22,7 @@ class SliderButton extends Phaser.GameObjects.Image {
 			.on('drag', this.onDrag )
 			.on('dragend', this.onDragEnd );
 		this.onOut();
-		
+
 		this.soundHover = scene.sound.add('hover_button');
 		this.soundHover.setVolume(0.1);
 		this.soundDrag = scene.sound.add('ui_dnd_grab');
