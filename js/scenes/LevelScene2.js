@@ -143,9 +143,18 @@ class LevelScene2 extends Phaser.Scene {
 				node.updateProgress(this.timeController.time);
 			}
 		}, this);
+		this.timeController.on('onSectionStart', function() {
+			for (let i = this.nodes.length - 1; i >= 0; i--) {
+				this.nodes[i].startExploration(this.timeController.section);
+				this.nodes[i].availableCheck(true, this.research);
+			}
+		}, this);
 		this.timeController.on('onSectionComplete', function() {
 			this.setBudget(this.budget + web.currentScenario.budgetReward);
 			this.setResearch(this.research + web.currentScenario.researchReward);
+			for (let i = this.nodes.length - 1; i >= 0; i--) {
+				this.nodes[i].availableCheck(false, this.research);
+			}
 		}, this);
 
 		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
@@ -395,10 +404,7 @@ class LevelScene2 extends Phaser.Scene {
 				this.infoPanel.updateButtons(this.timeController.time, this.budget);
 				this.graph.draw(this.timeController.time);
 
-				if (this.research > 0) {
-					this.exploreNode(node);
-					this.setResearch(this.research - 1);
-				}
+				this.exploreNode(node);
 			}
 		}
 	}
@@ -412,6 +418,9 @@ class LevelScene2 extends Phaser.Scene {
 	setResearch(value) {
 		this.research = value;
 		this.timeController.onResearchUpdate(value);
+		for (const node of this.nodes) {
+			node.availableCheck(this.timeController.running, value);
+		}
 	}
 
 	purchaseAction(event) {
@@ -424,7 +433,12 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	exploreNode(node) {
-		if (node.exploreState == "ready") {
+		if (this.timeController.running) {
+			return;
+		}
+
+		// Upon clicking researched node
+		if (node.exploreState == "finished") {
 
 			this.dragEnabled = false;
 			this.addEvent(600, function() {
@@ -436,7 +450,9 @@ class LevelScene2 extends Phaser.Scene {
 				// 	other.resetExploration(this.timeController.time);
 				// }
 				for (const neighbour of node.neighbours) {
-					neighbour.startExploration(this.timeController.time);
+					if (neighbour.visibility == "hidden") {
+						neighbour.setVisibility("unexplored");
+					}
 				}
 
 				this.addEvent(500, function() {
@@ -445,10 +461,13 @@ class LevelScene2 extends Phaser.Scene {
 				});
 			});
 
-
 		}
+		// Upon clicking unexplored node
 		else {
-			node.startExploration(this.timeController.time);
+			if (this.research > 0 || node.exploreQueued) {
+				let cost = node.toggleExploration();
+				this.setResearch(this.research - cost);
+			}
 		}
 	}
 

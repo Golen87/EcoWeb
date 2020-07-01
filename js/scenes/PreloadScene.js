@@ -74,6 +74,8 @@ class PreloadScene extends Phaser.Scene {
 		this.load.spritesheet('player_icons', 'assets/images/ui/PlayerIcons.png', { frameWidth: 100, frameHeight: 100 });
 
 		this.load.image('search', 'assets/images/ui/search.png');
+		this.load.image('cross', 'assets/images/ui/cross.png');
+		this.load.image('check', 'assets/images/ui/check.png');
 
 
 		/* Nodes */

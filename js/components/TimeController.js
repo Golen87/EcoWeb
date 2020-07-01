@@ -111,7 +111,7 @@ class TimeController extends Phaser.GameObjects.Container {
 
 		this.section = null;
 		this.running = false;
-		this.onContinue(web.currentScenario.sections[0]);
+		this.onContinue();
 	}
 
 
@@ -179,6 +179,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.section = section;
 		this.running = true;
 		this.onPlay(true);
+		this.onSectionStart();
 	}
 
 	onContinue() {
@@ -233,6 +234,9 @@ class TimeController extends Phaser.GameObjects.Container {
 	}
 
 	onForward() {
+		if (!this.running) {
+			this.onContinue();
+		}
 		if (!this.forwardButton.active) {
 			this.forwardButton.setActive(true);
 			this.rewindButton.setActive(false);
@@ -244,12 +248,17 @@ class TimeController extends Phaser.GameObjects.Container {
 		}
 	}
 
+
 	onTimeChange() {
 		this.emit('onTimeChange');
 	}
 
 	onTimeEnd() {
 		this.emit('onTimeEnd');
+	}
+
+	onSectionStart() {
+		this.emit('onSectionStart');
 	}
 
 	onSectionComplete() {

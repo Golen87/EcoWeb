@@ -104,6 +104,8 @@ class Node extends Button {
 		//this.searchContainer.add(this.searchBg2);
 
 		this.exploreState = null;
+		this.exploreQueued = false;
+		this.exploreAvailable = true;
 		this.progressStart = 0;
 		this.progressLength = 20;
 		this.progressArc = scene.add.graphics();
@@ -122,7 +124,7 @@ class Node extends Button {
 
 
 		if (this.species.visibility == "unexplored") {
-			this.startExploration(0);
+			//this.startExploration(0);
 			//this.updateProgress(9999);
 		}
 
@@ -172,7 +174,7 @@ class Node extends Button {
 		else if (value == "unexplored") {
 			this.setVisible(true);
 			this.setAlpha(1.0);
-			if (this.exploreState == "ready") {
+			if (this.exploreState == "loading" || this.exploreState == "finished") {
 				this.image.setVisible(true);
 				this.unexplored.setVisible(false);
 			}
@@ -193,7 +195,16 @@ class Node extends Button {
 			color = Phaser.Display.Color.ObjectToColor(color);
 			color = color.color;
 			this.circle.setTint(color);
-			this.searchContainer.setVisible(true);
+			this.searchContainer.setVisible(this.exploreQueued || this.exploreAvailable || this.exploreState == "finished");
+			if (this.exploreState == "finished") {
+				this.search.setTexture("check");
+			}
+			else if (this.exploreQueued) {
+				this.search.setTexture("check");
+			}
+			else {
+				this.search.setTexture("search");
+			}
 		}
 		else if (value == "hidden") {
 			this.setVisible(true);
@@ -346,7 +357,7 @@ class Node extends Button {
 		if (this.exploreState == "loading") {
 			this.progressArc.setAlpha(1);
 		}
-		else if (this.exploreState == "ready") {
+		else if (this.exploreState == "finished") {
 			this.search.setAlpha(0.66 + (0.33) * Math.sin(time/150));
 			this.progressArc.setAlpha(1);
 		}
@@ -359,11 +370,22 @@ class Node extends Button {
 		return (this.visibility != "explored" && !this.exploreState);
 	}
 
-	startExploration(time) {
+	toggleExploration() {
 		if (this.canExplore()) {
+			this.exploreQueued = !this.exploreQueued;
 			this.setVisibility("unexplored");
+			return this.exploreQueued ? 1 : -1;
+		}
+		return 0;
+	}
+
+	startExploration(section) {
+		if (this.exploreQueued) {
+			this.exploreQueued = false;
 			this.exploreState = "loading";
-			this.progressStart = time;
+			this.setVisibility("unexplored");
+			this.progressStart = section.start;
+			this.progressLength = section.end - section.start;
 		}
 	}
 
@@ -403,10 +425,15 @@ class Node extends Button {
 			}
 
 			if (this.progress >= 1) {
-				this.exploreState = "ready";
+				this.exploreState = "finished";
 				this.setVisibility(this.visibility);
 			}
 		}
+	}
+
+	availableCheck(running, research) {
+		this.exploreAvailable = ( !running && research > 0);
+		this.setVisibility(this.visibility);
 	}
 
 
