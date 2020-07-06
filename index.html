@@ -1041,7 +1041,7 @@
 										<!-- Cost -->
 										<td v-if="action.type == 'player'" class="align-middle p-2">
 											<div class="input-group input-lg">
-												<input v-model.number="action.cost" type="number" class="form-control" min="0" :max="scenario.budget" step="1" required>
+												<input v-model.number="action.cost" type="number" class="form-control" min="0" :max="10000" step="1" required>
 												<div class="input-group-append">
 													<div class="input-group-text">cost</div>
 												</div>
