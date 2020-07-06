@@ -149,9 +149,11 @@ class LevelScene2 extends Phaser.Scene {
 				this.nodes[i].availableCheck(true, this.research);
 			}
 		}, this);
-		this.timeController.on('onSectionComplete', function() {
-			this.setBudget(this.budget + web.currentScenario.budgetReward);
-			this.setResearch(this.research + web.currentScenario.researchReward);
+		this.timeController.on('onSectionComplete', function(hasReward) {
+			if (hasReward) {
+				this.setBudget(this.budget + web.currentScenario.budgetReward);
+				this.setResearch(this.research + web.currentScenario.researchReward);
+			}
 			for (let i = this.nodes.length - 1; i >= 0; i--) {
 				this.nodes[i].availableCheck(false, this.research);
 			}

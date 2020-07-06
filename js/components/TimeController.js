@@ -262,6 +262,10 @@ class TimeController extends Phaser.GameObjects.Container {
 	}
 
 	onSectionComplete() {
-		this.emit('onSectionComplete');
+		let sections = web.currentScenario.sections;
+		let index = sections.indexOf(this.section);
+		let hasReward = (index > 0 && index < sections.length-1);
+
+		this.emit('onSectionComplete', hasReward);
 	}
 }
