@@ -118,7 +118,6 @@ class Node extends Button {
 
 		this.search = scene.add.image(0, 0, 'search');
 		this.search.setScale(0.75 * SEARCH_SIZE / Math.max(this.search.width, this.search.height));
-		this.search.setTint(0);
 		this.search.setTint(this.interpolateColor(this.BLACK, 0, 0.5));
 		this.searchContainer.add(this.search);
 
@@ -134,7 +133,7 @@ class Node extends Button {
 
 
 	getScale() {
-		let w = this.aliveValue;
+		let w = 0.8 + 0.2 * this.aliveValue;
 		let smooth = 0.5 + Math.atan(4 * (this.populationValue - 0.5)) / Math.PI + w * this.wiggle;
 		//let value = (0.3 + 1.0 * smooth) * (1+w)/2 + 0.1 * this.holdEasing;
 		let value = (0.3 + 1.0 * smooth) * w - 0.1 * this.holdEasing;
@@ -223,7 +222,10 @@ class Node extends Button {
 	updateScale() {
 		this.setScale(this.getScale());
 		this.searchContainer.setScale(1/this.getScale());
-		//this.image.setAlpha(0.5 + 0.5*this.aliveValue);
+		this.image.setAlpha(0.5 + 0.5*this.aliveValue);
+		if (this.visibility == "explored") {
+			this.circle.setTint(this.interpolateColor(0x777777, this.BLACK, this.aliveValue));
+		}
 
 		//this.updateArrow(pop);
 
@@ -432,7 +434,7 @@ class Node extends Button {
 	}
 
 	availableCheck(running, research) {
-		this.exploreAvailable = ( !running && research > 0);
+		this.exploreAvailable = (!running && research > 0);
 		this.setVisibility(this.visibility);
 	}
 
