@@ -168,12 +168,12 @@ class InfoPanel extends Phaser.GameObjects.Container {
 		button.cost = 0;
 	}
 
-	updateButtons(time, budget) {
+	updateButtons(running, time, budget) {
 		if (this.species) {
 			for (let i = 0; i < this.eventButtons.length-1; i++) {
 				const button = this.eventButtons[i];
 				button.setActive(false);
-				if (button.callback && budget >= button.cost && time >= this.lockTime) {
+				if (!running && button.callback && budget >= button.cost && time >= this.lockTime) {
 					button.setActive(true);
 				}
 			}

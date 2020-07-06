@@ -137,7 +137,7 @@ class LevelScene2 extends Phaser.Scene {
 			this.graph.draw(this.timeController.time);
 			this.timeAxis.draw(this.timeController.time);
 			this.updateNodePopulation();
-			this.infoPanel.updateButtons(this.timeController.time, this.budget);
+			this.infoPanel.updateButtons(this.timeController.running, this.timeController.time, this.budget);
 
 			for (const node of this.nodes) {
 				node.updateProgress(this.timeController.time);
@@ -267,13 +267,11 @@ class LevelScene2 extends Phaser.Scene {
 			this.timeController.setVisible(true);
 			this.graph.setVisible(true);
 			this.infoPanel.setVisible(true);
-			this.timeAxis.setVisible(true);
 		}, this);
 		this.input.keyboard.on('keydown-SIX', function (event) {
 			this.timeController.setVisible(false);
 			this.graph.setVisible(false);
 			this.infoPanel.setVisible(false);
-			this.timeAxis.setVisible(false);
 		}, this);
 	}
 
@@ -401,7 +399,7 @@ class LevelScene2 extends Phaser.Scene {
 				this.setCameraFocus(this.selectedNode.x, this.selectedNode.y);
 
 				this.infoPanel.selectNode(this.selectedNode);
-				this.infoPanel.updateButtons(this.timeController.time, this.budget);
+				this.infoPanel.updateButtons(this.timeController.running, this.timeController.time, this.budget);
 				this.graph.draw(this.timeController.time);
 
 				this.exploreNode(node);
@@ -412,7 +410,7 @@ class LevelScene2 extends Phaser.Scene {
 	setBudget(value) {
 		this.budget = value;
 		this.timeController.onBudgetUpdate(value);
-		this.infoPanel.updateButtons(this.timeController.time, this.budget);
+		this.infoPanel.updateButtons(this.timeController.running, this.timeController.time, this.budget);
 	}
 
 	setResearch(value) {
