@@ -1,26 +1,6 @@
 class TitleScene extends Phaser.Scene {
 	constructor() {
 		super({key: 'TitleScene'});
-
-		this.options = [
-			["Nytt Spel", function() {
-				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
-				this.soundSwoosh.play();
-				this.addEvent(150, function() {
-					this.scene.start("WorldScene");
-				});
-			}],
-			["Fortsätt", function() {
-				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
-				this.soundSwoosh.play();
-				this.addEvent(150, function() {
-					this.scene.start("WorldScene");
-				});
-			}],
-			["Inställningar", function() {
-				console.log("Inställningar");
-			}],
-		];
 	}
 
 	create() {
@@ -34,11 +14,37 @@ class TitleScene extends Phaser.Scene {
 		let title = createText(this, LEFT+30, 0.18*this.H, 120, "#FFF", "EcoWeb");
 		title.setOrigin(0, 0.5);
 
-		for (let i = 0; i < this.options.length; i++) {
+
+		let options = [
+			["Fortsätt", function() {
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
+				this.soundSwoosh.play();
+				this.addEvent(150, function() {
+					this.scene.start("WorldScene");
+				});
+			}],
+			["Nytt Spel", function() {
+				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
+				this.soundSwoosh.play();
+				window.profile.reset();
+				this.addEvent(150, function() {
+					this.scene.start("WorldScene");
+				});
+			}],
+			["Inställningar", function() {
+				console.log("Inställningar");
+			}],
+		];
+
+		if (window.profile.isBlank()) {
+			options.splice(0, 1);
+		}
+
+		for (let i = 0; i < options.length; i++) {
 			const SEP = 90;
 			const TOP = 0.4*this.H + i*SEP;
-			const TEXT = this.options[i][0];
-			const FUNC = this.options[i][1].bind(this);
+			const TEXT = options[i][0];
+			const FUNC = options[i][1].bind(this);
 			//const LEFT_OFFSET = 30;
 
 			let menuButton = new MenuButton(this, LEFT, TOP, TEXT, FUNC);

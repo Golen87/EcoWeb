@@ -122,10 +122,10 @@ class Node extends Button {
 		this.searchContainer.add(this.search);
 
 
-		if (this.species.visibility == "unexplored") {
+		//if (this.species.visibility == "explored") {
 			//this.startExploration(0);
 			//this.updateProgress(9999);
-		}
+		//}
 
 		this.visibility = null;
 		this.setVisibility(this.species.visibility);
@@ -170,10 +170,10 @@ class Node extends Button {
 			this.innerCircle.setAlpha(0.75, 0.75, 1.0, 1.0);
 			this.searchContainer.setVisible(false);
 		}
-		else if (value == "unexplored") {
+		else if (value == "explorable") {
 			this.setVisible(true);
 			this.setAlpha(1.0);
-			if (this.exploreState == "loading" || this.exploreState == "finished") {
+			if (this.exploreState == "loading" || this.exploreState == "finished" || window.profile.isExplored(this.species)) {
 				this.image.setVisible(true);
 				this.unexplored.setVisible(false);
 			}
@@ -205,11 +205,17 @@ class Node extends Button {
 				this.search.setTexture("search");
 			}
 		}
-		else if (value == "hidden") {
+		else if (value == "hidden" || value == "unexplored") {
 			this.setVisible(true);
 			this.setAlpha(0.2);
-			this.image.setVisible(false);
-			this.unexplored.setVisible(true);
+			if (window.profile.isExplored(this.species)) {
+				this.image.setVisible(true);
+				this.unexplored.setVisible(false);
+			}
+			else {
+				this.image.setVisible(false);
+				this.unexplored.setVisible(true);
+			}
 			this.image.setTint(0x000000);
 			this.innerCircle.setAlpha(0.2);
 			this.circle.setAlpha(0.2);
@@ -263,7 +269,7 @@ class Node extends Button {
 	}
 
 	onOver() {
-		if (this.visibility != "hidden") {
+		if (this.visibility == "explored" || this.visibility == "explorable") {
 			this.hover = true;
 		}
 		//this.soundHover.play();
@@ -272,7 +278,7 @@ class Node extends Button {
 	}
 
 	onDown() {
-		if (this.visibility != "hidden") {
+		if (this.visibility == "explored" || this.visibility == "explorable") {
 			this.hold = true;
 		}
 		//this.soundRelease.play();
@@ -375,7 +381,7 @@ class Node extends Button {
 	toggleExploration() {
 		if (this.canExplore()) {
 			this.exploreQueued = !this.exploreQueued;
-			this.setVisibility("unexplored");
+			this.setVisibility("explorable");
 			return this.exploreQueued ? 1 : -1;
 		}
 		return 0;
@@ -385,14 +391,14 @@ class Node extends Button {
 		if (this.exploreQueued) {
 			this.exploreQueued = false;
 			this.exploreState = "loading";
-			this.setVisibility("unexplored");
+			this.setVisibility("explorable");
 			this.progressStart = section.start;
 			this.progressLength = section.end - section.start;
 		}
 	}
 
 	resetExploration(time) {
-		if (this.visibility == "unexplored") {
+		if (this.visibility == "explorable") {
 			this.exploreState = "loading";
 			this.progressStart = time;
 		}

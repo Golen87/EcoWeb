@@ -76,6 +76,10 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('search', 'assets/images/ui/search.png');
 		this.load.image('cross', 'assets/images/ui/cross.png');
 		this.load.image('check', 'assets/images/ui/check.png');
+		this.load.image('star', 'assets/images/ui/star.png');
+		this.load.image('star_empty', 'assets/images/ui/star_empty.png');
+		this.load.image('lock', 'assets/images/ui/lock.png');
+		this.load.image('book', 'assets/images/ui/book.png');
 
 
 		/* Nodes */

@@ -116,6 +116,10 @@ class LevelScene2 extends Phaser.Scene {
 						this.paths.push(path);
 						this.nodes[i].neighbours.push(this.nodes[j]);
 						this.nodes[j].neighbours.push(this.nodes[i]);
+
+						if (this.nodes[i].visibility == "explored" && this.nodes[j].visibility == "unexplored") {
+							this.nodes[j].setVisibility("explorable");
+						}
 					}
 				}
 			}
@@ -450,8 +454,8 @@ class LevelScene2 extends Phaser.Scene {
 				// 	other.resetExploration(this.timeController.time);
 				// }
 				for (const neighbour of node.neighbours) {
-					if (neighbour.visibility == "hidden") {
-						neighbour.setVisibility("unexplored");
+					if (neighbour.visibility == "unexplored") {
+						neighbour.setVisibility("explorable");
 					}
 				}
 
@@ -557,6 +561,8 @@ class LevelScene2 extends Phaser.Scene {
 			}]
 		];
 
+		window.profile.completeLevel(web.currentScenario, tier);
+
 		this.briefingWindow.show(name, desc, buttons);
 	}
 
@@ -568,6 +574,7 @@ class LevelScene2 extends Phaser.Scene {
 		];
 
 		this.rewardWindow.show(species, buttons);
+		window.profile.exploreNode(species);
 	}
 
 	addEvent(delay, callback) {

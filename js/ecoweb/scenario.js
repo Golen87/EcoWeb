@@ -2,6 +2,7 @@ class Scenario {
 	constructor(data) {
 		this.species = [];
 
+		this.id = data.id;
 		this.name = data.name;
 	
 		this.maxTime = data.time.intro + data.time.sections * data.time.length + data.time.outro;

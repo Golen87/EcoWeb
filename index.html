@@ -46,6 +46,7 @@
 		<script src="js/database/defaultDatabase.js"></script>
 		<script src="js/database/database.js"></script>
 		<script src="js/database/vueDatabase.js"></script>
+		<script src="js/database/saveProfile.js"></script>
 
 		<script src="js/ecoweb/organism.js"></script>
 		<script src="js/ecoweb/scenario.js"></script>
@@ -874,6 +875,14 @@
 							<label class="col-sm-4 col-form-label">Briefing</label>
 							<div class="col-sm-8">
 								<textarea v-model="scenario.description" class="form-control" rows="5" maxlength="1000"></textarea>
+							</div>
+						</div>
+
+						<!-- Stars -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Stars needed</label>
+							<div class="col-sm-8">
+								<input v-model.number="scenario.stars" type="number" class="form-control" min="0" step="1" max="1000" required>
 							</div>
 						</div>
 

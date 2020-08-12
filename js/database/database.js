@@ -474,6 +474,7 @@ class Database {
 			"research": 1,
 			"researchreward": 1,
 			"description": "",
+			"stars": 0,
 			"position": [50,50],
 			"actors": [],
 			"actions": [],

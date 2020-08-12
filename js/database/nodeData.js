@@ -89,8 +89,9 @@ const RELATION_INTERACTIONS = [
 ];
 
 const ACTOR_VISIBILITY = [
-	{ value: "explored",	text: "Explored" },
-	{ value: "unexplored",	text: "Unexplored" },
+	{ value: "explored",	text: "■ Explored" },
+	{ value: "explorable",	text: "● Explorable" },
+	{ value: "unexplored",	text: "○ Unexplored" },
 	{ value: "hidden",		text: "Hidden" },
 ];
 
