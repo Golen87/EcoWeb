@@ -35,7 +35,7 @@ const NODE_IMAGES = [
 	{ value: "pirål",				text: "Pirål.png" },
 	{ value: "plankton",			text: "Plankton.png" },
 	{ value: "rådjur",				text: "Rådjur.png" },
-	{ value: "rankforing",			text: "Rankforing.png" },
+	{ value: "rankfoting",			text: "Rankfoting.png" },
 	{ value: "räv",					text: "Räv.png" },
 	{ value: "säl",					text: "Säl.png" },
 	{ value: "sjöborre",			text: "Sjöborre.png" },
