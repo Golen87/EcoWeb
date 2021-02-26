@@ -1,8 +1,8 @@
-const DATABASE_VERSION = 2;
+const DATABASE_VERSION = 3;
 
 class Database {
 	constructor() {
-		this.uniqueIdCounter = 1;
+		//this.uniqueIdCounter = 1;
 
 		this.nodes = [];
 		this.events = [];
@@ -24,7 +24,7 @@ class Database {
 			this.loadScenarios(data.scenarios);
 			this.loadCustomTags(data.tags);
 
-			this.updateUniqueId();
+			//this.updateUniqueId();
 		}
 		else {
 			console.error("Ignore loading old database.");
@@ -66,20 +66,24 @@ class Database {
 	}
 
 	getUniqueId() {
-		return this.uniqueIdCounter++;
+		return uuidv4();
+		//return this.uniqueIdCounter++;
 	}
 
-	updateUniqueId() {
-		for (const node of this.nodes) {
-			this.uniqueIdCounter = Math.max(this.uniqueIdCounter, node.id + 1);
-		}
-		for (const event of this.events) {
-			this.uniqueIdCounter = Math.max(this.uniqueIdCounter, event.id + 1);
-		}
-		for (const scenario of this.scenarios) {
-			this.uniqueIdCounter = Math.max(this.uniqueIdCounter, scenario.id + 1);
-		}
-	}
+	// updateUniqueId() {
+	// 	for (const node of this.nodes) {
+	// 		this.uniqueIdCounter = Math.max(this.uniqueIdCounter, node.id + 1);
+	// 		for (const stage of node.stages) {
+	// 			this.uniqueIdCounter = Math.max(this.uniqueIdCounter, stage.id + 1);
+	// 		}
+	// 	}
+	// 	for (const event of this.events) {
+	// 		this.uniqueIdCounter = Math.max(this.uniqueIdCounter, event.id + 1);
+	// 	}
+	// 	for (const scenario of this.scenarios) {
+	// 		this.uniqueIdCounter = Math.max(this.uniqueIdCounter, scenario.id + 1);
+	// 	}
+	// }
 
 
 	/* Nodes */
@@ -87,7 +91,7 @@ class Database {
 	newNode() {
 		return {
 			"id": this.getUniqueId(),
-			"name": null,
+			"name": "",
 			"image": "missing",
 			"color": "#000000",
 			"description": null,
@@ -96,23 +100,24 @@ class Database {
 			"animal": {
 				"size": null,
 				"food": null,
-				"consumption": 1.0,
-				"weight": 1.0,
-				"age": 1.0,
-				"offspring": 1.0
+				// "consumption": 1.0,
+				// "weight": 1.0,
+				// "age": 1.0,
+				// "offspring": 1.0
 			},
-			"plant": {
-				"size": null
-			},
-			"fungi": {
-				"size": null
-			},
+			// "plant": {
+				// "size": null
+			// },
+			// "fungi": {
+				// "size": null
+			// },
 			"abiotic": {},
 			"service": {
 				"category": null
 			},
 			"notes": "",
-			"relations": []
+			"relations": [],
+			"stages": []
 		};
 	}
 
@@ -130,6 +135,35 @@ class Database {
 					for (const r in data.relations) {
 						this.addRelation(node, data.relations[r].type);
 						this.transferObject(data.relations[r], node.relations[r]);
+					}
+
+					// TODO: Possibly remove bad tags and delete incomplete relations
+					node.stages = [];
+					for (const s in data.stages) {
+						this.addStage(node);
+						this.transferObject(data.stages[s], node.stages[s]);
+						// TODO: Check if stages still exist
+						node.stages[s].produces = data.stages[s].produces;
+					}
+					// TODO: Move all of this to "repair" function, or change database to sql already
+					const stageIdList = node.stages.map(function(stage) { return stage.id; });
+					for (const stage of node.stages) {
+						for (const id in stage.produces) {
+							if (!stageIdList.includes(id)) {
+								delete stage.produces[id];
+							}
+						}
+					}
+					// Add default stage if none exists
+					if (node.stages.length == 0) {
+						this.addStage(node);
+						node.stages[0].name = "Vuxen";
+						node.stages[0].age = node.animal.age;
+						node.stages[0].weight = node.animal.weight;
+						node.stages[0].produces[node.stages[0].id] = node.animal.offspring;
+						node.stages[0].isEdible = true;
+						node.stages[0].isProducing = true;
+						node.stages[0].isPopulation = true;
 					}
 
 					if (JSON.stringify(node) !== JSON.stringify(data)) {
@@ -192,6 +226,11 @@ class Database {
 		if (clone) {
 			clone.id = this.getUniqueId();
 			clone.name = null;
+			for (const stage of clone.stages) {
+				stage.id = this.getUniqueId();
+				stage.next = {};
+				stage.produces = {};
+			}
 			return clone;
 		}
 	}
@@ -209,20 +248,20 @@ class Database {
 				return 1;
 			}
 		}
-		// if (a.type == "animal") {
-		// 	if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) < ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
-		// 		return -1;
-		// 	}
-		// 	if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) > ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
-		// 		return 1;
-		// 	}
+		if (a.type == "animal") {
+			if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) < ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
+				return -1;
+			}
+			if (ANIMAL_FOODS_VALUES.indexOf(a.animal.food) > ANIMAL_FOODS_VALUES.indexOf(b.animal.food)) {
+				return 1;
+			}
 		// 	if (a.animal.weight > b.animal.weight) {
 		// 		return -1;
 		// 	}
 		// 	if (a.animal.weight < b.animal.weight) {
 		// 		return 1;
 		// 	}
-		// }
+		}
 		if (a.type == "service") {
 			if (SERVICE_CATEGORIES_VALUES.indexOf(a.service.category) < SERVICE_CATEGORIES_VALUES.indexOf(b.service.category)) {
 				return -1;
@@ -247,7 +286,8 @@ class Database {
 		}
 		node.relations.push({
 			"type": type,
-			"node_id": -1,
+			"node_id": null,
+			"stage_id": null,
 			"tags": [],
 			//"category": "",
 			"interaction": "",
@@ -338,6 +378,50 @@ class Database {
 		return relation.preference / total;
 	}
 
+	addStage(node) {
+		node.stages.push({
+			"id": this.getUniqueId(), // Unique stage id
+			"name": null, // Stage name
+			"age": null, // Maximum age
+			"weight": null, // Edible weight
+			"next": null, // The next stage the population is transferred to
+			"survival": 100, // Odds of transfering to next
+			"animal": {
+				"consumption": 1.0, // Food kg/day
+				"efficiency": 50, // Hunting "velocity" in competition for food
+				"territory": 1, // Area km² per individual for intra-species competition
+			},
+			"plant": {
+				"sunlight": 0, // Sunlight m² requirement
+				"layer": STAGE_LAYERS[0].value, // Canopy layers in forests
+				"shade": STAGE_SHADES[0].value, // Percentage of light passing through
+			},
+			"produces": {}, // Production of other stages within the species
+			"isEdible": false, // Whether the stage is edible
+			"isProducing": false, // Whether the stage can produce other stages
+			"isPopulation": false // Whether the stage pop counts to the total pop
+		});
+	}
+
+	deleteStage(node, index) {
+		node.stages.splice(index, 1);
+		// TODO: Reset other stages next/produces/requirements
+	}
+
+	getStageById(stage_id, node_id=null) {
+		for (const node of this.nodes) {
+			if (node_id == null || node.id == node_id) {
+				for (const stage of node.stages) {
+					if (stage.id == stage_id) {
+						return stage;
+					}
+				}
+			}
+		}
+		console.error("Could not find stage with id '" + stage_id + "'");
+		return null;
+	}
+
 
 	/* Events */
 
@@ -348,7 +432,7 @@ class Database {
 			"description": null,
 			"image": "missing",
 			"duration": 0,
-			"owner_id": -1,
+			"owner_id": null,
 			"effects": []
 		};
 	}
@@ -441,7 +525,7 @@ class Database {
 		}
 		let effect = {
 			"type": type,
-			"node_id": -1,
+			"node_id": null,
 			"tags": [],
 			"method": EFFECT_METHODS[0].value,
 			"value": 0
@@ -459,9 +543,10 @@ class Database {
 
 	newScenario() {
 		return {
-			"id": this.getUniqueId(),
-			"name": null,
+			"id": this.getUniqueId(), // Scenario id
+			"name": null, // Scenario title
 			"time": {
+				"deltatime": 0.1,
 				"intro": 50,
 				"outro": 50,
 				"sections": 5,
@@ -469,21 +554,23 @@ class Database {
 				"playspeed": 5,
 				"fastspeed": 50,
 			},
-			"budget": 100,
-			"budgetreward": 20,
-			"research": 1,
-			"researchreward": 1,
-			"description": "",
-			"stars": 0,
-			"position": [50,50],
-			"actors": [],
-			"actions": [],
-			"conditions": {
+			"budget": 100, // Budget for purchasing actions
+			"budgetreward": 20, // Budget awarded each section
+			"research": 1, // Research points for exploring nodes
+			"researchreward": 1, // Research points awarded each section
+			"description": "", // Briefing message upon start
+			"stars": 0, // Stars required to unlock the scenario
+			"position": [50,50], // Camera default position
+			"actors": [], // List of actor nodes of species
+			"actions": [], // List of actions of events
+			"conditions": { // Victory conditions for star-rewards
 				0: {},
 				1: {},
 				2: {},
 				3: {},
-			}
+			},
+			"sunlight": 1000000,
+			"territory": 100000,
 		};
 	}
 
@@ -499,8 +586,10 @@ class Database {
 					// TODO: Possibly remove bad tags and delete incomplete actors
 					scenario.actors = [];
 					for (const r in data.actors) {
-						this.addActor(scenario);
-						this.transferObject(data.actors[r], scenario.actors[r]);
+						if (this.getNodeById(data.actors[r].node_id).name) {
+							this.addActor(scenario);
+							this.transferObject(data.actors[r], scenario.actors[scenario.actors.length-1]);
+						}
 					}
 
 					if (data.conditions) {
@@ -565,11 +654,12 @@ class Database {
 	// Actor: node in a scenario
 	addActor(scenario) {
 		let actor = {
-			"node_id": -1,
-			"population": 0.1,
+			"node_id": null,
+			"population": 1,
 			"popfunc": "0.5",
 			"visibility": ACTOR_VISIBILITY[0].value,
 			"position": [0,0],
+			"fixed": false,
 		};
 		scenario.actors.push(actor);
 		return actor;
@@ -597,7 +687,7 @@ class Database {
 	// Action: event in a scenario
 	addAction(scenario) {
 		let action = {
-			"event_id": -1,
+			"event_id": null,
 			"type": ACTION_TYPES[0].value,
 			"time": 0,
 			"cost": 0,

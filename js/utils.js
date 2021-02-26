@@ -5,6 +5,10 @@ function randReal(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
+function randInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 /**
  * Cumulative distribution function
  */
@@ -37,6 +41,29 @@ function normRange(target, buffer, decay) {
 		return 1 - (pnorm(x, -decay/2-buffer, decay/4) - pnorm(x, decay/2+buffer, decay/4));
 	}
 	return CDF.bind(this);
+}
+
+// Smoothsteps x between points a and b
+function smoothstep(x, a, b) {
+	let t = (x-a) / (b-a);
+	return 3*t*t - 2*t*t*t;
+}
+
+function createSmoothstepPlateau(a, b, c, d, amp=1) {
+	return function(x) {
+		if (x <= a || x >= d) {
+			return 0;
+		}
+		if (x >= b && x <= c) {
+			return amp;
+		}
+		if (x > a && x < b) {
+			return amp * smoothstep(x, a, b);
+		}
+		if (x > c && x < d) {
+			return amp * smoothstep(x, d, c);
+		}
+	};
 }
 
 
@@ -111,5 +138,23 @@ function createText(scene, x=0, y=0, size=20, color="#FFF", text="") {
 		fontFamily: game.font,
 		fontSize: size + "px",
 		fill: color
+	});
+}
+
+function interpolateColor(color1, color2, value) {
+	return Phaser.Display.Color.ObjectToColor(
+		Phaser.Display.Color.Interpolate.ColorWithColor(
+			Phaser.Display.Color.ColorToRGBA(color1),
+			Phaser.Display.Color.ColorToRGBA(color2),
+		100, value * 100)
+	).color;
+}
+
+
+// General random-ish uuid
+function uuidv4() {
+	return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+		var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+		return v.toString(16);
 	});
 }

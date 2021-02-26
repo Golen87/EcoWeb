@@ -281,7 +281,7 @@ class EcoWeb {
 				let total = 0.0;
 				for (let j = 0; j < pop.length; j++) {
 					let p = this.species[j];
-					let amount = s.diet[p.name] || 0.0;
+					let amount = s.diet[p.id] || 0.0;
 					eating[j] = amount * pop[j];
 					total += eating[j];
 				}

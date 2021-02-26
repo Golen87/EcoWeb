@@ -52,9 +52,11 @@
 		<script src="js/ecoweb/scenario.js"></script>
 		<script src="js/ecoweb/event.js"></script>
 		<script src="js/ecoweb/ecoweb.js"></script>
+		<script src="js/ecoweb/simulator.js"></script>
 
 		<script src="js/graph/vueGraphTools.js"></script>
 		<script src="js/graph/chart.js"></script>
+		<script src="js/graph/chart2.js"></script>
 
 		<script src="js/components/Button.js"></script>
 		<script src="js/components/MenuButton.js"></script>
@@ -111,6 +113,9 @@
 				<div style="background: white;">
 					<canvas id="myChart"></canvas>
 				</div>
+				<div style="background: white;">
+					<canvas id="myChart2" height="60"></canvas>
+				</div>
 			</div>
 
 			<div id="graphTools" class="justify-content-center">
@@ -126,28 +131,68 @@
 						</div>
 						<div v-if="main.show" class="card-body p-2">
 							<div class="row no-gutters mb-1" style="height: 2em;">
-								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Time</small></span>
-								<input class="col-sm mx-2"
-									type="range"
-									min="0" max="500" step="10"
-									v-model="duration"
-									v-on:input="updateDuration($event)"
-									v-on:change="updateDuration($event)">
-								<input class="col-sm-3"
+								<span class="col-sm-5 align-self-center" style="white-space: nowrap;"><small>Time</small></span>
+								<input class="col-sm-7"
 									type="number"
-									min="0" max="1000" step="10"
-									v-model.number="duration"
-									v-on:change="updateDuration($event)"/>
+									min="1" max="1000" step="1"
+									v-model.number="maxTime"
+									v-on:change="updateMaxTime($event)"/>
 							</div>
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-5 align-self-center" style="white-space: nowrap;"><small>Delta</small></span>
+								<input class="col-sm-4"
+									type="number"
+									min="0.01" max="2" step="0.01"
+									v-model.number="deltaTime"
+									v-on:change="updateDeltaTime($event)"/>
+								<input class="col-sm"
+									type="range"
+									min="0.01" max="2" step="0.01"
+									v-model="deltaTime"
+									v-on:input="updateDeltaTime($event)"
+									v-on:change="updateDeltaTime($event)">
+							</div>
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-5 align-self-center" style="white-space: nowrap;"><small>Sunlight</small></span>
+								<input class="col-sm-7"
+									type="number"
+									min="0" step="1"
+									v-model.number="sunlight"
+									v-on:change="updateSunlight($event)"/>
+							</div>
+							<div class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-5 align-self-center" style="white-space: nowrap;"><small>Territory</small></span>
+								<input class="col-sm-7"
+									type="number"
+									min="0" step="1"
+									v-model.number="territory"
+									v-on:change="updateTerritory($event)"/>
+							</div>
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="showNodesCheck"
+									v-model="showNodes" v-on:click="updateShowNodes($event)">
+								<small><label class="form-check-label" for="showNodesCheck">Show nodes</label></small>
+							</div>
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="showStagesCheck"
+									v-model="showStages" v-on:click="updateShowStages($event)">
+								<small><label class="form-check-label" for="showStagesCheck">Show stages</label></small>
+							</div>
+							<div class="form-check">
+								<input type="checkbox" class="form-check-input" id="showBiomassCheck"
+									v-model="showBiomass" v-on:click="updateShowBiomass($event)">
+								<small><label class="form-check-label" for="showBiomassCheck">Show biomass</label></small>
+							</div>
+							<hr>
+							<button type="button" class="btn btn-secondary"
+								title="Refresh simulation"
+								v-on:click="refresh">
+								Refresh
+							</button>
 							<button type="button" class="btn btn-secondary"
 								title="Skip in time to where populations have stabilized"
 								v-on:click="stabilize">
 								Stabilize
-							</button>
-							<button type="button" class="btn btn-secondary"
-								title="Reset populations to initial values"
-								v-on:click="reset">
-								Reset
 							</button>
 						</div>
 					</div>
@@ -160,10 +205,6 @@
 								style="width: 25px; height: 25px;"
 								v-model="s.enable"
 								v-on:click="toggleEnable($event, s)">
-							<!--input type="checkbox" class="col-sm-1"
-								style="width: 25px; height: 25px;"
-								v-model="s.showGraph"
-								v-on:click="toggleShowGraph($event, s)"-->
 							<span class="col-sm font-weight-bold">{{s.name}}</span>
 							<i class="fas col-sm-1 fa-angle-down pointer"
 								style="font-size: 1.5em;"
@@ -171,78 +212,25 @@
 						</div>
 						<div v-if="s.show" class="card-body p-2">
 							<div class="row no-gutters mb-1" style="height: 2em;">
-								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Pop</small></span>
-								<input class="col-sm mx-2"
-									type="range"
-									min="0.01" max="1" step="0.01"
-									v-model="s.startPopulation"
-									v-on:input="updateValue($event, s, 'startPopulation')"
-									v-on:change="updateValue($event, s, 'startPopulation')">
-								<input class="col-sm-3"
+								<span class="col-sm-5 align-self-center" style="white-space: nowrap;"><small v-if="s.fixed">Fixed pop.</small><small v-else>Start pop.</small></span>
+								<input class="col-sm-5"
 									type="number"
-									min="0" max="1" step="0.01"
+									min="0" step="1"
 									v-model.number="s.startPopulation"
 									v-on:change="updateValue($event, s, 'startPopulation')"/>
+								<input class="col-sm-2 h-100"
+									type="checkbox"
+									v-model.number="s.fixed"
+									v-on:change="updateGraph()"/>
 							</div>
-							<div class="row no-gutters mb-1" style="height: 2em;">
-								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Grow</small></span>
-								<input class="col-sm mx-2"
-									type="range"
-									min="-1" max="1" step="0.01"
-									v-model="s.growthRate"
-									v-on:input="updateValue($event, s, 'growthRate')"
-									v-on:change="updateValue($event, s, 'growthRate')">
-								<input class="col-sm-3"
+							<div v-for="(stage, index) in s.stages" v-if="s.type == 'animal'" class="row no-gutters mb-1" style="height: 2em;">
+								<span class="col-sm-5 align-self-center" style="white-space: nowrap;"><small>{{stage.name}} territory</small></span>
+								<input class="col-sm-7"
 									type="number"
-									min="-1" max="1" step="0.01"
-									v-model.number="s.growthRate"
-									v-on:change="updateValue($event, s, 'growthRate')"/>
+									min="0" step="any"
+									v-model.number="stage.territory"
+									v-on:change="updateValue($event, stage, 'territory')"/>
 							</div>
-							<div class="row no-gutters mb-1" style="height: 2em;">
-								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>Self</small></span>
-								<input class="col-sm mx-2"
-									type="range"
-									min="-1" max="0" step="0.01"
-									v-model="s.selfCompetition"
-									v-on:input="updateValue($event, s, 'selfCompetition')"
-									v-on:change="updateValue($event, s, 'selfCompetition')">
-								<input class="col-sm-3"
-									type="number"
-									min="-1" max="0" step="0.01"
-									v-model.number="s.selfCompetition"
-									v-on:change="updateValue($event, s, 'selfCompetition')"/>
-							</div>
-							<hr>
-							<div v-for="value, key in s.relationship" class="row no-gutters mb-1" style="height: 2em;">
-								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>{{key}}</small></span>
-								<input class="col-sm mx-2"
-									type="range"
-									min="-1" max="1" step="0.01"
-									v-model="s.relationship[key]"
-									v-on:input="updateValue($event, s, 'relationship[key]')"
-									v-on:change="updateValue($event, s, 'relationship[key]')">
-								<input class="col-sm-3"
-									type="number"
-									min="-1" max="0" step="0.01"
-									v-model.number="s.relationship[key]"
-									v-on:change="updateValue($event, s, 'relationship[key]')"/>
-							</div>
-							<!--
-							<div v-for="value, key in s.relationship" class="row no-gutters mb-1" style="height: 2em;">
-								<span class="col-sm-2 align-self-center" style="white-space: nowrap;"><small>{{key}}</small></span>
-								<input class="col-sm mx-2"
-									type="range"
-									min="-1" max="1" step="0.01"
-									v-model="s.relationship[key]"
-									v-on:input="updateValue($event, s, 'relationship[key]')"
-									v-on:change="updateValue($event, s, 'relationship[key]')">
-								<input class="col-sm-3"
-									type="number"
-									min="-1" max="0" step="0.01"
-									v-model.number="s.relationship[key]"
-									v-on:change="updateValue($event, s, 'relationship[key]')"/>
-							</div>
-							-->
 						</div>
 					</div>
 				</div>
@@ -296,9 +284,9 @@
 								<!--td class="align-middle d-none d-md-table-cell">{{ s.id }}</td-->
 								<td class="align-middle d-none d-lg-table-cell">{{ s.type }} &ndash; {{ s.animal.food || s.service.category }}</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
-									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editNode(s)"><i class="fas fa-fw fa-edit"></i></button>
-									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyNode(s)"><i class="fas fa-fw fa-copy"></i></button>
-									<button class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteNode(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
+									<button type="button" class="list-edit-button btn btn-primary" title="Edit" v-on:click="editNode(s)"><i class="fas fa-fw fa-edit"></i></button>
+									<button type="button" class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyNode(s)"><i class="fas fa-fw fa-copy"></i></button>
+									<button type="button" class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteNode(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
 								</td>
 							</tr>
 						</tbody>
@@ -339,11 +327,11 @@
 								<th class="align-middle">{{ s.name }}</th>
 								<td class="align-middle d-none d-lg-table-cell">{{ s.category }}</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
-									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editEvent(s)"><i class="fas fa-fw fa-edit"></i></button>
-									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyEvent(s)"><i class="fas fa-fw fa-copy"></i></button>
-									<button class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteEvent(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
-									<button class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveEvent(s,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
-									<button class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveEvent(s,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
+									<button type="button" class="list-edit-button btn btn-primary" title="Edit" v-on:click="editEvent(s)"><i class="fas fa-fw fa-edit"></i></button>
+									<button type="button" class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyEvent(s)"><i class="fas fa-fw fa-copy"></i></button>
+									<button type="button" class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteEvent(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
+									<button type="button" class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveEvent(s,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
+									<button type="button" class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveEvent(s,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
 								</td>
 							</tr>
 						</tbody>
@@ -384,11 +372,11 @@
 										v-bind:title="getNode(actor).name">
 								</td>
 								<td class="align-middle" style="width: 1%; white-space: nowrap;">
-									<button class="list-edit-button btn btn-primary" title="Edit" v-on:click="editScenario(s)"><i class="fas fa-fw fa-edit"></i></button>
-									<button class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyScenario(s)"><i class="fas fa-fw fa-copy"></i></button>
-									<button class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteScenario(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
-									<button class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveScenario(s,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
-									<button class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveScenario(s,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
+									<button type="button" class="list-edit-button btn btn-primary" title="Edit" v-on:click="editScenario(s)"><i class="fas fa-fw fa-edit"></i></button>
+									<button type="button" class="list-edit-button btn btn-primary" title="Copy" v-on:click="copyScenario(s)"><i class="fas fa-fw fa-copy"></i></button>
+									<button type="button" class="list-edit-button btn btn-danger" title="Delete" v-on:click="deleteScenario(s)"><i class="fas fa-fw fa-trash-alt"></i></button>
+									<button type="button" class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveScenario(s,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
+									<button type="button" class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveScenario(s,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
 								</td>
 							</tr>
 						</tbody>
@@ -416,7 +404,10 @@
 								<input type="button" class="tab-button nav-link" v-bind:class="{ active: tab == 1 }" v-on:click="setTab(1)" value="Info">
 							</li>
 							<li class="nav-item">
-								<input type="button" class="tab-button nav-link" v-bind:class="{ active: tab == 2 }" v-on:click="setTab(2)" value="Relations">
+								<input type="button" class="tab-button nav-link" v-bind:class="{ active: tab == 2 }" v-on:click="setTab(2)" value="Stages">
+							</li>
+							<li class="nav-item">
+								<input type="button" class="tab-button nav-link" v-bind:class="{ active: tab == 3 }" v-on:click="setTab(3)" value="Relations">
 							</li>
 						</div>
 					</ul>
@@ -435,7 +426,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Name</label>
 							<div class="col-sm-8">
-								<input v-model="node.name" type="text" class="form-control" minlength="2" maxlength="30" required>
+								<input v-model="node.name" type="text" class="form-control" minlength="2" maxlength="30" :required="tab == 1">
 							</div>
 						</div>
 
@@ -443,7 +434,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Image</label>
 							<div class="col-sm-8">
-								<select v-model="node.image" class="form-control" required>
+								<select v-model="node.image" class="form-control" :required="tab == 1">
 									<option v-for="option in NODE_IMAGES" v-bind:value="option.value">{{ getStrippedPath(option.text) }}</option>
 								</select>
 							</div>
@@ -453,7 +444,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Color</label>
 							<div class="col-sm-8">
-								<input v-model="node.color" type="color" class="form-control" required>
+								<input v-model="node.color" type="color" class="form-control" :required="tab == 1">
 							</div>
 						</div>
 
@@ -471,7 +462,7 @@
 						<div class="form-group row">
 							<label class="col-sm-4 col-form-label">Type</label>
 							<div class="col-sm-8">
-								<select v-model="node.type" class="form-control" required>
+								<select v-model="node.type" class="form-control" :required="tab == 1">
 									<option v-for="option in NODE_TYPES" v-bind:value="option.value">{{ option.text }}</option>
 								</select>
 							</div>
@@ -484,7 +475,7 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Size</label>
 								<div class="col-sm-8">
-									<select v-model="node.animal.size" class="form-control" required>
+									<select v-model="node.animal.size" class="form-control" :required="tab == 1">
 										<option v-for="option in ANIMAL_SIZES" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
@@ -494,55 +485,55 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Food</label>
 								<div class="col-sm-8">
-									<select v-model="node.animal.food" class="form-control" required>
+									<select v-model="node.animal.food" class="form-control" :required="tab == 1">
 										<option v-for="option in ANIMAL_FOODS" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
 							</div>
 
 							<!-- Consumption -->
-							<div class="form-group row">
+							<!-- <div class="form-group row">
 								<label class="col-sm-4 col-form-label">Consumption</label>
 								<div class="col-sm-8 input-group">
-									<input v-model.number="node.animal.consumption" type="number" class="form-control" min="0" step="0.01" required>
+									<input v-model.number="node.animal.consumption" type="number" class="form-control" min="0" step="0.01" :required="tab == 1">
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">kg / day</span>
 									</div>
 								</div>
-							</div>
+							</div> -->
 
 							<!-- Weight -->
-							<div class="form-group row">
+							<!-- <div class="form-group row">
 								<label class="col-sm-4 col-form-label">Weight</label>
 								<div class="col-sm-8 input-group">
-									<input v-model.number="node.animal.weight" type="number" class="form-control" min="0" step="0.01" required>
+									<input v-model.number="node.animal.weight" type="number" class="form-control" min="0" step="0.01" :required="tab == 1">
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">kg</span>
 									</div>
 								</div>
-							</div>
+							</div> -->
 
 							<!-- Age -->
-							<div class="form-group row">
+							<!-- <div class="form-group row">
 								<label class="col-sm-4 col-form-label">Age</label>
 								<div class="col-sm-8 input-group">
-									<input v-model.number="node.animal.age" type="number" class="form-control" min="0" step="0.01" required>
+									<input v-model.number="node.animal.age" type="number" class="form-control" min="0" step="0.01" :required="tab == 1">
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">years</span>
 									</div>
 								</div>
-							</div>
+							</div> -->
 
 							<!-- Offspring -->
-							<div class="form-group row">
+							<!-- <div class="form-group row">
 								<label class="col-sm-4 col-form-label">Offspring</label>
 								<div class="col-sm-8 input-group">
-									<input v-model.number="node.animal.offspring" type="number" class="form-control" min="0" step="0.01" required>
+									<input v-model.number="node.animal.offspring" type="number" class="form-control" min="0" step="0.01" :required="tab == 1">
 									<div class="input-group-append">
 										<span class="input-group-text" id="basic-addon2">/ year</span>
 									</div>
 								</div>
-							</div>
+							</div> -->
 						</div>
 
 						<!-- Service parameters -->
@@ -552,7 +543,7 @@
 							<div class="form-group row">
 								<label class="col-sm-4 col-form-label">Category</label>
 								<div class="col-sm-8">
-									<select v-model="node.service.category" class="form-control" required>
+									<select v-model="node.service.category" class="form-control" :required="tab == 1">
 										<option v-for="option in SERVICE_CATEGORIES" v-bind:value="option.value">{{ option.text }}</option>
 									</select>
 								</div>
@@ -592,8 +583,239 @@
 					</div>
 				</div>
 
-				<!-- Diet tab -->
+				<!-- Stages tab -->
 				<div v-show="tab == 2" class="input-section">
+					<!-- Stage list -->
+					<div class="input-fields col-md-5 col-xl-5">
+
+						<div class="editor-full-list">
+							<table class="table">
+								<tbody>
+									<tr v-for="(stage, index) in node.stages" v-bind:class="{ 'table-active': selectedStage == index }" v-on:click="selectStage(index)">
+										<td scope="row" class="align-middle d-none d-sm-table-cell" style="width: 1%; white-space: nowrap;">
+											<!-- <img
+												v-bind:src="getImage(node.image)"
+												class="img-thumbnail p-0 rounded-circle"
+												style="border: none; height: 40px;"
+												v-bind:style="{ boxShadow: 'inset 0 0 0 2px ' + node.color }"
+												v-bind:title="stage.name"> -->
+											<span v-show="stage.isEdible"><i class="fas fa-fw fa-lg fa-utensils"></i></span>
+											<span v-show="!stage.isEdible"><i class="fas fa-fw fa-lg fa-times" style="opacity: 0;"></i></span>
+											<span v-show="stage.isProducing"><i class="fas fa-fw fa-lg fa-seedling"></i></span>
+											<span v-show="!stage.isProducing"><i class="fas fa-fw fa-lg fa-times" style="opacity: 0;"></i></span>
+											<span v-show="stage.isPopulation"><i class="fas fa-fw fa-lg fa-chart-bar"></i></span>
+											<span v-show="!stage.isPopulation"><i class="fas fa-fw fa-lg fa-times" style="opacity: 0;"></i></span>
+										</td>
+										<th class="align-middle">{{ stage.name }}</th>
+										<td class="align-middle" style="width: 1%; white-space: nowrap;">
+											<button type="button" class="list-edit-button-small btn btn-secondary" title="Move up" v-on:click="moveStage(index,-1)"><i class="fas fa-fw fa-sm fa-chevron-up"></i></button>
+											<button type="button" class="list-edit-button-small btn btn-secondary" title="Move down" v-on:click="moveStage(index,1)"><i class="fas fa-fw fa-sm fa-chevron-down"></i></button>
+											<button type="button" class="list-edit-button btn btn-danger" title="Delete" v-on:click.stop="deleteStage(index)"><i class="fas fa-fw fa-trash-alt"></i></button>
+										</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+
+						<hr>
+						<div class="d-flex justify-content-end">
+							<div>
+								<input type="button" class="btn btn-primary" value="Add stage" v-on:click="addStage()">
+							</div>
+						</div>
+
+					</div>
+
+
+					<!-- Stage data -->
+					<div class="input-fields col-md-7 col-xl-7 d-flex flex-column">
+						<div v-if="node.stages.length > 0">
+
+							<fieldset>
+								<div class="form-group row">
+									<legend class="col-form-label col-sm-4"></legend>
+									<div class="col-sm-8 text-left">
+										<div class="form-check">
+											<input v-model="selected.isEdible" type="checkbox" class="form-check-input" id="radioIsEdible">
+											<label class="form-check-label" for="radioIsEdible">
+												Edible
+											</label>
+										</div>
+										<div class="form-check">
+											<input v-model="selected.isProducing" type="checkbox" class="form-check-input" id="radioIsProducing">
+											<label class="form-check-label" for="radioIsProducing">
+												Produces
+											</label>
+										</div>
+										<div class="form-check">
+											<input v-model="selected.isPopulation" type="checkbox" class="form-check-input" id="radioIsPopulation">
+											<label class="form-check-label" for="radioIsPopulation">
+												Counts as total population
+											</label>
+										</div>
+									</div>
+								</div>
+							</fieldset>
+
+							<div class="d-flex align-items-center">
+								<hr><span class="text-muted px-2">Info</span><hr>
+							</div>
+
+							<!-- Name -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Name</label>
+								<div class="col-sm-8">
+									<input v-model="selected.name" ref="name" type="text" class="form-control" minlength="2" maxlength="30" :required="tab == 2">
+								</div>
+							</div>
+
+							<!-- Age -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Age</label>
+								<div class="col-sm-8 input-group">
+									<input v-model.number="selected.age" type="number" class="form-control" min="0" step="0.01" :required="tab == 2">
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">years</span>
+									</div>
+								</div>
+							</div>
+
+
+							<!-- Next -->
+							<div class="form-group row">
+								<label class="col-sm-4 col-form-label">Next</label>
+								<div class="col-sm-8">
+									<select v-model="selected.next" class="form-control">
+										<option v-for="option in all_stages" v-bind:value="option.value">{{ option.text }}</option>
+									</select>
+								</div>
+							</div>
+
+							<!-- Survival -->
+							<div v-if="selected.next" class="form-group row">
+								<label class="col-sm-4 col-form-label">Survival</label>
+								<div class="col-sm-8 input-group">
+									<input v-model.number="selected.survival" type="number" class="form-control" min="0" step="any" max="100" :required="tab == 2">
+									<div class="input-group-append">
+										<span class="input-group-text" id="basic-addon2">%</span>
+									</div>
+								</div>
+							</div>
+
+							<div v-if="selected.isEdible">
+								<div class="d-flex align-items-center">
+									<hr><span class="text-muted px-2">Edible</span><hr>
+								</div>
+
+								<!-- Weight -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Weight</label>
+									<div class="col-sm-8 input-group">
+										<input v-model.number="selected.weight" type="number" class="form-control" min="0" step="any" :required="tab == 2">
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">kg</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Animal -->
+							<div v-if="node.type == 'animal'">
+								<div class="d-flex align-items-center">
+									<hr><span class="text-muted px-2">Animal</span><hr>
+								</div>
+
+								<!-- Consumption -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Consumption</label>
+									<div class="col-sm-8 input-group">
+										<input v-model.number="selected.animal.consumption" type="number" class="form-control" min="0" step="any" :required="tab == 2">
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">kg</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Efficiency -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Efficiency</label>
+									<div class="col-sm-8 input-group">
+										<input v-model.number="selected.animal.efficiency" type="number" class="form-control" min="1" step="1" :required="tab == 2">
+									</div>
+								</div>
+
+								<!-- Territory -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Territory</label>
+									<div class="col-sm-8 input-group">
+										<input v-model.number="selected.animal.territory" type="number" class="form-control" min="0" step="any" :required="tab == 2">
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">km&sup2;</span>
+										</div>
+									</div>
+								</div>
+							</div>
+
+							<!-- Plant -->
+							<div v-if="node.type == 'plant'">
+								<div class="d-flex align-items-center">
+									<hr><span class="text-muted px-2">Plant</span><hr>
+								</div>
+
+								<!-- Sunlight -->
+								<div class="form-group row">
+									<label class="col-sm-4 col-form-label">Sunlight</label>
+									<div class="col-sm-8 input-group">
+										<input v-model.number="selected.plant.sunlight" type="number" class="form-control" min="0" step="any" placeholder="0">
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">m&sup2;</span>
+										</div>
+									</div>
+								</div>
+
+								<!-- Layer -->
+								<div v-if="selected.plant.sunlight > 0" class="form-group row">
+									<label class="col-sm-4 col-form-label">Layer</label>
+									<div class="col-sm-8">
+										<select v-model="selected.plant.layer" class="form-control" :required="tab == 2">
+											<option v-for="option in STAGE_LAYERS" v-bind:value="option.value">{{ option.text }}</option>
+										</select>
+									</div>
+								</div>
+
+								<!-- Shade -->
+								<div v-if="selected.plant.sunlight > 0" class="form-group row">
+									<label class="col-sm-4 col-form-label">Shade</label>
+									<div class="col-sm-8">
+										<select v-model="selected.plant.shade" class="form-control" :required="tab == 2">
+											<option v-for="option in STAGE_SHADES" v-bind:value="option.value">{{ option.text }}</option>
+										</select>
+									</div>
+								</div>
+							</div>
+
+							<!-- Produces -->
+							<div v-if="selected.isProducing">
+								<div class="d-flex align-items-center">
+									<hr><span class="text-muted px-2">Produces</span><hr>
+								</div>
+
+								<div v-for="(stage, index) in node.stages" v-if="!stage.isProducing || selected == stage" class="form-group row">
+									<label class="col-sm-4 col-form-label">{{ stage.name }}</label>
+									<div class="col-sm-8 input-group">
+										<input v-model.number="selected.produces[stage.id]" type="number" class="form-control" min="0" step="0.01" placeholder="0">
+										<div class="input-group-append">
+											<span class="input-group-text" id="basic-addon2">yearly</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Diet tab -->
+				<div v-show="tab == 3" class="input-section">
 					<!-- Relation list -->
 					<div class="input-fields col-md-8 col-xl-6">
 
@@ -605,7 +827,7 @@
 								<div v-if="relation.type == 'node'" class="form-group row">
 									<label class="col-sm-4 col-form-label">Other node</label>
 									<div class="col-sm-8">
-										<select v-model="relation.node_id" class="form-control" required>
+										<select v-model="relation.node_id" class="form-control" :required="tab == 3">
 											<option value="" disabled hidden>Select a node...</option>
 											<!-- <optgroup label="Nodes"> -->
 											<!-- <option disabled>──────────</option> -->
@@ -614,22 +836,33 @@
 									</div>
 								</div>
 
-								<!-- Tags -->
-								<div v-if="relation.type == 'tags'" class="form-group row">
+								<!-- Stage -->
+								<div v-if="relation.type == 'node'" class="form-group row">
+									<label class="col-sm-4 col-form-label">Stage</label>
+									<div class="col-sm-8">
+										<select v-model="relation.stage_id" class="form-control">
+											<option v-bind:value="null">Any</option>
+											<option v-for="option in getEdibleStages(relation.node_id)" v-bind:value="option.id">{{ option.name }}</option>
+										</select>
+									</div>
+								</div>
+
+								<!-- Tags (needs tags for stages) -->
+								<!-- <div v-if="relation.type == 'tags'" class="form-group row">
 									<label class="col-sm-4 col-form-label">Tags</label>
 									<div class="col-sm-8">
-										<select v-model="relation.tags" class="form-control" multiple required>
+										<select v-model="relation.tags" class="form-control" multiple :required="tab == 3">
 											<option value="" disabled hidden>Select tags...</option>
 											<option v-for="option in all_tags" v-bind:value="option" :disabled="option == ''">{{ option }}</option>
 										</select>
 									</div>
-								</div>
+								</div> -->
 
 								<!-- Interaction -->
 								<div class="form-group row">
 									<label class="col-sm-4 col-form-label">Interaction</label>
 									<div class="col-sm-8">
-										<select v-model="relation.interaction" class="form-control" required>
+										<select v-model="relation.interaction" class="form-control" :required="tab == 3">
 											<option value="" disabled hidden>Select interaction</option>
 											<option v-for="option in RELATION_INTERACTIONS" v-bind:value="option.value">{{ option.text }}</option>
 										</select>
@@ -642,7 +875,7 @@
 								<div class="form-group row">
 									<label class="col-sm-4 col-form-label">Preference</label>
 									<div class="col-sm-8 input-group">
-										<input v-model.number="relation.preference" type="number" class="form-control" min="0" step="1" required>
+										<input v-model.number="relation.preference" type="number" class="form-control" min="0" step="1" :required="tab == 3">
 										<div class="input-group-append">
 											<span class="input-group-text">{{ getPreference(relation) }}</span>
 										</div>
@@ -769,7 +1002,7 @@
 							<label class="col-sm-4 col-form-label">Owner</label>
 							<div class="col-sm-8">
 								<select v-model="event.owner_id" class="form-control" required>
-									<option v-bind:value="-1">No owner (automatic)</option>
+									<option v-bind:value="null">No owner (automatic)</option>
 									<option disabled>──────────</option>
 									<option v-for="option in all_nodes" v-bind:value="option.id">{{ option.name }}</option>
 								</select>
@@ -888,11 +1121,38 @@
 
 						<hr>
 
+						<!-- Sunlight -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Sunlight</label>
+							<div class="col-sm-8 input-group">
+								<input v-model.number="scenario.sunlight" type="number" class="form-control" min="0" step="1" required>
+								<div class="input-group-append">
+									<span class="input-group-text" id="basic-addon2">m&sup2;</span>
+								</div>
+							</div>
+						</div>
+
+						<!-- Territory -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Territory</label>
+							<div class="col-sm-8 input-group">
+								<input v-model.number="scenario.territory" type="number" class="form-control" min="0" step="1" required>
+								<div class="input-group-append">
+									<span class="input-group-text" id="basic-addon2">km&sup2;</span>
+								</div>
+							</div>
+						</div>
+
+						<hr>
+
 						<!-- Total time -->
 						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Time</label>
+							<label class="col-sm-4 col-form-label">Time &ndash; Deltatime</label>
 							<div class="col-sm-8">
-								<input :value="getTotalTime()" type="number" class="form-control" disabled>
+								<div class="input-group">
+									<input :value="getTotalTime()" type="number" class="form-control" disabled>
+									<input v-model.number="scenario.time.deltatime" type="number" class="form-control" min="0.01" step="0.01" max="2" required>
+								</div>
 							</div>
 						</div>
 
@@ -901,8 +1161,8 @@
 							<label class="col-sm-4 col-form-label">Intro &ndash; Outro</label>
 							<div class="col-sm-8">
 								<div class="input-group">
-									<input v-model.number="scenario.time.intro" type="number" class="form-control" min="0" step="1" max="1000" required>
-									<input v-model.number="scenario.time.outro" type="number" class="form-control" min="0" step="1" max="1000" required>
+									<input v-model.number="scenario.time.intro" type="number" class="form-control" min="0" step="any" max="1000" required>
+									<input v-model.number="scenario.time.outro" type="number" class="form-control" min="0" step="any" max="1000" required>
 								</div>
 							</div>
 						</div>
@@ -913,7 +1173,7 @@
 							<div class="col-sm-8">
 								<div class="input-group">
 									<input v-model.number="scenario.time.sections" type="number" class="form-control" min="0" step="1" max="1000" required>
-									<input v-model.number="scenario.time.length" type="number" class="form-control" min="0" step="1" max="1000" required>
+									<input v-model.number="scenario.time.length" type="number" class="form-control" min="0" step="any" max="1000" required>
 								</div>
 							</div>
 						</div>
@@ -923,8 +1183,8 @@
 							<label class="col-sm-4 col-form-label">Play speed &ndash; Fast</label>
 							<div class="col-sm-8">
 								<div class="input-group">
-									<input v-model.number="scenario.time.playspeed" type="number" class="form-control" min="0" step="0.1" max="1000" required>
-									<input v-model.number="scenario.time.fastspeed" type="number" class="form-control" min="0" step="0.1" max="1000" required>
+									<input v-model.number="scenario.time.playspeed" type="number" class="form-control" min="0" step="any" max="1000" required>
+									<input v-model.number="scenario.time.fastspeed" type="number" class="form-control" min="0" step="any" max="1000" required>
 								</div>
 							</div>
 						</div>
@@ -977,6 +1237,7 @@
 										<td scope="col" class="text-muted">Population</td>
 										<td scope="col" class="text-muted">Visibility</td>
 										<td scope="col" class="text-muted">Position</td>
+										<td scope="col" class="text-muted"><i class="fas fa-lock"></i></td>
 									</tr>
 								</thead>
 								<tbody>
@@ -993,9 +1254,9 @@
 										</td>
 
 										<!-- Population -->
-										<td class="align-middle p-2" style="width: 100px;" v-if="!checkAbiotic(actor)">
+										<td class="align-middle p-2" style="width: 150px;" v-if="!checkAbiotic(actor)">
 											<div class="input-group">
-												<input v-model.number="actor.population" type="number" class="form-control" min="0" max="1" step="0.01" required>
+												<input v-model.number="actor.population" type="number" class="form-control" min="0" step="1" required>
 											</div>
 										</td>
 
@@ -1017,10 +1278,17 @@
 										</td>
 
 										<!-- Position -->
-										<td class="align-middle p-2">
+										<td class="align-middle p-2" style="width: 120px;">
 											<div class="input-group">
 												<input v-model.number="actor.position[0]" type="number" class="form-control" min="0" max="100" step="1" required>
 												<input v-model.number="actor.position[1]" type="number" class="form-control" min="0" max="100" step="1" required>
+											</div>
+										</td>
+
+										<!-- Fixed -->
+										<td class="align-middle p-2">
+											<div class="input-group">
+												<input v-model.number="actor.fixed" type="checkbox" class="form-control" style="width: 1em; height: 1em;">
 											</div>
 										</td>
 									</tr>

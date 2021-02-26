@@ -1,10 +1,14 @@
 class Scenario {
 	constructor(data) {
 		this.species = [];
+		this.speciesMap = {};
+		this.stages = [];
+		this.stagesMap = {};
 
 		this.id = data.id;
 		this.name = data.name;
-	
+
+		this.deltaTime = data.time.deltatime; // Years
 		this.maxTime = data.time.intro + data.time.sections * data.time.length + data.time.outro;
 		this.timeIntro = data.time.intro;
 		this.timeOutro = data.time.outro;
@@ -21,6 +25,9 @@ class Scenario {
 		this.cameraPos = {x: data.position[0], y: data.position[1]};
 		this.conditions = data.conditions;
 
+		this.sunlight = data.sunlight;
+		this.territory = data.territory;
+
 		// Create time sections list
 		this.sections = [];
 		let t = this.timeIntro;
@@ -35,60 +42,79 @@ class Scenario {
 		this.sections.push({ start: this.maxTime - this.timeOutro, end: this.maxTime });
 
 
+		// Add organisms with classes
 		for (let actor of data.actors) {
-			let node = window.database.getNodeById(actor.node_id);
+			let data = window.database.getNodeById(actor.node_id);
 
-			let organism = new Organism(node, actor);
+			let nodeClass = {
+				"animal":	Animal,
+				"plant":	Plant,
+				"fungi":	Fungi,
+				"abiotic":	Abiotic,
+				"service":	Service,
+			}[data.type];
 
-			// node.animal.size
-			// node.animal.food
-			// node.animal.consumption
-			// node.animal.weight
-			// node.animal.age
-			// node.animal.offspring
+			let node = new nodeClass(data, actor);
 
-			/*for (let pair of window.database.getOutgoingRelations(node)) {
-				let other = pair.node;
-				let rel = pair.relation;
-
-				console.log('rel', node.name, '->', other.name, rel.preference);
-				//console.log
-			}*/
-
-			let prefTot = 0;
-			for (const rel of node.relations) {
-				prefTot += rel.preference;
+			this.species.push(node);
+			this.speciesMap[node.id] = node;
+			for (const id in node.stages) {
+				let stage = node.stages[id];
+				this.stages.push(stage);
+				this.stagesMap[id] = stage;
 			}
+		}
 
-			for (const rel of node.relations) {
+		// Set relations
+		for (let organism of this.species) {
+			// Find all available relations
+			let relations = [];
+			for (const rel of organism.relations) {
 				if (rel.type == "node") {
 					let other = window.database.getNodeById(rel.node_id);
-					organism.diet[other.name] = rel.preference / prefTot;
-				}
-				else if (rel.type == "tags") {
-					let others = window.database.getNodesByTags(rel.tags);
-					for (let other of others) {
-						organism.diet[other.name] = rel.preference / others.length / prefTot;
+					if (this.speciesMap[other.id]) {
+						let node = this.speciesMap[other.id];
+						if (rel.stage_id) {
+							let stage = this.speciesMap[other.id].stages[rel.stage_id];
+							relations.push([node, stage, rel]);
+						}
+						else {
+							// console.error('Relation {0}->{1} is missing Stage'.format(organism.name, other.name));
+							for (let id in this.speciesMap[other.id].stages) {
+								let stage = this.speciesMap[other.id].stages[id];
+								if (stage.isEdible) {
+									relations.push([node, stage, rel]);
+								}
+							}
+						}
 					}
 				}
-				// rel.interaction
+				else if (rel.type == "tags") {
+					console.warn("Ignoring tag relation");
+					// let others = window.database.getNodesByTags(rel.tags);
+					// for (let other of others) {
+					// 	if (this.speciesMap[other.id]) {
+					// 		relations.push([this.speciesMap[other.id], rel]);
+					// 	}
+					// }
+				}
 			}
 
-			/*
-			let total = 0;
-			for (var i = 0; i < arguments.length; i+=2)
-				total += arguments[i+1];
+			// Filter predation relations
+			let prey = relations.filter(pair => (pair[2].interaction == "predation" || pair[2].interaction == "herbivory" || pair[2].interaction == "parasitism" || pair[2].interaction == "amensalism"));
+			let prefTot = prey.reduce(function(a, b) { return a + b[2].preference; }, 0);
 
-			for (var i = 0; i < arguments.length; i+=2) {
-				let prey = arguments[i];
-				let amount = arguments[i+1];
-				this.diet[prey.name] = amount / total;
+			// Set diet
+			for (const pair of prey) {
+				let node = pair[0];
+				let stage = pair[1];
+				let rel = pair[2];
+				organism.addDiet(node, stage, rel.preference / prefTot);
 			}
-			*/
-
-			//organism.setDiet();
-			this.species.push(organism);
 		}
+
+
+		/* Events */
 
 		this.events = [];
 

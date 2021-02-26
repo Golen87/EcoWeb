@@ -2,7 +2,13 @@ function createGraphTools() {
 	return new Vue({
 		el: "#graphTools",
 		data: {
-			duration: 100,
+			maxTime: 100,
+			deltaTime: 1,
+			sunlight: 1,
+			territory: 1,
+			showNodes: true,
+			showStages: true,
+			showBiomass: true,
 			species: [],
 			scenarios: [],
 			main: {show: false},
@@ -15,23 +21,52 @@ function createGraphTools() {
 		},
 		methods: {
 			stabilize(event) {
-				web.stabilize();
-				this.updateGraph();
+				window.simulator.stabilize();
 			},
-			reset(event) {
-				web.restart();
+			refresh(event) {
+				window.simulator.refresh();
 			},
 			updateValue(event, s, key) {
 				s[key] = parseFloat(event.target.value);
 				this.updateGraph();
 			},
-			updateDuration(event) {
-				this.duration = parseFloat(event.target.value);
-				web.maxTime = this.duration;
+			updateBool(event, s, key) {
 				this.updateGraph();
 			},
+			updateMaxTime(event) {
+				this.maxTime = parseFloat(event.target.value);
+				window.simulator.scenario.maxTime = this.maxTime;
+				this.updateGraph();
+			},
+			updateDeltaTime(event) {
+				this.deltaTime = parseFloat(event.target.value);
+				window.simulator.scenario.deltaTime = this.deltaTime;
+				this.updateGraph();
+			},
+			updateSunlight(event) {
+				this.sunlight = parseFloat(event.target.value);
+				window.simulator.scenario.sunlight = this.sunlight;
+				this.updateGraph();
+			},
+			updateTerritory(event) {
+				this.territory = parseFloat(event.target.value);
+				window.simulator.scenario.territory = this.territory;
+				this.updateGraph();
+			},
+			updateShowNodes() {
+				this.showNodes = !this.showNodes;
+				window.simulator.showNodes = this.showNodes;
+			},
+			updateShowStages() {
+				this.showStages = !this.showStages;
+				window.simulator.showStages = this.showStages;
+			},
+			updateShowBiomass() {
+				this.showBiomass = !this.showBiomass;
+				window.simulator.showBiomass = this.showBiomass;
+			},
 			updateGraph() {
-				web.refresh();
+				window.simulator.refresh();
 			},
 			toggleShow(event, s) {
 				s.show = !s.show;

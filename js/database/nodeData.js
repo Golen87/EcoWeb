@@ -106,6 +106,20 @@ const EFFECT_METHODS = [
 	{ value: "percentage",	text: "Percentage" },
 ];
 
+const STAGE_LAYERS = [
+	{ value: 0,		text: "Ground" },
+	{ value: 1,		text: "Herb (1m)" },
+	{ value: 5,		text: "Shrub (5m)" },
+	{ value: 10,	text: "Understory (10m)" },
+	{ value: 30,	text: "Canopy (30m)" },
+];
+
+const STAGE_SHADES = [
+	{ value: 0.25,	text: "Partial (25%)" },
+	{ value: 0.50,	text: "Dappled (50%)" },
+	{ value: 0.75,	text: "Full (75%)" },
+];
+
 
 const NODE_TYPES_VALUES = NODE_TYPES.map((x) => {return x.value;});
 const NODE_IMAGES_VALUES = NODE_IMAGES.map((x) => {return x.value;});

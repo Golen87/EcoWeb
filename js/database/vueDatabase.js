@@ -45,7 +45,7 @@ function createDatabaseTools(database) {
 	function trySubmit() {
 		const form = $(this.$el);
 		form.find(":submit").click();
-		if (form[0].checkValidity()) {
+		if (form[0].reportValidity()) {
 			return true;
 		}
 		return false;
@@ -187,6 +187,10 @@ function createDatabaseTools(database) {
 			addNode() {
 				this.show = false;
 				gotoNodeEditor(database.newNode());
+
+				//let node = database.newNode();
+				//database.addStage(node);
+				//gotoNodeEditor(node);
 			},
 			getImage,
 		},
@@ -280,7 +284,9 @@ function createDatabaseTools(database) {
 			show: false,
 			tab: 1,
 			node: database.newNode(),
-			ANIMAL_FOODS, ANIMAL_SIZES, NODE_TYPES, NODE_IMAGES, SERVICE_CATEGORIES, RELATION_INTERACTIONS,
+			original: database.newNode(),
+			selectedStage: 0,
+			ANIMAL_FOODS, ANIMAL_SIZES, NODE_TYPES, NODE_IMAGES, SERVICE_CATEGORIES, RELATION_INTERACTIONS, STAGE_LAYERS, STAGE_SHADES
 		},
 		computed: {
 			all_nodes,
@@ -288,6 +294,8 @@ function createDatabaseTools(database) {
 			all_custom_tags,
 			incoming_relations() { return window.database.getIncomingRelations(this.node); },
 			outgoing_relations() { return window.database.getOutgoingRelations(this.node); },
+			all_stages() { return [{value:null, text:"<none>"}].concat(this.node.stages.map((stage) => {return {value:stage.id, text:stage.name};})); },
+			selected() { return this.node.stages[this.selectedStage]; },
 			form_changed() { return this.show && JSON.stringify(this.node) !== JSON.stringify(this.original); },
 		},
 		methods: {
@@ -295,7 +303,9 @@ function createDatabaseTools(database) {
 			open(node) {
 				this.original = node;
 				this.node = JSON.parse(JSON.stringify(node));
+				this.selectedStage = 0;
 				this.show = true;
+				this.tab = 1;
 			},
 			close,
 			trySubmit,
@@ -312,11 +322,7 @@ function createDatabaseTools(database) {
 			},
 			gotoNodeEditor,
 			setTab(tab) {
-				let form = $(this.$el);
-				if(!form[0].checkValidity()) {
-					form.find(":submit").click();
-				}
-				else {
+				if (this.checkForm()) {
 					this.tab = tab;
 				}
 			},
@@ -331,6 +337,43 @@ function createDatabaseTools(database) {
 				let rounded = Math.round(100 * perc);
 				return "~" + rounded + "%";
 			},
+			addStage() {
+				if (this.checkForm()) {
+					database.addStage(this.node);
+					this.selectStage(this.node.stages.length - 1);
+				}
+			},
+			selectStage(index) {
+				if (this.checkForm()) {
+					this.selectedStage = index;
+					if (this.$refs.name) {
+						this.$refs.name.focus();
+					}
+				}
+			},
+			moveStage(index, dir) {
+				window.database.moveObj(this.node.stages, this.node.stages[index].id, dir);
+			},
+			deleteStage(index) {
+				database.deleteStage(this.node.stages, index);
+				if (index < this.selectedStage) {
+					this.selectedStage -= 1;
+				}
+				else {
+					this.selectedStage = Math.min(this.selectedStage, this.node.stages.length - 1);
+				}
+			},
+			getEdibleStages(id) {
+				if (id) {
+					let stages = database.getNodeById(id).stages;
+					return stages.filter(stage => stage.isEdible);
+				}
+				return [];
+			},
+			checkForm() {
+				let form = $(this.$el);
+				return form[0].reportValidity();
+			},
 			getStrippedPath(path) { return path.substring(path.lastIndexOf("/") + 1, path.length); },
 			getImage,
 		}
@@ -340,7 +383,6 @@ function createDatabaseTools(database) {
 		el: "#eventEditor",
 		data: {
 			show: false,
-			tab: 1,
 			event: database.newEvent(),
 			NODE_IMAGES, EFFECT_METHODS,
 		},
@@ -433,15 +475,6 @@ function createDatabaseTools(database) {
 				this.original = JSON.parse(JSON.stringify(this.scenario));
 				this.scenario = JSON.parse(JSON.stringify(newScenario));
 			},
-			setTab(tab) {
-				var form = $(this.$el);
-				if(!form[0].checkValidity()) {
-					form.find(":submit").click();
-				}
-				else {
-					this.tab = tab;
-				}
-			},
 			openNodeSelector() {
 				let idList = [];
 				for (const actor of this.scenario.actors) {
@@ -489,11 +522,12 @@ function createDatabaseTools(database) {
 			run() {
 				let form = $(this.$el);
 				form.find(":submit").click();
-				if (form[0].checkValidity()) {
+				if (form[0].reportValidity()) {
 					// Hack
 					for (var i = database.scenarios.length - 1; i >= 0; i--) {
 						if (this.scenario.id == database.scenarios[i].id) {
-							web.startScenario(i);
+							//web.startScenario(i);
+							window.simulator.loadScenario(database.scenarios[i]);
 						}
 					}
 				}
@@ -658,7 +692,7 @@ function createDatabaseTools(database) {
 				let nodeList = [];
 				for (const nodeId in this.selected) {
 					if (this.selected[nodeId]) {
-						nodeList.push(parseInt(nodeId));
+						nodeList.push(nodeId);
 					}
 				}
 
