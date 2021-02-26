@@ -6,13 +6,15 @@ class TitleScene extends Phaser.Scene {
 	create() {
 		this.cameras.main.fadeEffect.start(false, 200, 0x00, 0x00, 0x00);
 
-		let bg = this.add.image(this.CX, this.CY, 'bg_1');
+		// let bg = this.add.video(this.CX, this.CY, 'planet_video');
+		// bg.play(true);
+		let bg = this.add.image(this.CX, this.CY, 'planet_still');
 		this.fitToScreen(bg);
 
-		const LEFT = this.W / 8;
+		const LEFT = this.W * 6 / 8;
 
-		let title = createText(this, LEFT+30, 0.18*this.H, 120, "#FFF", "EcoWeb");
-		title.setOrigin(0, 0.5);
+		let title = createText(this, LEFT, 0.18*this.H, 120, "#FFF", "EcoWeb");
+		title.setOrigin(0.5, 0.5);
 
 
 		let options = [
@@ -41,8 +43,8 @@ class TitleScene extends Phaser.Scene {
 		}
 
 		for (let i = 0; i < options.length; i++) {
-			const SEP = 90;
-			const TOP = 0.4*this.H + i*SEP;
+			const SEP = 80;
+			const TOP = this.H * 4.5 / 8 - (options.length-1)*SEP/2 + i*SEP;
 			const TEXT = options[i][0];
 			const FUNC = options[i][1].bind(this);
 			//const LEFT_OFFSET = 30;
@@ -51,9 +53,9 @@ class TitleScene extends Phaser.Scene {
 			this.add.existing(menuButton);
 		}
 
-		let line = this.add.image(LEFT, 0, 'menu_line');
-		line.setScale(this.H / line.height);
-		line.setOrigin(1, 0);
+		// let line = this.add.image(LEFT, 0, 'menu_line');
+		// line.setScale(this.H / line.height);
+		// line.setOrigin(1, 0);
 
 		//let box = new CheckBox(this, LEFT+450, 300+70*0, "test 1", false, (state) => {console.log(state);});
 		//this.add.existing(box);

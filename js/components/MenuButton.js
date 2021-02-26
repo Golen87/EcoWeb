@@ -6,21 +6,24 @@ class MenuButton extends Button {
 		const HEIGHT = 61;
 
 		this.highlight = scene.add.sprite(0, 0, 'menu_bar_hover');
-		this.highlight.setOrigin(0, 0.5);
+		this.highlight.setOrigin(0.5, 0.5);
 		this.add(this.highlight);
 
 		this.background = scene.add.sprite(0, 0, 'menu_bar');
-		this.background.setOrigin(0, 0.5);
+		this.background.setOrigin(0.5, 0.5);
 		this.add(this.background);
 
 		this.background.setScale(HEIGHT / this.background.height);
 		this.highlight.setScale(HEIGHT / this.background.height);
 
-		this.text = createText(scene, 30, 0, 30, "#FFF", text);
-		this.text.setOrigin(0, 0.5);
+		this.text = createText(scene, 0, 0, 30*1.2, "#FFF", text);
+		this.text.setOrigin(0.5, 0.5);
 		this.add(this.text);
 
 		this.bindInteractive(this.background);
+
+		this.background.setAlpha(0.001);
+		this.highlight.setAlpha(0.001);
 	}
 
 

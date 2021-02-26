@@ -9,6 +9,11 @@ class TimeAxis extends Phaser.GameObjects.Container {
 		this.setDepth(100);
 		this.setScrollFactor(0);
 
+		this.bg2 = scene.add.image(0, 0, 'frame_timeline');
+		this.bg2.setScale(1.07 * this.width / this.bg2.width);
+		this.bg2.setOrigin(0.495, 0.40);
+		this.add(this.bg2);
+
 		this.background = scene.add.graphics({x: -this.width/2, y: -this.height/2});
 		this.add(this.background);
 
@@ -26,19 +31,19 @@ class TimeAxis extends Phaser.GameObjects.Container {
 		const GRID_SIZE = 10;
 
 		this.background.clear();
-		this.background.fillStyle(0x666666, 0.5);
-		this.background.fillRect(0, 0, this.width, this.height);
-		this.background.fillStyle(0x222222, 0.5);
-		this.background.fillRect(2.5, 2.5, this.width-5, this.height-5);
+		// this.background.fillStyle(0x666666, 0.5);
+		// this.background.fillRect(0, 0, this.width, this.height);
+		// this.background.fillStyle(0x222222, 0.5);
+		// this.background.fillRect(2.5, 2.5, this.width-5, this.height-5);
 
 		// Axis steps
-		const scenario = web.currentScenario;
+		const scenario = window.simulator.scenario;
 		let sections = [0];
 		for (const section of scenario.sections) {
 			sections.push(section.end);
 		}
 
-		this.background.lineStyle(1.5, 0xffffff);
+		this.background.lineStyle(1.5, 0x000000);
 		let x = 0;
 		for (let duration of sections) {
 			x = duration / scenario.maxTime;
@@ -49,7 +54,7 @@ class TimeAxis extends Phaser.GameObjects.Container {
 		}
 
 		// Axises
-		this.background.lineStyle(2, 0xffffff);
+		this.background.lineStyle(2, 0x000000);
 		//this.background.strokePoints([{x:PADDING, y:this.height/2-GRID_SIZE},{x:PADDING, y:this.height/2+GRID_SIZE}]);
 		//this.background.strokePoints([{x:this.width-PADDING, y:this.height/2-GRID_SIZE},{x:this.width-PADDING, y:this.height/2+GRID_SIZE}]);
 		this.background.strokePoints([{x:PADDING, y:this.height/2},{x:this.width-PADDING, y:this.height/2}]);
@@ -61,7 +66,7 @@ class TimeAxis extends Phaser.GameObjects.Container {
 		this.foreground.clear();
 
 
-		let fac = Math.min(1, time / web.currentScenario.maxTime);
+		let fac = Math.min(1, time / window.simulator.scenario.maxTime);
 
 		let points = [];
 		points.push({
@@ -73,7 +78,7 @@ class TimeAxis extends Phaser.GameObjects.Container {
 			y: 0.5 * this.height
 		});
 
-		const color = 0xFFFFFF;
+		const color = 0x000000;
 		const p = points[points.length-1];
 
 		this.foreground.lineStyle(8.0, color);

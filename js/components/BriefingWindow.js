@@ -8,10 +8,10 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		this.setDepth(100);
 		this.setScrollFactor(0);
 
-		this.bg = scene.add.rectangle(0, 0, this.width, this.height, 0x666666);
-		this.bg2 = scene.add.rectangle(0, 0, this.width-5, this.height-5, 0x222222);
-		this.add(this.bg);
-		this.add(this.bg2);
+		// this.bg = scene.add.rectangle(0, 0, this.width, this.height, 0x666666);
+		// this.bg2 = scene.add.rectangle(0, 0, this.width-5, this.height-5, 0x222222);
+		// this.add(this.bg);
+		// this.add(this.bg2);
 
 
 		/* Faded background */
@@ -27,6 +27,10 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 			.on('drag', this.onOutsideDown.bind(this))
 			.on('pointerup', this.onOutsideDown.bind(this));
 		this.graphics.setScrollFactor(0);
+
+		this.bg3 = scene.add.image(0, 0, 'frame_briefing');
+		this.bg3.setScale(this.width / this.bg3.width);
+		this.add(this.bg3);
 
 
 		/* Image */
@@ -44,17 +48,22 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		/* Text */
 
 		let textX = IMAGE_X + SIZE/2 + SEP;
-		let textY = IMAGE_Y - SIZE/2 + SEP;
+		let textY = IMAGE_Y - SIZE/2 + 2*SEP;
 
-		this.titleText = createText(scene, textX, textY, 45);
-		this.titleText.setOrigin(0);
+		this.titleText = createText(scene, 0, textY, 45, "#000");
+		this.titleText.setOrigin(0.5, 0);
 		this.add(this.titleText);
 
 		textY += 1.5 * 45;
-		this.descText = createText(scene, textX, textY, 30);
+		this.descText = createText(scene, textX, textY, 30, "#000");
 		this.descText.setOrigin(0);
 		this.descText.setWordWrapWidth(-2*textX);
 		this.add(this.descText);
+
+
+		this.ok = scene.add.image(8, this.height*0.465, 'frame_ok');
+		this.ok.setScale(0.83);
+		this.add(this.ok);
 
 
 		/* Event buttons */
@@ -117,13 +126,14 @@ class BriefingWindow extends Phaser.GameObjects.Container {
 		for (let i = 0; i < options.length; i++) {
 			const SEP = 0.45 * this.width;
 			const LEFT = (0.5 + i - options.length/2) * SEP;
-			const TOP = 0.39 * this.height;
+			const TOP = (0.39+0.055) * this.height;
 			const TEXT = options[i][0];
 			const FUNC = options[i][1];
 
 			this.buttons[i] = new PauseButton(this.scene, LEFT, TOP, TEXT, FUNC);
-			this.buttons[i].setScale(0.8);
+			this.buttons[i].setScale(1.0);
 			this.buttons[i].setScrollFactor(0);
+			this.buttons[i].setAlpha(0.01);
 			this.add(this.buttons[i]);
 		}
 	}

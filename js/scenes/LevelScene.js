@@ -106,7 +106,7 @@ class LevelScene extends Phaser.Scene {
 		for (let i = 0; i < this.nodes.length; i++) {
 			for (let j = 0; j < this.nodes.length; j++) {
 				if (i != j) {
-					let diet = web.species[i].diet[web.species[j].name];
+					let diet = web.species[i].diet[web.species[j].id];
 					if (diet) {
 						let path = new Path(this, this.nodes[i], this.nodes[j], diet);
 						this.paths.push(path);
@@ -142,8 +142,8 @@ class LevelScene extends Phaser.Scene {
 
 					//let diet = 20 * Math.max(-web.A[i][j], -web.A[j][i]);
 					let diet = Math.max(
-						web.species[i].diet[web.species[j].name] || 0,
-						web.species[j].diet[web.species[i].name] || 0
+						web.species[i].diet[web.species[j].id] || 0,
+						web.species[j].diet[web.species[i].id] || 0
 					);
 					let target = 300 - diet * (200) -200+400 * this.nodes[i].population;
 

@@ -16,7 +16,7 @@ class Node extends Button {
 		this.neighbours = [];
 
 		//this.WHITE = 0xe3e3d1;
-		this.WHITE = 0xFFFFFF;
+		this.WHITE = 0xFAECDC;
 		//this.BLACK = 0x332d24;
 		//this.BLACK = 0x474741;
 		//this.BLACK = 0x33312e;
@@ -122,6 +122,55 @@ class Node extends Button {
 		this.searchContainer.add(this.search);
 
 
+		const ARROWS_SIZE = 0.265 * this.size / 51;
+		const ARROWS_X = 0.0 * this.size;
+		const ARROWS_Y = 0.0 * this.size;
+		this.arrowsContainer = scene.add.container(0*ARROWS_X, 0*ARROWS_Y);
+		this.add(this.arrowsContainer);
+
+		const arrows = [
+			{x:0.54, y:0.40, s:'small'},
+			{x:0.54, y:0.40, s:'big'},
+			{x:0.38, y:0.54, s:'small'},
+			{x:0.64, y:0.61, s:'small'},
+			{x:0.73, y:0.31, s:'small'},
+			{x:0.60, y:0.16, s:'small'},
+		];
+		this.downArrows = [];
+		for (const a of arrows) {
+			let arrow = scene.add.image(a.x*this.size, a.y*this.size, 'arrow_down_'+a.s);
+			arrow.setScale(ARROWS_SIZE);
+			this.arrowsContainer.add(arrow);
+			this.downArrows.push(arrow);
+		}
+		this.upArrows = [];
+		for (const a of arrows) {
+			let arrow = scene.add.image(a.x*this.size, -a.y*this.size, 'arrow_up_'+a.s);
+			arrow.setScale(ARROWS_SIZE);
+			this.arrowsContainer.add(arrow);
+			this.upArrows.push(arrow);
+		}
+
+
+		const RADIAL_SIZE = 0.4 * this.size;
+		const RADIAL_X = -0.55 * this.size;
+		const RADIAL_Y = -0.55 * this.size;
+		this.radialContainer = scene.add.container(RADIAL_X, RADIAL_Y);
+		this.add(this.radialContainer);
+		
+		this.radialBg = scene.add.image(0, 0, 'circle');
+		this.radialBg.setScale(RADIAL_SIZE / this.radialBg.height);
+		this.radialBg.setTint(this.WHITE);
+		this.radialContainer.add(this.radialBg);
+		this.radialBg.setInteractive({ useHandCursor: true })
+			.on('pointerup', this.onKill.bind(this));
+		this.radialContainer.bringToTop();
+
+		this.radialMag = scene.add.image(0, 0, 'frame_search');
+		this.radialMag.setScale(1.2*RADIAL_SIZE / this.radialBg.height);
+		this.radialContainer.add(this.radialMag);
+
+
 		//if (this.species.visibility == "explored") {
 			//this.startExploration(0);
 			//this.updateProgress(9999);
@@ -130,6 +179,9 @@ class Node extends Button {
 		this.visibility = null;
 		this.setVisibility(this.species.visibility);
 	}
+	onKill() {
+		console.log(this.scene.timeController.time);
+	}
 
 
 	getScale() {
@@ -137,11 +189,13 @@ class Node extends Button {
 		let smooth = 0.5 + Math.atan(4 * (this.populationValue - 0.5)) / Math.PI + w * this.wiggle;
 		//let value = (0.3 + 1.0 * smooth) * (1+w)/2 + 0.1 * this.holdEasing;
 		let value = (0.3 + 1.0 * smooth) * w - 0.1 * this.holdEasing;
+		return 0.8;
 		return value;
 	}
 
-	setPopulation(pop, immediate=false) {
+	setPopulation(pop, der, immediate=false) {
 		this.population = pop;
+		this.derivative = der;
 		if (immediate) {
 			this.aliveEasing = this.isAlive();
 			this.aliveValue = this.isAlive();
@@ -258,6 +312,7 @@ class Node extends Button {
 
 	setSelected(value) {
 		this.selected = value;
+		console.log(value);
 	}
 
 
@@ -343,6 +398,8 @@ class Node extends Button {
 		const limit = this.hoverSpeed * delta;
 		this.hoverEasing += Phaser.Math.Clamp(hoverTarget - this.hoverEasing, -limit, limit);
 		this.hoverValue = Phaser.Math.Easing.Cubic.InOut(this.hoverEasing);
+		this.radialContainer.setVisible(this.selected);
+		this.radialContainer.setPosition(-0.55 * this.size * this.hoverValue, -0.55 * this.size * this.hoverValue);
 
 		this.holdEasing += 0.5 * (this.hold - this.holdEasing);
 
@@ -371,6 +428,17 @@ class Node extends Button {
 		}
 		else {
 			this.progressArc.clear();
+		}
+
+
+		// Derivative arrows
+		for (let i = this.upArrows.length - 1; i >= 0; i--) {
+			let upValue = this.derivative > 1E-2 ? Math.log(this.derivative)/Math.log(10) + 0 : 0;
+			let downValue = -this.derivative > 1E-2 ? Math.log(-this.derivative)/Math.log(10) + 0 : 0;
+			// let upValue = this.derivative / 1000;
+			// let downValue = -this.derivative / 1000;
+			this.upArrows[i].setVisible(Phaser.Math.Clamp(upValue-i, 0, 1) > 0.5);
+			this.downArrows[i].setVisible(Phaser.Math.Clamp(downValue-i, 0, 1) > 0.5);
 		}
 	}
 

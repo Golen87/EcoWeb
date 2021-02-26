@@ -81,6 +81,23 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('lock', 'assets/images/ui/lock.png');
 		this.load.image('book', 'assets/images/ui/book.png');
 
+		this.load.image('arrow_down_big', 'assets/images/ui/arrow/DownBig.png');
+		this.load.image('arrow_down_small', 'assets/images/ui/arrow/DownSmall.png');
+		this.load.image('arrow_up_big', 'assets/images/ui/arrow/UpBig.png');
+		this.load.image('arrow_up_small', 'assets/images/ui/arrow/UpSmall.png');
+
+		// this.load.image('frame_ui', 'assets/images/ui/frame/Ram.png');
+		this.load.image('frame_ui', 'assets/images/ui/frame/UI_Ram2.png');
+		this.load.image('frame_briefing', 'assets/images/ui/frame/LevelIntroBlank.png');
+		// this.load.image('frame_briefing', 'assets/images/ui/frame/LevelIntroConcept.png');
+		this.load.image('frame_ok', 'assets/images/ui/frame/OK.png');
+		this.load.image('frame_timeline', 'assets/images/ui/frame/Timeline.png');
+		this.load.image('frame_search', 'assets/images/ui/frame/search.png');
+
+		/* Videos */
+		this.load.video('planet_video', 'assets/videos/planet.mp4', 'loadeddata', false, true);
+		this.load.image('planet_still', 'assets/videos/planet.png');
+
 
 		/* Nodes */
 		this.load.image('circle', 'assets/images/circle_128.png');
@@ -121,9 +138,10 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
-		web.startScenario(0);
 		//this.scene.start("LevelScene");
 		this.scene.start("TitleScene");
+		//web.startScenario(0);
+		window.simulator.loadScenario(database.scenarios[0]);
 	}
 
 	update(time, delta) {

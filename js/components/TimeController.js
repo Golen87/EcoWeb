@@ -104,8 +104,8 @@ class TimeController extends Phaser.GameObjects.Container {
 		this.time = null;
 		this.setTime(0);
 
-		this.speed = web.currentScenario.playSpeed;
-		this.fastSpeed = web.currentScenario.fastSpeed;
+		this.speed = window.simulator.scenario.playSpeed;
+		this.fastSpeed = window.simulator.scenario.fastSpeed;
 		this.playSpeed = null;
 		this.setSpeed(0);
 
@@ -123,7 +123,7 @@ class TimeController extends Phaser.GameObjects.Container {
 
 
 	setTime(time) {
-		time = Phaser.Math.Clamp(time, 0, web.currentScenario.maxTime);
+		time = Phaser.Math.Clamp(time, 0, window.simulator.scenario.maxTime);
 		if (this.time != time) {
 			if (this.running && this.section && time >= this.section.end) {
 				time = this.section.end;
@@ -141,7 +141,7 @@ class TimeController extends Phaser.GameObjects.Container {
 		if (time == 0) {
 			this.setSpeed(0);
 		}
-		if (time == web.currentScenario.maxTime) {
+		if (time == window.simulator.scenario.maxTime) {
 			this.setSpeed(0);
 			this.onTimeEnd();
 		}
@@ -183,7 +183,7 @@ class TimeController extends Phaser.GameObjects.Container {
 	}
 
 	onContinue() {
-		const sections = web.currentScenario.sections;
+		const sections = window.simulator.scenario.sections;
 
 		if (this.running) {
 			this.onPlay();
@@ -262,7 +262,7 @@ class TimeController extends Phaser.GameObjects.Container {
 	}
 
 	onSectionComplete() {
-		let sections = web.currentScenario.sections;
+		let sections = window.simulator.scenario.sections;
 		let index = sections.indexOf(this.section);
 		let hasReward = (index > 0 && index < sections.length-1);
 

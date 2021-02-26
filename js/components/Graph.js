@@ -66,14 +66,14 @@ class Graph extends Phaser.GameObjects.Container {
 
 		/* Nodes */
 
-		let fac = Math.min(1, time / web.currentScenario.maxTime);
+		let fac = Math.min(1, time / window.simulator.scenario.maxTime);
 
-		for (var s = 0; s < web.currentScenario.species.length; s += 1) {
-			const species = web.currentScenario.species[s];
+		for (var s = 0; s < window.simulator.scenario.species.length; s += 1) {
+			const species = window.simulator.scenario.species[s];
 
 			let points = [];
 			for (var i = 0; i <= fac; i += 0.001) {
-				let value = Phaser.Math.Clamp(web.getValueAt(s, i * web.time), 0, 1);
+				let value = Phaser.Math.Clamp(window.simulator.getValueAt(species.id, i * window.simulator.time), 0, 1);
 				points.push({
 					x: PADDING + i * (this.width - 2*PADDING),
 					y: PADDING + (1-value) * (this.height - 2*PADDING)

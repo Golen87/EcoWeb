@@ -13,6 +13,13 @@ class WorldScene extends Phaser.Scene {
 		let title = createText(this, this.CX, 0.07*this.H, 50, "#FFF", "Nivåer");
 		title.setOrigin(0.5);
 
+		// Bestiary icon
+		//this.add.image(50, 50, 'circle').setScale(0.55).setTint(0x866750);
+		//this.book = new SymbolButton(this, 50, 50, 'book', 45, () => {
+		//	this.bestiary.show();
+		//});
+		//this.add.existing(this.book);
+
 		// Total star count
 		this.add.image(this.W-90, 40, 'star').setScale(0.35);
 		createText(this, this.W-55, 40, 40, "#FFF", window.profile.getTotalStars()).setOrigin(0, 0.5);
@@ -29,7 +36,8 @@ class WorldScene extends Phaser.Scene {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
 				this.addEvent(150, function() {
-					web.startScenario(i);
+					//web.startScenario(i);
+					window.simulator.loadScenario(window.database.scenarios[i]);
 					this.scene.start("LevelScene2");
 				});
 			});
@@ -64,6 +72,21 @@ class WorldScene extends Phaser.Scene {
 		// Menu swap sound
 		this.soundSwoosh = this.sound.add('ui_menu_swoosh');
 		this.soundSwoosh.setVolume(1.0);
+
+
+		/* Bestiary */
+
+		// this.back = new SymbolButton(this, 100, 100, 'symbol_menu', 0.8 * 100, () => {
+		// 	this.pauseWindow.show();
+		// });
+		// this.back.setScrollFactor(0);
+		// this.add.existing(this.back);
+
+		// this.pauseWindow = new PauseWindow(this, this.CX, this.CY, []);
+		// this.pauseWindow.setDepth(1000);
+		// this.pauseWindow.hide();
+		// this.pauseWindow.setScrollFactor(0);
+		// this.add.existing(this.pauseWindow);
 	}
 
 

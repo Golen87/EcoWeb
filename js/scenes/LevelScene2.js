@@ -75,14 +75,16 @@ class LevelScene2 extends Phaser.Scene {
 
 
 		this.cameraCenter = new Phaser.Math.Vector2(3/4*this.CX, this.CY);
-		this.cameraCenterDebug = this.add.circle(this.cameraCenter.x, this.cameraCenter.y, this.W*0.005, 0xFF0000);
+		this.cameraCenterDebug = this.add.circle(this.cameraCenter.x, this.cameraCenter.y, this.W*0.003, 0xAAAAAA);
 		this.cameraCenterDebug.setDepth(1000);
 		this.cameraCenterDebug.setScrollFactor(0);
+		this.cameraCenterDebug.setBlendMode(Phaser.BlendModes.SCREEN);
+		window.a = this.cameraCenterDebug;
 		this.cameras.main.setScroll(-this.cameraCenter.x, -this.cameraCenter.y);
 		this.limitSize = size;
 
-		let camX = size * (-0.5 + (web.currentScenario.cameraPos.x / 100));
-		let camY = size * (-0.5 + (web.currentScenario.cameraPos.y / 100));
+		let camX = size * (-0.5 + (window.simulator.scenario.cameraPos.x / 100));
+		let camY = size * (-0.5 + (window.simulator.scenario.cameraPos.y / 100));
 		this.cameras.main.scrollX = camX - this.cameraCenter.x;
 		this.cameras.main.scrollY = camY - this.cameraCenter.y;
 
@@ -93,8 +95,8 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.nodes = [];
 		this.selectedNode = null;
-		for (let i in web.currentScenario.species) {
-			const organism = web.currentScenario.species[i];
+		for (let i in window.simulator.scenario.species) {
+			const organism = window.simulator.scenario.species[i];
 
 			let x = size * (-0.5 + (organism.x / 100));
 			let y = size * (-0.5 + (organism.y / 100));
@@ -107,18 +109,28 @@ class LevelScene2 extends Phaser.Scene {
 		}
 
 		this.paths = [];
-		for (let i = 0; i < this.nodes.length; i++) {
-			for (let j = 0; j < this.nodes.length; j++) {
-				if (i != j) {
-					let diet = web.species[i].diet[web.species[j].name];
-					if (diet) {
-						let path = new Path(this, this.nodes[i], this.nodes[j], diet);
+		for (const node of this.nodes) {
+			for (const other of this.nodes) {
+				if (node != other) {
+					let eats = false;
+					let amount = 0;
+					for (const item of node.species.diet) {
+						if (other.species.id == item.node.id) {
+							eats = true;
+							// item.stage
+							amount = item.pref;
+							// my stage.efficiency
+							break;
+						}
+					}
+					if (eats) {
+						let path = new Path(this, node, other, amount);
 						this.paths.push(path);
-						this.nodes[i].neighbours.push(this.nodes[j]);
-						this.nodes[j].neighbours.push(this.nodes[i]);
+						node.neighbours.push(other);
+						other.neighbours.push(node);
 
-						if (this.nodes[i].visibility == "explored" && this.nodes[j].visibility == "unexplored") {
-							this.nodes[j].setVisibility("explorable");
+						if (node.visibility == "explored" && other.visibility == "unexplored") {
+							other.setVisibility("explorable");
 						}
 					}
 				}
@@ -128,15 +140,22 @@ class LevelScene2 extends Phaser.Scene {
 
 		/* UI windows */
 
+		this.frame = this.add.image(this.CX, this.CY, 'frame_ui');
+		this.frame.setScrollFactor(0);
+		this.frame.setDepth(1000);
+		this.fitToScreen(this.frame);
+
 		const UI_SEP = 0.01 * this.H;
 		const UI_WIDTH = 0.26 * this.W;
 		const UI_HEIGHT = (this.H - 5 * UI_SEP) / 4;
 
 		this.timeController = new TimeController(this, UI_WIDTH, UI_HEIGHT);
 		this.timeController.setPosition(
-			this.W - UI_WIDTH/2 - UI_SEP,
-			this.H - UI_HEIGHT/2 - UI_SEP
+			this.W - UI_WIDTH/2 - UI_SEP + 60,
+			this.H - UI_HEIGHT/2 - UI_SEP + 50
 		);
+		this.timeController.setDepth(2000);
+		this.timeController.setAlpha(0.01);
 		this.timeController.on('onTimeChange', function() {
 			this.graph.draw(this.timeController.time);
 			this.timeAxis.draw(this.timeController.time);
@@ -155,8 +174,8 @@ class LevelScene2 extends Phaser.Scene {
 		}, this);
 		this.timeController.on('onSectionComplete', function(hasReward) {
 			if (hasReward) {
-				this.setBudget(this.budget + web.currentScenario.budgetReward);
-				this.setResearch(this.research + web.currentScenario.researchReward);
+				this.setBudget(this.budget + window.simulator.scenario.budgetReward);
+				this.setResearch(this.research + window.simulator.scenario.researchReward);
 			}
 			for (let i = this.nodes.length - 1; i >= 0; i--) {
 				this.nodes[i].availableCheck(false, this.research);
@@ -165,8 +184,10 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.graph = new Graph(this, UI_WIDTH, UI_HEIGHT);
 		this.graph.setPosition(
-			this.W - UI_WIDTH/2 - UI_SEP,
-			this.H - UI_HEIGHT*3/2 - 2*UI_SEP
+			// this.W - UI_WIDTH/2 - UI_SEP,
+			// this.H - UI_HEIGHT*3/2 - 2*UI_SEP
+			UI_WIDTH/2 + UI_SEP,
+			UI_HEIGHT/2 + UI_SEP
 		);
 
 		this.infoPanel = new InfoPanel(this, UI_WIDTH, 2*UI_HEIGHT + UI_SEP);
@@ -181,9 +202,11 @@ class LevelScene2 extends Phaser.Scene {
 
 		this.timeAxis = new TimeAxis(this, UI_AXIS_WIDTH, UI_AXIS_HEIGHT);
 		this.timeAxis.setPosition(
-			UI_BUTTON_SIZE + (this.W - UI_WIDTH - 2*UI_SEP - UI_BUTTON_SIZE) / 2,
+			//UI_BUTTON_SIZE + (this.W - UI_WIDTH - 2*UI_SEP - UI_BUTTON_SIZE) / 2,
+			this.W / 2,
 			UI_AXIS_HEIGHT/2 + UI_SEP
 		);
+		this.timeAxis.setScale(0.8);
 
 
 		/* Briefing window */
@@ -199,11 +222,11 @@ class LevelScene2 extends Phaser.Scene {
 		this.add.existing(this.briefingWindow);
 
 		this.addEvent(1000, () => {
-			this.showBriefing();
+			// this.showBriefing();
 		});
 
 		this.timeController.on('onTimeEnd', function() {
-			this.showDebriefing();
+			// this.showDebriefing();
 		}, this);
 
 
@@ -219,15 +242,16 @@ class LevelScene2 extends Phaser.Scene {
 		this.rewardWindow.setScrollFactor(0);
 		this.add.existing(this.rewardWindow);
 
-		//this.showReward(web.currentScenario.species[6]);
+		//this.showReward(window.simulator.scenario.species[6]);
 
 
 		/* Pause menu */
 
-		this.back = new SymbolButton(this, UI_BUTTON_SIZE/2, UI_BUTTON_SIZE/2, 'symbol_menu', 0.8 * UI_BUTTON_SIZE, () => {
+		this.back = new SymbolButton(this, this.W - UI_BUTTON_SIZE/2.5, UI_BUTTON_SIZE/2.5, 'symbol_menu', 0.8 * UI_BUTTON_SIZE, () => {
 			this.pauseWindow.show();
 		});
 		this.back.setScrollFactor(0);
+		this.back.setAlpha(0.01);
 		this.add.existing(this.back);
 
 		this.pauseWindow = new PauseWindow(this, this.CX, this.CY, this.pauseOptions);
@@ -238,9 +262,9 @@ class LevelScene2 extends Phaser.Scene {
 
 
 		this.budget = 0;
-		this.setBudget(web.currentScenario.budget);
+		this.setBudget(window.simulator.scenario.budget);
 		this.research = 0;
-		this.setResearch(web.currentScenario.research);
+		this.setResearch(window.simulator.scenario.research);
 		this.updateNodePopulation();
 
 
@@ -271,14 +295,21 @@ class LevelScene2 extends Phaser.Scene {
 		}, this);
 		this.input.keyboard.on('keydown-FIVE', function (event) {
 			this.timeController.setVisible(true);
-			this.graph.setVisible(true);
-			this.infoPanel.setVisible(true);
+			// this.graph.setVisible(true);
+			// this.infoPanel.setVisible(true);
+			this.timeAxis.setVisible(true);
+			this.frame.setVisible(true);
 		}, this);
 		this.input.keyboard.on('keydown-SIX', function (event) {
 			this.timeController.setVisible(false);
-			this.graph.setVisible(false);
-			this.infoPanel.setVisible(false);
+			// this.graph.setVisible(false);
+			// this.infoPanel.setVisible(false);
+			this.timeAxis.setVisible(false);
+			this.frame.setVisible(false);
 		}, this);
+		this.infoPanel.setVisible(false);
+		this.graph.setVisible(false);
+		this.setCameraCenter(this.CX, this.CY);
 	}
 
 	update(time, deltaMs) {
@@ -292,7 +323,7 @@ class LevelScene2 extends Phaser.Scene {
 		this.timeAxis.update(time, delta);
 
 		for (let i = this.nodes.length - 1; i >= 0; i--) {
-			//let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/web.species.length + this.slider.value*20);
+			//let s = 0.01 * Math.sin(this.time.now / 1000 + 2*Math.PI * i/window.simulator.species.length + this.slider.value*20);
 			//this.nodes[i].setWiggle(s);
 			this.nodes[i].update(time, delta);
 		}
@@ -429,8 +460,8 @@ class LevelScene2 extends Phaser.Scene {
 
 	purchaseAction(event) {
 		if (this.budget >= event.cost) {
-			web.setEvent(event, this.timeController.time);
-			web.refresh();
+			window.simulator.setEvent(event, this.timeController.time);
+			window.simulator.refresh();
 			this.infoPanel.updateLockTime();
 			this.setBudget(this.budget - event.cost);
 		}
@@ -482,16 +513,17 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	updateNodePopulation(immediate=false) {
-		for (let i = this.nodes.length - 1; i >= 0; i--) {
-			let pop = web.getValueAt(i, this.timeController.time);
-			this.nodes[i].setPopulation(pop, immediate);
+		for (const node of this.nodes) {
+			let pop = window.simulator.getValueAt(node.species.id, this.timeController.time);
+			let der = window.simulator.getDerivativeAt(node.species.id, this.timeController.time);
+			node.setPopulation(pop, der, immediate);
 		}
 
 		this.timeController.onRatingUpdate(this.checkConditions());
 	}
 
 	checkConditions() {
-		const cond = web.currentScenario.conditions;
+		const cond = window.simulator.scenario.conditions;
 		for (let tier = 3; tier > 0; tier--) {
 			let success = true;
 
@@ -500,10 +532,10 @@ class LevelScene2 extends Phaser.Scene {
 				const min = range[0];
 				const max = range[1];
 
-				for (var s = 0; s < web.currentScenario.species.length; s += 1) {
-					const node = web.currentScenario.species[s];
+				for (var s = 0; s < window.simulator.scenario.species.length; s += 1) {
+					const node = window.simulator.scenario.species[s];
 					if (node.id == id) {
-						const value = web.getValueAt(s, this.timeController.time);
+						const value = window.simulator.getValueAt(node.id, this.timeController.time);
 						if (value < min || value > max) {
 							success = false;
 							break;
@@ -528,8 +560,8 @@ class LevelScene2 extends Phaser.Scene {
 	}
 
 	showBriefing() {
-		const name = web.currentScenario.name;
-		const desc = web.currentScenario.description;
+		const name = window.simulator.scenario.name;
+		const desc = window.simulator.scenario.description;
 		const buttons = [
 			["OK", () => {
 				this.briefingWindow.hide();
@@ -542,13 +574,13 @@ class LevelScene2 extends Phaser.Scene {
 	showDebriefing() {
 		const name = "Utvärdering";
 		const tier = this.checkConditions();
-		const desc = web.currentScenario.conditions[tier].description;
+		const desc = window.simulator.scenario.conditions[tier].description;
 		const buttons = [
 			["Starta Om", () => {
 				this.cameras.main.fadeEffect.start(true, 100, 0x00, 0x00, 0x00);
 				this.soundSwoosh.play();
 				this.addEvent(150, function() {
-					web.restart();
+					window.simulator.refresh();
 					this.scene.restart();
 				});
 			}],
@@ -561,7 +593,7 @@ class LevelScene2 extends Phaser.Scene {
 			}]
 		];
 
-		window.profile.completeLevel(web.currentScenario, tier);
+		window.profile.completeLevel(window.simulator.scenario, tier);
 
 		this.briefingWindow.show(name, desc, buttons);
 	}
