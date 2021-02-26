@@ -19,11 +19,11 @@ var config = {
 		WorldScene,
 		LevelScene,
 		LevelScene2,
+		LevelScene3,
 
 		ExampleScene1,
 		ExampleScene2,
 		ExampleScene3,
-		ClickScene,
 	]
 };
 

@@ -14,12 +14,16 @@ class Button extends Phaser.GameObjects.Container {
 	}
 
 
-	bindInteractive(gameObject) {
-		gameObject.setInteractive({ useHandCursor: true })
+	bindInteractive(gameObject, draggable=false) {
+		gameObject.removeInteractive();
+		gameObject.setInteractive({ useHandCursor: true, draggable: draggable })
 			.on('pointerout', this.onOut.bind(this))
 			.on('pointerover', this.onOver.bind(this))
 			.on('pointerdown', this.onDown.bind(this))
-			.on('pointerup', this.onUp.bind(this));
+			.on('pointerup', this.onUp.bind(this))
+			.on('dragstart', this.onDragStart.bind(this))
+			.on('drag', this.onDrag.bind(this))
+			.on('dragend', this.onDragEnd.bind(this));
 		this.onOut();
 	}
 
@@ -46,4 +50,12 @@ class Button extends Phaser.GameObjects.Container {
 			this.onClick();
 		}
 	}
+
+	onClick() {}
+
+	onDragStart(pointer, dragX, dragY) {}
+
+	onDrag(pointer, dragX, dragY) {}
+
+	onDragEnd(pointer, dragX, dragY, dropped) {}
 }

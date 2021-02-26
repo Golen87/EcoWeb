@@ -50,6 +50,13 @@ const NODE_IMAGES = [
 	{ value: "valar",				text: "Valar.png" },
 	{ value: "vanliggroda",			text: "VanligGroda.png" },
 	{ value: "vithövdadhavsörn",	text: "VithövdadHavsörn.png" },
+
+	{ value: "acalypha",				text: "Acalypha.png" },
+	{ value: "equus_quagga",			text: "Equus_Quagga.png" },
+	{ value: "heteropogon_contortus",	text: "Heteropogon_contortus.png" },
+	{ value: "lycaon_picturus",			text: "Lycaon_Picturus.png" },
+	{ value: "madoqua_kirkii",			text: "Madoqua_kirkii.png" },
+	{ value: "panthera_leo",			text: "Panthera_leo.png" },
 ];
 
 const ANIMAL_FOODS = [

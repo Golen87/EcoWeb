@@ -19,6 +19,10 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('bg_2', 'assets/images/background/BG2.png');
 		this.load.image('bg_3', 'assets/images/background/BG3.png');
 
+		this.load.image('bg_uni_1', 'assets/images/background/universeum/bg1.jpg');
+		this.load.image('bg_uni_2', 'assets/images/background/universeum/bg2.jpg');
+		this.load.image('bg_uni_3', 'assets/images/background/universeum/bg3.jpg');
+
 		this.load.image('bg_parallax_1', 'assets/images/background/parallax/1.png');
 		this.load.image('bg_parallax_2', 'assets/images/background/parallax/2.png');
 		this.load.image('bg_parallax_3', 'assets/images/background/parallax/3.png');
@@ -129,6 +133,10 @@ class PreloadScene extends Phaser.Scene {
 		this.load.audio('ambience_main_menu', [ 'assets/audio/ambience_main_menu.ogg' ] );
 
 
+		/* Plugins */
+		this.load.plugin('rexroundrectangleplugin', 'web/rexroundrectangleplugin.min.js', true);
+
+
 		this.load.on('progress', this.onLoadProgress, this);
 		//this.load.on('complete', this.onLoadComplete, this);
 	}
@@ -138,10 +146,12 @@ class PreloadScene extends Phaser.Scene {
 	}
 
 	create() {
-		//this.scene.start("LevelScene");
-		this.scene.start("TitleScene");
 		//web.startScenario(0);
 		window.simulator.loadScenario(database.scenarios[0]);
+		// this.scene.start("TitleScene");
+		// this.scene.start("WorldScene");
+		// this.scene.start("LevelScene2");
+		this.scene.start("LevelScene3");
 	}
 
 	update(time, delta) {
