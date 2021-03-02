@@ -1,4 +1,4 @@
-const DATABASE_VERSION = 3;
+const DATABASE_VERSION = 4;
 
 class Database {
 	constructor() {
