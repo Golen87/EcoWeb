@@ -6,6 +6,7 @@ class Node2 extends Button {
 		scene.add.existing(this);
 
 		this.neighbours = [];
+		this.active = false;
 		this.startX = x;
 		this.startY = y;
 		this.goalX = x;
@@ -17,20 +18,23 @@ class Node2 extends Button {
 		this.liftSmooth = 0;
 
 
-		// Proximity area
-		// this.proximity = scene.add.sprite(0, 0, "circle");
-		// this.proximity.setScale(2*80 / this.proximity.height);
-		// this.proximity.setInteractive({ useHandCursor: false })
-		// 	.on('pointerout', () => {
-		// 		this.plus.setVisible(false);
-		// 		this.minus.setVisible(false);
-		// 	})
-		// 	.on('pointerover', () => {
-		// 		this.plus.setVisible(true);
-		// 		this.minus.setVisible(true);
-		// 	});
-		// this.proximity.setAlpha(0.001);
-		// this.add(this.proximity);
+		// ...
+		this.minPopThreshold = 0;
+		this.maxPopThreshold = 1;
+		if (this.species.type == 'plant') {
+			this.minPopThreshold = 0.45;
+			this.maxPopThreshold = 1.00;
+		}
+		else if (this.species.type == 'animal') {
+			if (this.species.food == 'herbivore') {
+				this.minPopThreshold = 0.25;
+				this.maxPopThreshold = 0.60;
+			}
+			else if (this.species.food == 'carnivore') {
+				this.minPopThreshold = 0.25;
+				this.maxPopThreshold = 0.35;
+			}
+		}
 
 
 		// Image
@@ -40,10 +44,10 @@ class Node2 extends Button {
 		this.bindInteractive(this.circle.image, true);
 		this.add(this.circle);
 
-		this.text = createText(scene, 0, 45, 20, "#FFF", this.species.name);
+		this.text = createText(scene, 0, 0*45, 20, "#FFF", this.species.name);
 		// this.text.setDepth(1);
-		this.text.setOrigin(0.5, 0);
-		this.text.setVisible(false);
+		this.text.setOrigin(0.5);
+		// this.text.setVisible(false);
 		this.circle.add(this.text);
 
 
@@ -52,7 +56,7 @@ class Node2 extends Button {
 
 		// Plus button
 		this.plus = new CircleButton(scene, xs, -ys, 0.3*80, () => {
-			this.scene.change(this, 1);
+			this.emit('onPlusMinus', this, 1);
 		});
 		this.plus.image.setAlpha(0.7);
 		this.plus.setVisible(false);
@@ -66,7 +70,7 @@ class Node2 extends Button {
 
 		// Minus button
 		this.minus = new CircleButton(scene, xs, ys, 0.3*80, () => {
-			this.scene.change(this, -1);
+			this.emit('onPlusMinus', this, -1);
 		});
 		this.minus.image.setAlpha(0.7);
 		this.minus.setVisible(false);
@@ -110,11 +114,15 @@ class Node2 extends Button {
 	}
 
 	isInsidePlayingField() {
-		if (this.goalX > 0.65 * this.scene.W)
+		// if (this.goalX > 0.65 * this.scene.W)
+		// if (this.goalX < 80/2)
+		// if (this.goalY > this.scene.H - 80/2)
+		// if (this.goalY < 80/2)
+		if (this.goalX > this.scene.W - 80/2)
 			return false;
 		if (this.goalX < 80/2)
 			return false;
-		if (this.goalY > this.scene.H - 80/2)
+		if (this.goalY > this.scene.H - 0.2 * this.scene.H)
 			return false;
 		if (this.goalY < 80/2)
 			return false;
@@ -132,8 +140,8 @@ class Node2 extends Button {
 	}
 
 	onDrag(pointer, dragX, dragY) {
-		this.goalX = dragX + this.offsetX;
-		this.goalY = dragY + this.offsetY;
+		this.goalX = dragX*this.circle.scaleX + this.offsetX;
+		this.goalY = dragY*this.circle.scaleX + this.offsetY;
 	}
 
 	onDragEnd(pointer, dragX, dragY, dropped) {
@@ -151,6 +159,12 @@ class Node2 extends Button {
 			this.resetPosition();
 			this.scene.updateSize(this, -this.size);
 		}
+		else {
+			if (!this.active) {
+				this.active = true;
+				this.emit('onEnter', this, true, true);
+			}
+		}
 
 		this.scene.tweens.add({
 			targets: this,
@@ -160,10 +174,15 @@ class Node2 extends Button {
 		});
 	}
 
-	resetPosition() {
+	resetPosition(manually=true) {
 		this.goalX = this.startX;
 		this.goalY = this.startY;
 		this.stickX = this.startX;
 		this.stickY = this.startY;
+
+		if (this.active) {
+			this.emit('onExit', this, false, manually);
+		}
+		this.active = false;
 	}
 }

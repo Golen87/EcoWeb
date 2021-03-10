@@ -4,26 +4,48 @@ class LevelScene3 extends Phaser.Scene {
 	}
 
 	create() {
-		let bg = this.add.image(this.CX, this.CY, 'bg_uni_3');
+		this.timeStamp = 0;
+		this.input.addPointer(2);
+
+		let bg = this.add.image(this.CX, this.CY, 'bg_uni_1');
 		bg.setAlpha(0.2);
 		this.fitToScreen(bg);
 
 		// Sidebar background
-		let sbWSep = 30;
-		let sbHSep = 30;
-		let sbW = 0.25*this.W;
-		let sbH = this.H - 2*sbHSep;
-		let sbX = this.W - sbWSep - sbW/2;
-		let sbY = this.CY;
-		this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0X777777);
+		// let sbWSep = 30;
+		// let sbHSep = 30;
+		// let sbW = 0.25*this.W;
+		// let sbH = this.H - 2*sbHSep;
+		// let sbX = this.W - sbWSep - sbW/2;
+		// let sbY = this.CY;
+		let sbW = this.W;
+		let sbH = 0.2 * this.H;
+		let sbX = this.CX;
+		let sbY = this.H - sbH/2;
+		this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0X000000);
 		this.sidebarBg.setAlpha(0.2);
 
-		this.text = createText(this, sbX, sbY-sbH/2+30, 20, "#FFF", window.simulator.scenario.name);
-		this.text.setOrigin(0.5);
+		this.text = createText(this, 10, 10, 20, "#FFF", window.simulator2.scenario.name);
+		this.text.setOrigin(0);
+
+		this.timeText = createText(this, this.W-10, 10, 20, "#FFF", this.timeStamp);
+		this.timeText.setOrigin(1, 0);
+
+		// Relation matrix debug
+		this.matrix = [];
+		for (let i = 0; i < window.simulator2.species.length; i++) {
+			createText(this, 25+25*(i+1), this.H-120+15*0, 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
+			createText(this, 25+25*0, this.H-120+15*(i+1), 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
+			this.matrix[i] = [];
+			for (let j = 0; j < window.simulator2.species.length; j++) {
+				this.matrix[i][j] = createText(this, 25+25*(j+1), this.H-120+15*(i+1), 10, "#FFF", window.simulator2.interactionMatrix[i][j]);
+				this.matrix[i][j].setOrigin(0.5);
+			}
+		}
 
 		// Reset button
-		this.resetButton = new TextButton(this, sbX, sbY+sbH/2-30, 'Reset', 20, this.reset.bind(this));
-		this.resetButton.setOrigin(0.5);
+		this.resetButton = new TextButton(this, this.W-40, sbY, 'Reset', 20, this.reset.bind(this));
+		this.resetButton.setOrigin(1, 0.5);
 		this.add.existing(this.resetButton);
 
 		// this.scale.refresh();
@@ -32,18 +54,18 @@ class LevelScene3 extends Phaser.Scene {
 		// Nodes
 
 		this.nodes = [];
-		const w = 2;
-		const h = 3;
-		for (let i in window.simulator.scenario.species) {
-			const organism = window.simulator.scenario.species[i];
+		const w = window.simulator2.species.length/2;
+		const h = 2;
+		for (let i = 0; i < window.simulator2.species.length; i++) {
+			const organism = window.simulator2.scenario.species[i];
 
 			// let x = this.CX + this.W * (-0.5 + (organism.x / 100));
 			// let y = this.CY + this.H * (-0.5 + (organism.y / 100));
-			let x = sbX + (80+30)*((1-w)/2 + i%w);
-			let y = sbY + (80+30)*((1-h)/2 + Math.floor(i/w));
+			let x = sbX + (80+25)*((1-w)/2 + i%w);
+			let y = sbY + (80+25)*((1-h)/2 + Math.floor(i/w));
 
 			let bg = this.add.sprite(x, y, "circle");
-			bg.setTint(0x000000).setAlpha(0.25).setScale(80 / bg.height);
+			bg.setTint(0x222222).setAlpha(0.5).setScale(80 / bg.height);
 
 			let node = new Node2(this, x, y, organism);
 
@@ -56,6 +78,11 @@ class LevelScene3 extends Phaser.Scene {
 				// break;
 			}
 			node.setDepth(1);
+			node.text.setText(0);
+
+			node.on('onEnter', this.onNodeAddOrRemove, this);
+			node.on('onExit', this.onNodeAddOrRemove, this);
+			node.on('onPlusMinus', this.onNodePlusMinus, this);
 		}
 
 
@@ -76,13 +103,13 @@ class LevelScene3 extends Phaser.Scene {
 							break;
 						}
 					}
-					amount = 1.0;
+					// amount = 1.0;
 					if (eats) {
 						// console.log(node.species.name, '->', other.species.name, '=', amount);
 						let path = new Path(this, node, other, amount);
 						this.paths.push(path);
-						node.neighbours.push({node:other, value:-amount});
-						other.neighbours.push({node:node, value:amount});
+						node.neighbours.push({node:other, value:amount});
+						other.neighbours.push({node:node, value:-amount});
 					}
 				}
 			}
@@ -91,16 +118,35 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Empty circle
 
-		let emptyCarnivore = new FakeNode(this, this.W*0.25, this.W*0.1, 'Carnivore');
-		let emptyHerbivore = new FakeNode(this, this.W*0.45, this.W*0.25, 'Herbivore');
-		let emptyPlant = new FakeNode(this, this.W*0.35, this.W*0.45, 'Plant');
+		// let emptyCarnivore = new FakeNode(this, this.W*0.45, this.W*0.10, 'Carnivore');
+		// let emptyHerbivore = new FakeNode(this, this.W*0.60, this.W*0.23, 'Herbivore');
+		// let emptyPlant = new FakeNode(this, this.W*0.50, this.W*0.37, 'Plant');
 
-		this.paths.push(new Path(this, emptyCarnivore, emptyHerbivore, 1));
-		this.paths.push(new Path(this, emptyHerbivore, emptyPlant, 1));
+		// this.paths.push(new Path(this, emptyCarnivore, emptyHerbivore, 1));
+		// this.paths.push(new Path(this, emptyHerbivore, emptyPlant, 1));
+		// for (const node of this.nodes) {
+		// 	if (node.species.type == "animal") {
+		// 		if (node.species.food == "carnivore") {
+		// 			this.paths.push(new Path(this, node, emptyHerbivore, 1));
+		// 		}
+		// 		else if (node.species.food == "herbivore") {
+		// 			this.paths.push(new Path(this, node, emptyPlant, 1));
+		// 			this.paths.push(new Path(this, emptyCarnivore, node, 1));
+		// 		}
+		// 	}
+		// 	else if (node.species.type == "plant") {
+		// 		this.paths.push(new Path(this, emptyHerbivore, node, 1));
+		// 	}
+		// }
 	}
 
 	update(time, deltaMs) {
 		let delta = deltaMs / 1000;
+
+		if (this.timeStamp < window.simulator2.time) {
+			this.timeStamp += 0.1;
+			this.updatePopulations();
+		}
 
 		//console.log(game.input.mousePointer.x, game.input.mousePointer.y);
 
@@ -117,11 +163,19 @@ class LevelScene3 extends Phaser.Scene {
 	reset() {
 		for (const node of this.nodes) {
 			this.updateSize(node, -node.size);
-			node.resetPosition();
+			node.resetPosition(false);
 		}
+		window.simulator2.run();
+		this.updatePaths();
 	}
 
-	change(startNode, startValue) {
+	onNodePlusMinus(node, value) {
+		this.timeStamp = window.simulator2.time;
+		window.simulator2.changeGrowthRate(node.species, value);
+		window.simulator2.run();
+		this.updatePaths();
+
+		/*
 		this.explored = [];
 		this.queue = [[startNode, startValue, 0]];
 		let maxDelay = 0;
@@ -157,9 +211,13 @@ class LevelScene3 extends Phaser.Scene {
 				}
 			}
 		});
+		*/
 	}
 
 	updateSize(node, value, delay=0) {
+		if (true)
+			return;
+
 		node.size = Phaser.Math.Clamp(node.size + value, -3, 3);
 		let scale = 1.0 + node.size / 3;
 
@@ -177,6 +235,61 @@ class LevelScene3 extends Phaser.Scene {
 			delay: 150*delay
 		});
 	}
+
+	onNodeAddOrRemove(node, active, manually) {
+		this.timeStamp = window.simulator2.time;
+		window.simulator2.addOrRemoveSpecies(node.species, active);
+		if (manually) {
+			window.simulator2.run();
+			this.updatePaths();
+		}
+	}
+
+
+	updatePopulations() {
+		this.timeText.setText(this.timeStamp.toFixed(1));
+
+		let populations = window.simulator2.getPopulationAt(this.timeStamp);
+
+		for (let i = 0; i < this.nodes.length; i++) {
+			if (this.nodes[i].active) {
+				// let min = this.nodes[i].minPopThreshold;
+				// let max = this.nodes[i].maxPopThreshold;
+				// let value = (populations[i] - min) / (max - min);
+				let value = populations[i];
+				this.nodes[i].circle.setScale(0.4 + 0.9 * value);
+			}
+			else {
+				this.nodes[i].circle.setScale(1);
+			}
+
+			this.nodes[i].text.setText((populations[i]*100).toFixed());
+			// let p = Math.round(Phaser.Math.Clamp(populations[i], 0, 1) * 10);
+			// let t = "";
+			// for (let i=0; i<p; i++) {t+="|";}
+			// for (let i=p; i<10; i++) {t+=".";}
+			// this.nodes[i].text.setText(t);
+		}
+	}
+
+	updatePaths() {
+		for (let i in window.simulator2.species) {
+			for (let j in window.simulator2.species) {
+
+				// Update path thickness
+				for (const path of this.paths) {
+					if (path.node1 == this.nodes[i] && path.node2 == this.nodes[j]) {
+						let value = window.simulator2.interactionMatrix[i][j];
+						path.lineThickness = 3*value;
+					}
+				}
+
+				// Update debug matrix
+				this.matrix[i][j].setText(window.simulator2.interactionMatrix[i][j]);
+			}
+		}
+	}
+
 
 
 	get W() { return this.cameras.main.displayWidth; }

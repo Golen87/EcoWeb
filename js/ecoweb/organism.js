@@ -266,8 +266,8 @@ class Animal extends Organism {
 	constructor(node, actor) {
 		super(node, actor);
 
-		// this.size = node.animal.size;
-		// this.food = node.animal.food;
+		this.size = node.animal.size;
+		this.food = node.animal.food;
 		// this.consumption = node.animal.consumption;
 		// this.weight = node.animal.weight;
 		// this.age = node.animal.age;

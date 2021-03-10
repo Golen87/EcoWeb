@@ -38,6 +38,8 @@ class Path extends Phaser.GameObjects.Container {
 		// this.speed *= this.curve.getLength() / 250;
 		this.dotCount = 1.5 + amount * 3.5;
 
+		this.lineThickness = 2;
+
 		this.drawBezier(0);
 	}
 
@@ -64,9 +66,9 @@ class Path extends Phaser.GameObjects.Container {
 		// Draw bezier curve
 
 		let color = 0xffffff;
-		let lineAlpha = 0.1 * Phaser.Math.Easing.Cubic.Out(this.amount);
-		this.graphics.lineStyle(this.getWidth(), color, lineAlpha);
-		this.graphics.lineStyle(2.0, 0XFFFFFF, 1.0);
+		// let lineAlpha = 0.1 * Phaser.Math.Easing.Cubic.Out(this.amount);
+		// this.graphics.lineStyle(this.getWidth(), color, lineAlpha);
+		this.graphics.lineStyle(this.lineThickness, 0XFFFFFF, 1.0);
 		this.curve.draw(this.graphics);
 
 
@@ -76,7 +78,7 @@ class Path extends Phaser.GameObjects.Container {
 		let count = this.curve.getLength()/100;
 		// let radius = this.getWidth();
 		let hack = Math.max(this.node1.liftSmooth, this.node2.liftSmooth);
-		let radius = 4 - 3*hack;
+		let radius = (2 - 1.5*hack) * this.lineThickness;
 		let speed = this.speed * this.curve.getLength() / 300;
 		let offset = (time / speed) % (1/count);
 		this.graphics.fillStyle(color); // alpha: Math.min(Phaser.Math.Easing.Cubic.Out(this.amount), 1)
@@ -106,7 +108,11 @@ class Path extends Phaser.GameObjects.Container {
 
 		this.setAlpha(0);
 		if (this.node1.isInsidePlayingField() && this.node2.isInsidePlayingField()) {
-			this.setAlpha(1);
+			// this.setAlpha(1);
+			this.setAlpha(this.lineThickness/3);
+		}
+		else {
+			this.lineThickness = 2;
 		}
 
 

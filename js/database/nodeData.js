@@ -51,12 +51,25 @@ const NODE_IMAGES = [
 	{ value: "vanliggroda",			text: "VanligGroda.png" },
 	{ value: "vithövdadhavsörn",	text: "VithövdadHavsörn.png" },
 
-	{ value: "acalypha",				text: "Acalypha.png" },
-	{ value: "equus_quagga",			text: "Equus_Quagga.png" },
-	{ value: "heteropogon_contortus",	text: "Heteropogon_contortus.png" },
-	{ value: "lycaon_picturus",			text: "Lycaon_Picturus.png" },
-	{ value: "madoqua_kirkii",			text: "Madoqua_kirkii.png" },
-	{ value: "panthera_leo",			text: "Panthera_leo.png" },
+	// { value: "acalypha",				text: "Acalypha.png" },
+	// { value: "equus_quagga",			text: "Equus_Quagga.png" },
+	// { value: "heteropogon_contortus",	text: "Heteropogon_contortus.png" },
+	// { value: "lycaon_picturus",			text: "Lycaon_Picturus.png" },
+	// { value: "madoqua_kirkii",			text: "Madoqua_kirkii.png" },
+	// { value: "panthera_leo",			text: "Panthera_leo.png" },
+
+	{ value: "acalypha",				text: "Serengeti-P-acalypha.png" },
+	{ value: "equus_quagga",			text: "Serengeti-H-zebra.png" },
+	{ value: "heteropogon_contortus",	text: "Serengeti-P-heteropogon-contortus.png" },
+	{ value: "lycaon_picturus",			text: "Serengeti-C-wild-dog.png" },
+	{ value: "madoqua_kirkii",			text: "Serengeti-H-kirk-dik-dik.png" },
+	{ value: "panthera_leo",			text: "Serengeti-C-lion.png" },
+	{ value: "allophylus_rubifolius",	text: "Allophylus Rubifolius.png" },
+
+	// { value: "leopard_seal",	text: "sea-C-leopard-seal.png" },
+	// { value: "orca",			text: "sea-C-orca.png" },
+	// { value: "krill",			text: "sea-H-krill.png" },
+	// { value: "plankton",		text: "sea-H-Plankton.png" },
 ];
 
 const ANIMAL_FOODS = [
