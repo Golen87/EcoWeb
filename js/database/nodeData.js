@@ -65,6 +65,7 @@ const NODE_IMAGES = [
 	{ value: "madoqua_kirkii",			text: "Serengeti-H-kirk-dik-dik.png" },
 	{ value: "panthera_leo",			text: "Serengeti-C-lion.png" },
 	{ value: "allophylus_rubifolius",	text: "Allophylus Rubifolius.png" },
+	{ value: "placeholder_plant",		text: "PlaceHolder-Plant.png" },
 
 	// { value: "leopard_seal",	text: "sea-C-leopard-seal.png" },
 	// { value: "orca",			text: "sea-C-orca.png" },
