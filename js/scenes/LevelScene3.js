@@ -1,3 +1,5 @@
+const NODE_SIZE = 80;
+
 class LevelScene3 extends Phaser.Scene {
 	constructor() {
 		super({key: 'LevelScene3'});
@@ -11,7 +13,9 @@ class LevelScene3 extends Phaser.Scene {
 		bg.setAlpha(0.2);
 		this.fitToScreen(bg);
 
+
 		// Sidebar background
+
 		// let sbWSep = 30;
 		// let sbHSep = 30;
 		// let sbW = 0.25*this.W;
@@ -19,27 +23,32 @@ class LevelScene3 extends Phaser.Scene {
 		// let sbX = this.W - sbWSep - sbW/2;
 		// let sbY = this.CY;
 		let sbW = this.W;
-		let sbH = 0.2 * this.H;
+		let sbH = 0.19 * this.H;
 		let sbX = this.CX;
 		let sbY = this.H - sbH/2;
 		this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0X000000);
 		this.sidebarBg.setAlpha(0.2);
 
+
+		// Scenario name text
 		this.text = createText(this, 10, 10, 20, "#FFF", window.simulator2.scenario.name);
 		this.text.setOrigin(0);
 
+		// Time debug text
 		this.timeText = createText(this, this.W-10, 10, 20, "#FFF", this.timeStamp);
 		this.timeText.setOrigin(1, 0);
+		this.timeText.setVisible(false);
 
 		// Relation matrix debug
 		this.matrix = [];
 		for (let i = 0; i < window.simulator2.species.length; i++) {
-			createText(this, 25+25*(i+1), this.H-120+15*0, 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
-			createText(this, 25+25*0, this.H-120+15*(i+1), 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
+			// createText(this, 25+25*(i+1), this.H-120+15*0, 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
+			// createText(this, 25+25*0, this.H-120+15*(i+1), 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
 			this.matrix[i] = [];
 			for (let j = 0; j < window.simulator2.species.length; j++) {
 				this.matrix[i][j] = createText(this, 25+25*(j+1), this.H-120+15*(i+1), 10, "#FFF", window.simulator2.interactionMatrix[i][j]);
 				this.matrix[i][j].setOrigin(0.5);
+				this.matrix[i][j].setVisible(false);
 			}
 		}
 
@@ -53,32 +62,33 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Nodes
 
+		let t = "Place the plants and animals at the right slots in the food chain";
+		this.instructionText = createText(this, sbX, sbY - 0.85*NODE_SIZE , 20, "#FFF", t);
+		this.instructionText.setOrigin(0.5);
+
 		this.nodes = [];
-		const w = window.simulator2.species.length/2;
-		const h = 2;
+		const h = Math.ceil(window.simulator2.species.length / 8);
+		const w = window.simulator2.species.length / h;
 		for (let i = 0; i < window.simulator2.species.length; i++) {
 			const organism = window.simulator2.scenario.species[i];
 
 			// let x = this.CX + this.W * (-0.5 + (organism.x / 100));
 			// let y = this.CY + this.H * (-0.5 + (organism.y / 100));
-			let x = sbX + (80+25)*((1-w)/2 + i%w);
-			let y = sbY + (80+25)*((1-h)/2 + Math.floor(i/w));
+			let x = sbX + (NODE_SIZE*1.3)*((1-w)/2 + i%w);
+			let y = sbY + (NODE_SIZE*0.9)*((1-h)/2 + Math.floor(i/w));
 
 			let bg = this.add.sprite(x, y, "circle");
-			bg.setTint(0x222222).setAlpha(0.5).setScale(80 / bg.height);
+			bg.setTint(0x222222).setAlpha(0.5).setScale(NODE_SIZE / bg.height);
 
 			let node = new Node2(this, x, y, organism);
 
 			this.nodes.push(node);
 
-			node.size = 0;
-			this.updateSize(node, 0);
+			// node.size = 0;
+			// this.updateSize(node, 0);
 
-			if (this.nodes.length == 3) {
-				// break;
-			}
 			node.setDepth(1);
-			node.text.setText(0);
+			// node.text.setText(0);
 
 			node.on('onEnter', this.onNodeAddOrRemove, this);
 			node.on('onExit', this.onNodeAddOrRemove, this);
@@ -118,26 +128,45 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Empty circle
 
-		// let emptyCarnivore = new FakeNode(this, this.W*0.45, this.W*0.10, 'Carnivore');
-		// let emptyHerbivore = new FakeNode(this, this.W*0.60, this.W*0.23, 'Herbivore');
-		// let emptyPlant = new FakeNode(this, this.W*0.50, this.W*0.37, 'Plant');
+		this.emptyCarnivore = new FakeNode(this, this.W*0.45, this.W*0.10, 'Carnivore');
+		this.emptyHerbivore = new FakeNode(this, this.W*0.60, this.W*0.23, 'Herbivore');
+		this.emptyPlant = new FakeNode(this, this.W*0.50, this.W*0.37, 'Plant');
+		this.fakeNodes = [this.emptyCarnivore, this.emptyHerbivore, this.emptyPlant];
 
-		// this.paths.push(new Path(this, emptyCarnivore, emptyHerbivore, 1));
-		// this.paths.push(new Path(this, emptyHerbivore, emptyPlant, 1));
-		// for (const node of this.nodes) {
-		// 	if (node.species.type == "animal") {
-		// 		if (node.species.food == "carnivore") {
-		// 			this.paths.push(new Path(this, node, emptyHerbivore, 1));
-		// 		}
-		// 		else if (node.species.food == "herbivore") {
-		// 			this.paths.push(new Path(this, node, emptyPlant, 1));
-		// 			this.paths.push(new Path(this, emptyCarnivore, node, 1));
-		// 		}
-		// 	}
-		// 	else if (node.species.type == "plant") {
-		// 		this.paths.push(new Path(this, emptyHerbivore, node, 1));
-		// 	}
-		// }
+		this.paths.push(new Path(this, this.emptyCarnivore, this.emptyHerbivore, 1));
+		this.paths.push(new Path(this, this.emptyHerbivore, this.emptyPlant, 1));
+		for (const node of this.nodes) {
+			if (node.species.type == "animal") {
+				if (node.species.food == "carnivore") {
+					this.paths.push(new Path(this, node, this.emptyHerbivore, 1));
+					this.emptyCarnivore.replacements.push(node);
+				}
+				else if (node.species.food == "herbivore") {
+					this.paths.push(new Path(this, node, this.emptyPlant, 1));
+					this.paths.push(new Path(this, this.emptyCarnivore, node, 1));
+					this.emptyHerbivore.replacements.push(node);
+				}
+			}
+			else if (node.species.type == "plant") {
+				this.paths.push(new Path(this, this.emptyHerbivore, node, 1));
+				this.emptyPlant.replacements.push(node);
+			}
+		}
+
+
+		// this.add.image(100, 100, 'icon-backToBeginning');
+		// this.add.image(200, 100, 'icon-backward');
+		// this.add.image(300, 100, 'icon-forward');
+		// this.add.image(400, 100, 'icon-play');
+
+		// this.add.image(100, 200, 'icon-foodWeb');
+		// this.add.image(200, 200, 'icon-ecoWeb');
+		// this.add.image(300, 200, 'icon-ecoChallenge');
+		// this.add.image(400, 200, 'icon-ecoMission');
+
+		// this.add.image(100, 300, 'icon-soil');
+		// this.add.image(200, 300, 'icon-rain');
+		// this.add.image(300, 300, 'icon-sun');
 	}
 
 	update(time, deltaMs) {
@@ -154,6 +183,10 @@ class LevelScene3 extends Phaser.Scene {
 			node.update(time, delta);
 		}
 
+		for (const node of this.fakeNodes) {
+			node.update(time, delta);
+		}
+
 		for (const path of this.paths) {
 			path.update(time, delta);
 		}
@@ -162,7 +195,7 @@ class LevelScene3 extends Phaser.Scene {
 
 	reset() {
 		for (const node of this.nodes) {
-			this.updateSize(node, -node.size);
+			// this.updateSize(node, -node.size);
 			node.resetPosition(false);
 		}
 		window.simulator2.run();
@@ -214,27 +247,27 @@ class LevelScene3 extends Phaser.Scene {
 		*/
 	}
 
-	updateSize(node, value, delay=0) {
-		if (true)
-			return;
+	// updateSize(node, value, delay=0) {
+	// 	if (true)
+	// 		return;
 
-		node.size = Phaser.Math.Clamp(node.size + value, -3, 3);
-		let scale = 1.0 + node.size / 3;
+	// 	node.size = Phaser.Math.Clamp(node.size + value, -3, 3);
+	// 	let scale = 1.0 + node.size / 3;
 
-		// node.image.setTint(interpolateColor(0xFFFFFF, 0xFF0000, Math.abs(node.size / 4)));
+	// 	// node.image.setTint(interpolateColor(0xFFFFFF, 0xFF0000, Math.abs(node.size / 4)));
 
-		// node.setScale(scale);
-		if (node.tween) {
-			node.tween.stop();
-		}
-		node.tween = this.tweens.add({
-			targets: node.circle,
-			scale: { from: node.circle.scale, to: scale },
-			ease: 'Cubic',
-			duration: 500,
-			delay: 150*delay
-		});
-	}
+	// 	// node.setScale(scale);
+	// 	if (node.tween) {
+	// 		node.tween.stop();
+	// 	}
+	// 	node.tween = this.tweens.add({
+	// 		targets: node.circle,
+	// 		scale: { from: node.circle.scale, to: scale },
+	// 		ease: 'Cubic',
+	// 		duration: 500,
+	// 		delay: 150*delay
+	// 	});
+	// }
 
 	onNodeAddOrRemove(node, active, manually) {
 		this.timeStamp = window.simulator2.time;
@@ -243,6 +276,7 @@ class LevelScene3 extends Phaser.Scene {
 			window.simulator2.run();
 			this.updatePaths();
 		}
+		this.updatePopulations();
 	}
 
 
@@ -253,17 +287,24 @@ class LevelScene3 extends Phaser.Scene {
 
 		for (let i = 0; i < this.nodes.length; i++) {
 			if (this.nodes[i].active) {
-				// let min = this.nodes[i].minPopThreshold;
-				// let max = this.nodes[i].maxPopThreshold;
-				// let value = (populations[i] - min) / (max - min);
-				let value = populations[i];
+				let min = this.nodes[i].minPopThreshold;
+				let max = this.nodes[i].maxPopThreshold;
+				let value = (populations[i] - min) / (max - min);
+				// let value = populations[i];
 				this.nodes[i].circle.setScale(0.4 + 0.9 * value);
+
+				if (populations[i] < 0.03) {
+					this.nodes[i].resetPosition(false);
+					// window.simulator2.run();
+					// this.updatePaths();
+				}
 			}
 			else {
 				this.nodes[i].circle.setScale(1);
 			}
 
-			this.nodes[i].text.setText((populations[i]*100).toFixed());
+			// this.nodes[i].text.setText((populations[i]*100).toFixed());
+
 			// let p = Math.round(Phaser.Math.Clamp(populations[i], 0, 1) * 10);
 			// let t = "";
 			// for (let i=0; i<p; i++) {t+="|";}

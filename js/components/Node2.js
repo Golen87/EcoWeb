@@ -22,40 +22,42 @@ class Node2 extends Button {
 		this.minPopThreshold = 0;
 		this.maxPopThreshold = 1;
 		if (this.species.type == 'plant') {
-			this.minPopThreshold = 0.45;
+			// this.minPopThreshold = 0.45;
 			this.maxPopThreshold = 1.00;
 		}
 		else if (this.species.type == 'animal') {
 			if (this.species.food == 'herbivore') {
-				this.minPopThreshold = 0.25;
+				// this.minPopThreshold = 0.25;
 				this.maxPopThreshold = 0.60;
 			}
 			else if (this.species.food == 'carnivore') {
-				this.minPopThreshold = 0.25;
+				// this.minPopThreshold = 0.25;
 				this.maxPopThreshold = 0.35;
 			}
 		}
 
 
 		// Image
-		this.circle = new CircleButton(scene, 0, 0, 80, () => {}, this.species.image);
+		this.circle = new CircleButton(scene, 0, 0, NODE_SIZE, () => {}, this.species.image);
 		// this.circle.setDepth(1);
 		this.circle.image.setTint(0xEEEEEE);
 		this.bindInteractive(this.circle.image, true);
 		this.add(this.circle);
 
-		this.text = createText(scene, 0, 0*45, 20, "#FFF", this.species.name);
+		this.text = createText(scene, 0, -0.6*NODE_SIZE, 20, "#FFF", this.species.name);
 		// this.text.setDepth(1);
-		this.text.setOrigin(0.5);
+		this.text.setOrigin(0.5, 1.0);
 		// this.text.setVisible(false);
-		this.circle.add(this.text);
+		this.text.setAlpha(0);
+		// this.circle.add(this.text);
+		this.add(this.text);
 
 
-		let xs = 73 * (80/100);
-		let ys = 22 * (80/100);
+		let xs = 73 * (NODE_SIZE/100);
+		let ys = 22 * (NODE_SIZE/100);
 
 		// Plus button
-		this.plus = new CircleButton(scene, xs, -ys, 0.3*80, () => {
+		this.plus = new CircleButton(scene, xs, -ys, 0.3*NODE_SIZE, () => {
 			this.emit('onPlusMinus', this, 1);
 		});
 		this.plus.image.setAlpha(0.7);
@@ -63,13 +65,13 @@ class Node2 extends Button {
 		this.plus.bindInteractive(this.plus.image);
 		this.add(this.plus);
 
-		this.plusText = createText(scene, 0, 0, 0.3*80, "#000", "+");
+		this.plusText = createText(scene, 0, 0, 0.3*NODE_SIZE, "#000", "+");
 		this.plusText.setOrigin(0.5);
 		this.plus.add(this.plusText);
 
 
 		// Minus button
-		this.minus = new CircleButton(scene, xs, ys, 0.3*80, () => {
+		this.minus = new CircleButton(scene, xs, ys, 0.3*NODE_SIZE, () => {
 			this.emit('onPlusMinus', this, -1);
 		});
 		this.minus.image.setAlpha(0.7);
@@ -77,7 +79,7 @@ class Node2 extends Button {
 		this.minus.bindInteractive(this.minus.image);
 		this.add(this.minus);
 
-		this.minusText = createText(scene, 0, -1, 0.3*80, "#000", "–");
+		this.minusText = createText(scene, 0, -1, 0.3*NODE_SIZE, "#000", "–");
 		this.minusText.setOrigin(0.5);
 		this.minus.add(this.minusText);
 	}
@@ -104,27 +106,30 @@ class Node2 extends Button {
 			}
 		}
 
-		let withinDistance = Phaser.Math.Distance.BetweenPoints(this, this.scene.input) < 80;
+		let withinDistance = Phaser.Math.Distance.BetweenPoints(this, this.scene.input) < NODE_SIZE;
 		let showButtons = withinDistance && !this.hold && this.isInsidePlayingField();
 		this.plus.setVisible(showButtons);
 		this.minus.setVisible(showButtons);
 
 		let scale = 1 + 0.15 * this.liftSmooth;
 		this.circle.image.setScale(scale * this.circle.image.origScale);
+
+		// Show name when holding the node
+		this.text.setAlpha(this.liftSmooth);
 	}
 
 	isInsidePlayingField() {
 		// if (this.goalX > 0.65 * this.scene.W)
-		// if (this.goalX < 80/2)
-		// if (this.goalY > this.scene.H - 80/2)
-		// if (this.goalY < 80/2)
-		if (this.goalX > this.scene.W - 80/2)
+		// if (this.goalX < NODE_SIZE/2)
+		// if (this.goalY > this.scene.H - NODE_SIZE/2)
+		// if (this.goalY < NODE_SIZE/2)
+		if (this.goalX > this.scene.W - NODE_SIZE/2)
 			return false;
-		if (this.goalX < 80/2)
+		if (this.goalX < NODE_SIZE/2)
 			return false;
-		if (this.goalY > this.scene.H - 0.2 * this.scene.H)
+		if (this.goalY > this.scene.H - 0.2 * this.scene.H - NODE_SIZE/2)
 			return false;
-		if (this.goalY < 80/2)
+		if (this.goalY < NODE_SIZE/2)
 			return false;
 		return true;
 	}
@@ -157,7 +162,7 @@ class Node2 extends Button {
 
 		if (!this.isInsidePlayingField()) {
 			this.resetPosition();
-			this.scene.updateSize(this, -this.size);
+			// this.scene.updateSize(this, -this.size);
 		}
 		else {
 			if (!this.active) {
@@ -181,8 +186,8 @@ class Node2 extends Button {
 		this.stickY = this.startY;
 
 		if (this.active) {
+			this.active = false;
 			this.emit('onExit', this, false, manually);
 		}
-		this.active = false;
 	}
 }

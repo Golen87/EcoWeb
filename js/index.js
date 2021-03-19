@@ -1,7 +1,7 @@
-var config = {
+const config = {
 	type: Phaser.WEBGL,
-	width: 16*70,
-	height: 9*70,
+	width: 16*70*1.5,
+	height: 9*70*1.5,
 	parent: 'game',
 	scale: {
 		mode: Phaser.Scale.FIT
@@ -27,6 +27,7 @@ var config = {
 	]
 };
 
-var game = new Phaser.Game(config);
+const game = new Phaser.Game(config);
 
 game.font = "Mukta";
+game.language = "English";

@@ -99,10 +99,10 @@ class Simulator2 {
 
 		// Set interactions
 		for (let i = 0; i < L; i++) {
-			if (this.population[i] > 0) {
+			if (true || this.population[i] > 0) {
 
 				// Points to distribute
-				let weights = [1.0, 0.5, 0.2];
+				let weights = [1.0, 0.4, 0.2];
 
 				for (const rel of this.relationMap[i]) {
 					let j = rel.index;
@@ -111,6 +111,10 @@ class Simulator2 {
 						let value = weights.shift();
 						this.interactionMatrix[i][j] = value;
 						this.interactionMatrix[j][i] = -value;
+					}
+					else if (this.population[j] <= 0) {
+						this.interactionMatrix[i][j] = 0.5;
+						this.interactionMatrix[j][i] = -0.5;
 					}
 				}
 			}

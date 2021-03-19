@@ -112,7 +112,7 @@ class Path extends Phaser.GameObjects.Container {
 			this.setAlpha(this.lineThickness/3);
 		}
 		else {
-			this.lineThickness = 2;
+			// this.lineThickness = 2;
 		}
 
 
@@ -123,8 +123,6 @@ class Path extends Phaser.GameObjects.Container {
 
 
 	updateCurvePosition() {
-		const avg_size = 80;
-
 		let dist = Phaser.Math.Distance.BetweenPoints(this.node1, this.node2);
 		let xdist = Math.abs(this.node2.x-this.node1.x);
 
@@ -132,13 +130,13 @@ class Path extends Phaser.GameObjects.Container {
 		temp.subtract(this.node2);
 		// temp.scale(0.75);
 		temp.setLength(10);
-		temp.y -= (-avg_size+xdist/2+this.node2.y-this.node1.y) * Math.pow(10, 2 - xdist/avg_size);
+		temp.y -= (-NODE_SIZE+xdist/2+this.node2.y-this.node1.y) * Math.pow(10, 2 - xdist/NODE_SIZE);
 		temp.setLength(50+xdist/3);
 
 		// 0-100 instant (1000), 100-200 fast (100), 200-600 decline (10-1), 600+ slow (0.1)
 
 		this.curve.p1.copy(this.curve.p0);
-		this.curve.p1.y += avg_size;
+		this.curve.p1.y += NODE_SIZE;
 
 		this.curve.p2.copy(this.curve.p3);
 		this.curve.p2.add(temp);
@@ -148,7 +146,7 @@ class Path extends Phaser.GameObjects.Container {
 		this.curve.p3.add(temp);
 
 		this.curve.p0.copy(this.node1);
-		temp.set((this.node2.x-this.node1.x)/5, avg_size);
+		temp.set((this.node2.x-this.node1.x)/5, NODE_SIZE);
 		temp.setLength(0.45 * this.node1.getWidth());
 		this.curve.p0.add(temp);
 
