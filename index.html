@@ -111,7 +111,7 @@
 
 
 		<!-- Graph -->
-		<div class="d-flex flex-wrap justify-content-center p-2 mt-4" style="background: rgba(0,0,255,0.0);">
+		<div class="d-none flex-wrap justify-content-center p-2 mt-4" style="background: rgba(0,0,255,0.0);">
 
 			<div id="myChartWrapper">
 				<div style="background: white;">
@@ -245,7 +245,7 @@
 
 
 		<!-- Tab navigation -->
-		<nav id="databaseTabs" class="nav nav-tabs container justify-content-end px-0 mt-3">
+		<nav id="databaseTabs" class="d-none nav nav-tabs container justify-content-end px-0 mt-3">
 			<a class="nav-link bg-light mr-1 pointer" v-on:click="gotoNodes">Nodes <span class="badge badge-warning">{{ total_nodes }}</span></a>
 			<a class="nav-link bg-light mx-1 pointer" v-on:click="gotoEvents">Events <span class="badge badge-warning">{{ total_events }}</span></a>
 			<a class="nav-link bg-light mx-1 pointer" v-on:click="gotoScenarios">Scenarios <span class="badge badge-warning">{{ total_scenarios }}</span></a>
@@ -257,7 +257,7 @@
 		</nav>
 
 		<!-- Database editor -->
-		<div id="databaseWrapper" class="container card-body bg-light mx-auto mb-4 justify-content-center">
+		<div id="databaseWrapper" class="d-none container card-body bg-light mx-auto mb-4 justify-content-center">
 
 			<!-- Node list -->
 			<div id="nodeList" class="editor-container" v-show="show" v-cloak>
@@ -1411,7 +1411,7 @@
 
 
 		<!-- Node Selector Modal -->
-		<div class="modal fade" id="nodeSelectorModal" tabindex="-1" role="dialog" aria-labelledby="nodeSelectorModalLabel" aria-hidden="true">
+		<div class="d-none modal fade" id="nodeSelectorModal" tabindex="-1" role="dialog" aria-labelledby="nodeSelectorModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -1441,7 +1441,7 @@
 		</div>
 
 		<!-- Victory Conditions Editor Modal -->
-		<div class="modal fade" id="conditionsEditorModal" tabindex="-1" role="dialog" aria-labelledby="conditionsEditorModalLabel" aria-hidden="true">
+		<div class="d-none modal fade" id="conditionsEditorModal" tabindex="-1" role="dialog" aria-labelledby="conditionsEditorModalLabel" aria-hidden="true">
 			<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 				<div class="modal-content">
 					<div class="modal-header">

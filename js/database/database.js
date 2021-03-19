@@ -1,4 +1,5 @@
 const DATABASE_VERSION = 4;
+const DATABASE_LOCKED = true;
 
 class Database {
 	constructor() {
@@ -49,7 +50,7 @@ class Database {
 	load() {
 		let success = false;
 		let localdata = localStorage.getItem("database");
-		if (localdata) {
+		if (localdata && !DATABASE_LOCKED) {
 			success = this.importJSON(localdata);
 		}
 
@@ -62,7 +63,9 @@ class Database {
 	}
 
 	save() {
-		localStorage.setItem("database", this.exportJSON());
+		if (!DATABASE_LOCKED) {
+			localStorage.setItem("database", this.exportJSON());
+		}
 	}
 
 	getUniqueId() {
