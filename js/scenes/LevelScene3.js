@@ -3,6 +3,21 @@ const NODE_SIZE = 80;
 class LevelScene3 extends Phaser.Scene {
 	constructor() {
 		super({key: 'LevelScene3'});
+
+		// "Role" is a node's role in the scenario, deciding when it appears in the story
+		this.roleMap = {
+			"96b49f05-e31c-46c6-a11b-46a8417073d5":	"carnivore_1",	// Lejon
+			"5ca8345a-20b4-46d8-af6f-b3add4bbd89f":	"herbivore_1",	// Zebra
+			"29fe89a4-abd1-4f18-ad38-baac84902748":	"plant_1",		// Acalypha fruticosa
+			"23871c47-e590-473c-b551-1d9e04b0c612":	"carnivore_2",	// Vildhund
+			"28fdbae5-dc73-47bf-a069-cc72cd277607":	"herbivore_2",	// Kirks dik-dik
+			"e0ec6d69-8d39-45f4-ad7b-9a476ab01362":	"plant_2",		// Allophylus Rubifolius
+			"8243441b-4edb-413d-bf0f-fffdc337fd08":	"plant_3",		// Heteropogon contortus
+		};
+		this.story1 = ["carnivore_1", "herbivore_1", "plant_1"];
+		this.story2 = ["carnivore_1", "herbivore_1", "plant_1", "herbivore_2", "plant_2", "plant_3"];
+		this.currentStory = 0;
+		this.storyRunning = false;
 	}
 
 	create() {
@@ -23,16 +38,38 @@ class LevelScene3 extends Phaser.Scene {
 		// let sbX = this.W - sbWSep - sbW/2;
 		// let sbY = this.CY;
 		let sbW = this.W;
-		let sbH = 0.19 * this.H;
+		let sbH = 0.22 * this.H;
 		let sbX = this.CX;
 		let sbY = this.H - sbH/2;
 		this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0X000000);
 		this.sidebarBg.setAlpha(0.2);
+		// this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0XFF0000);
+		// this.sidebarBg.setAlpha(1.0);
 
 
 		// Scenario name text
-		this.text = createText(this, 10, 10, 20, "#FFF", window.simulator2.scenario.name);
+		this.text = createText(this, 10, 10, 20, "#FFF", window.simulator2.scenario.name + " Food Web");
 		this.text.setOrigin(0);
+
+		// Instructions text
+		this.instructionText = createText(this, sbX, sbY - 0.85*NODE_SIZE , 20, "#FFF", "Instruction text");
+		this.instructionText.setOrigin(0.5);
+
+		this.storyText1 = createText(this, sbX, sbY-0.30*sbH , 30, "#fcb061", "Big instruction text");
+		this.storyText1.setOrigin(0.5);
+		this.storyText2 = createText(this, sbX, sbY-0.10*sbH, 20, "#FFF", "Small instruction text");
+		this.storyText2.setOrigin(0.5);
+
+		// this.nextButton = new PauseButton(this, sbX, sbY-100, "Next", () => {
+			// this.instructionText.setText("awesome sauce");
+		// });
+		// this.add.existing(this.nextButton);
+		this.nextButton = this.add.rexRoundRectangle(sbX, sbY+0.20*sbH, 200, 20, 20, 0xa77440);
+		this.nextButton.setInteractive({ useHandCursor: true })
+			.on('pointerup', () => { this.startStory(this.currentStory + 1); }
+		);
+		this.nextText = createText(this, sbX, sbY+0.20*sbH, 30, "#FFF", "Next");
+		this.nextText.setOrigin(0.5);
 
 		// Time debug text
 		this.timeText = createText(this, this.W-10, 10, 20, "#FFF", this.timeStamp);
@@ -62,10 +99,6 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Nodes
 
-		let t = "Place the plants and animals at the right slots in the food chain";
-		this.instructionText = createText(this, sbX, sbY - 0.85*NODE_SIZE , 20, "#FFF", t);
-		this.instructionText.setOrigin(0.5);
-
 		this.nodes = [];
 		const h = Math.ceil(window.simulator2.species.length / 8);
 		const w = window.simulator2.species.length / h;
@@ -74,11 +107,12 @@ class LevelScene3 extends Phaser.Scene {
 
 			// let x = this.CX + this.W * (-0.5 + (organism.x / 100));
 			// let y = this.CY + this.H * (-0.5 + (organism.y / 100));
-			let x = sbX + (NODE_SIZE*1.3)*((1-w)/2 + i%w);
-			let y = sbY + (NODE_SIZE*0.9)*((1-h)/2 + Math.floor(i/w));
+			let temp = [2, 0, 1, 3, 4, 5, 6][i];
+			let x = sbX + (NODE_SIZE*1.3)*((1-w)/2 + temp%w);
+			let y = sbY + (NODE_SIZE*0.9)*((1-h)/2 + Math.floor(temp/w));
 
-			let bg = this.add.sprite(x, y, "circle");
-			bg.setTint(0x222222).setAlpha(0.5).setScale(NODE_SIZE / bg.height);
+			// let bg = this.add.sprite(x, y, "circle");
+			// bg.setTint(0x222222).setAlpha(0.5).setScale(NODE_SIZE / bg.height);
 
 			let node = new Node2(this, x, y, organism);
 
@@ -88,11 +122,80 @@ class LevelScene3 extends Phaser.Scene {
 			// this.updateSize(node, 0);
 
 			node.setDepth(1);
+			node.setVisible(false);
 			// node.text.setText(0);
 
 			node.on('onEnter', this.onNodeAddOrRemove, this);
 			node.on('onExit', this.onNodeAddOrRemove, this);
 			node.on('onPlusMinus', this.onNodePlusMinus, this);
+
+			if (this.roleMap[node.species.id]) {
+				node.role = this.roleMap[node.species.id];
+			}
+			else {
+				console.error("Unknown role for species:", node.species.name, node.species.id);
+			}
+		}
+
+
+		// Empty nodes
+
+		this.fakeNodes = {
+			carnivore_1:	new FakeNode(this, 0.49 * this.W, 0.15 * this.H, 'Carnivore'),
+			herbivore_1:	new FakeNode(this, 0.62 * this.W, 0.40 * this.H, 'Herbivore'),
+			plant_1:		new FakeNode(this, 0.53 * this.W, 0.65 * this.H, 'Plant'),
+
+			carnivore_2:	new FakeNode(this, 0.32 * this.W, 0.15 * this.H, 'Carnivore'),
+			herbivore_2:	new FakeNode(this, 0.38 * this.W, 0.40 * this.H, 'Herbivore'),
+			plant_2:		new FakeNode(this, 0.27 * this.W, 0.65 * this.H, 'Plant'),
+			plant_3:		new FakeNode(this, 0.75 * this.W, 0.65 * this.H, 'Plant'),
+		};
+
+		// this.emptyCarnivore = new FakeNode(this, this.W*0.45, this.W*0.10, 'Carnivore');
+		// this.emptyHerbivore = new FakeNode(this, this.W*0.60, this.W*0.23, 'Herbivore');
+		// this.emptyPlant = new FakeNode(this, this.W*0.50, this.W*0.37, 'Plant');
+		// this.fakeNodes = [this.emptyCarnivore, this.emptyHerbivore, this.emptyPlant];
+
+		/*
+		this.paths.push(new Path(this, this.emptyCarnivore, this.emptyHerbivore, 1));
+		this.paths.push(new Path(this, this.emptyHerbivore, this.emptyPlant, 1));
+		for (const node of this.nodes) {
+			if (node.species.type == "animal") {
+				if (node.species.food == "carnivore") {
+					this.paths.push(new Path(this, node, this.emptyHerbivore, 1));
+					// this.emptyCarnivore.addReplacement(node);
+				}
+				else if (node.species.food == "herbivore") {
+					this.paths.push(new Path(this, node, this.emptyPlant, 1));
+					this.paths.push(new Path(this, this.emptyCarnivore, node, 1));
+					// this.emptyHerbivore.addReplacement(node);
+				}
+			}
+			else if (node.species.type == "plant") {
+				this.paths.push(new Path(this, this.emptyHerbivore, node, 1));
+				// this.emptyPlant.addReplacement(node);
+			}
+
+			if (node.species.id == this.nodeMap.carnivore_1) {
+				this.emptyCarnivore.addReplacement(node);
+			}
+			if (node.species.id == this.nodeMap.herbivore_1) {
+				this.emptyHerbivore.addReplacement(node);
+			}
+			if (node.species.id == this.nodeMap.plant_1) {
+				this.emptyPlant.addReplacement(node);
+			}
+		}
+		*/
+
+
+		// Node-fake relations
+
+		for (const node of this.nodes) {
+			this.fakeNodes[node.role].addReplacement(node);
+
+			// this.nodeMap[key].fake = this.fakeNodes[key];
+			// this.fakeNodes[key].node = this.nodeMap[key].fake;
 		}
 
 
@@ -116,40 +219,15 @@ class LevelScene3 extends Phaser.Scene {
 					// amount = 1.0;
 					if (eats) {
 						// console.log(node.species.name, '->', other.species.name, '=', amount);
-						let path = new Path(this, node, other, amount);
-						this.paths.push(path);
-						node.neighbours.push({node:other, value:amount});
-						other.neighbours.push({node:node, value:-amount});
+						const nodeFake = this.fakeNodes[node.role];
+						const otherFake = this.fakeNodes[other.role];
+
+						this.addPath(node, other, amount);
+						this.addPath(nodeFake, other, amount);
+						this.addPath(nodeFake, otherFake, amount);
+						this.addPath(node, otherFake, amount);
 					}
 				}
-			}
-		}
-
-
-		// Empty circle
-
-		this.emptyCarnivore = new FakeNode(this, this.W*0.45, this.W*0.10, 'Carnivore');
-		this.emptyHerbivore = new FakeNode(this, this.W*0.60, this.W*0.23, 'Herbivore');
-		this.emptyPlant = new FakeNode(this, this.W*0.50, this.W*0.37, 'Plant');
-		this.fakeNodes = [this.emptyCarnivore, this.emptyHerbivore, this.emptyPlant];
-
-		this.paths.push(new Path(this, this.emptyCarnivore, this.emptyHerbivore, 1));
-		this.paths.push(new Path(this, this.emptyHerbivore, this.emptyPlant, 1));
-		for (const node of this.nodes) {
-			if (node.species.type == "animal") {
-				if (node.species.food == "carnivore") {
-					this.paths.push(new Path(this, node, this.emptyHerbivore, 1));
-					this.emptyCarnivore.replacements.push(node);
-				}
-				else if (node.species.food == "herbivore") {
-					this.paths.push(new Path(this, node, this.emptyPlant, 1));
-					this.paths.push(new Path(this, this.emptyCarnivore, node, 1));
-					this.emptyHerbivore.replacements.push(node);
-				}
-			}
-			else if (node.species.type == "plant") {
-				this.paths.push(new Path(this, this.emptyHerbivore, node, 1));
-				this.emptyPlant.replacements.push(node);
 			}
 		}
 
@@ -167,6 +245,8 @@ class LevelScene3 extends Phaser.Scene {
 		// this.add.image(100, 300, 'icon-soil');
 		// this.add.image(200, 300, 'icon-rain');
 		// this.add.image(300, 300, 'icon-sun');
+
+		this.startStory(1);
 	}
 
 	update(time, deltaMs) {
@@ -183,12 +263,71 @@ class LevelScene3 extends Phaser.Scene {
 			node.update(time, delta);
 		}
 
-		for (const node of this.fakeNodes) {
-			node.update(time, delta);
+		for (const key in this.fakeNodes) {
+			this.fakeNodes[key].update(time, delta);
 		}
 
 		for (const path of this.paths) {
 			path.update(time, delta);
+		}
+	}
+
+
+	startStory(number) {
+		this.storyRunning = true;
+		this.currentStory = number;
+
+		this.instructionText.setVisible(true);
+		this.nextButton.setVisible(false);
+		this.nextText.setVisible(false);
+		this.storyText1.setVisible(false);
+		this.storyText2.setVisible(false);
+
+		if (number == 1) {
+			this.instructionText.setText("Build a food chain by placing the plants and animals");//("Place the plants and animals at the right slots in the food chain");
+			for (const node of this.nodes) {
+				node.setVisible(this.story1.includes(node.role));
+			}
+			for (const key in this.fakeNodes) {
+				this.fakeNodes[key].setVisible(this.story1.includes(key));
+			}
+		}
+		else if (number == 2) {
+			this.instructionText.setText("Now, expand the food chain with more species to build a food web"); // "Place the plants and animals at the right slots in the food web"
+			for (const node of this.nodes) {
+				node.setVisible(this.story2.includes(node.role));
+			}
+			for (const key in this.fakeNodes) {
+				this.fakeNodes[key].setVisible(this.story2.includes(key));
+			}
+		}
+		else {
+			this.instructionText.setText("Try to remove the plants and animals to see how they influence each other");
+			for (const node of this.nodes) {
+				node.setVisible(this.story2.includes(node.role));
+			}
+			for (const key in this.fakeNodes) {
+				this.fakeNodes[key].setVisible(false);
+			}
+		}
+	}
+
+	completeStory() {
+		this.storyRunning = false;
+
+		this.instructionText.setVisible(false);
+		this.nextButton.setVisible(true);
+		this.nextText.setVisible(true);
+		this.storyText1.setVisible(true);
+		this.storyText2.setVisible(true);
+
+		if (this.currentStory == 1) {
+			this.storyText1.setText("You have created a food chain!");
+			this.storyText2.setText("The energy flows from the plant to the herbivore to the carnivore"); // The herbivore eats the plant, and the carnivore eats the herbivore.
+		}
+		else if (this.currentStory == 2) {
+			this.storyText1.setText("You have created a food web!");
+			this.storyText2.setText("Animals prefer some food over other, which makes more energy flow that way");
 		}
 	}
 
@@ -200,6 +339,7 @@ class LevelScene3 extends Phaser.Scene {
 		}
 		window.simulator2.run();
 		this.updatePaths();
+		this.startStory(1);
 	}
 
 	onNodePlusMinus(node, value) {
@@ -277,6 +417,24 @@ class LevelScene3 extends Phaser.Scene {
 			this.updatePaths();
 		}
 		this.updatePopulations();
+
+		if (this.storyRunning) {
+			let success = true;
+			for (const node of this.nodes) {
+				if ( (this.currentStory == 1 && this.story1.includes(node.role)) || (this.currentStory == 2 && this.story2.includes(node.role)) ) {
+					if (!node.active) {
+						success = false;
+						break;
+					}
+				}
+			}
+			if (this.currentStory > 2) {
+				success = false;
+			}
+			if (success) {
+				this.completeStory();
+			}
+		}
 	}
 
 
@@ -291,7 +449,7 @@ class LevelScene3 extends Phaser.Scene {
 				let max = this.nodes[i].maxPopThreshold;
 				let value = (populations[i] - min) / (max - min);
 				// let value = populations[i];
-				this.nodes[i].circle.setScale(0.4 + 0.9 * value);
+				this.nodes[i].circle.setScale(0.3 + 1.2 * value);
 
 				if (populations[i] < 0.03) {
 					this.nodes[i].resetPosition(false);
@@ -311,6 +469,13 @@ class LevelScene3 extends Phaser.Scene {
 			// for (let i=p; i<10; i++) {t+=".";}
 			// this.nodes[i].text.setText(t);
 		}
+	}
+
+	addPath(node1, node2, amount) {
+		let path = new Path(this, node1, node2, amount);
+		this.paths.push(path);
+		node1.neighbours.push({node:node2, value:amount});
+		node2.neighbours.push({node:node1, value:-amount});
 	}
 
 	updatePaths() {

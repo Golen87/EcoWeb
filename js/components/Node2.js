@@ -119,6 +119,9 @@ class Node2 extends Button {
 	}
 
 	isInsidePlayingField() {
+		if (!this.visible) {
+			return false;
+		}
 		// if (this.goalX > 0.65 * this.scene.W)
 		// if (this.goalX < NODE_SIZE/2)
 		// if (this.goalY > this.scene.H - NODE_SIZE/2)

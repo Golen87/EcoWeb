@@ -5,6 +5,7 @@ class FakeNode extends Button {
 		this.name = name;
 		scene.add.existing(this);
 
+		this.neighbours = [];
 		this.replacements = [];
 
 		this.graphics = scene.add.graphics({x: 0, y: 0});
@@ -26,14 +27,27 @@ class FakeNode extends Button {
 	}
 
 	update(time, delta) {
-		let anyInside = this.replacements.some(node => node.isInsidePlayingField());
+		let anyInside = this.replacements.some(node => node.isInsidePlayingField() || !node.stick);
 		let anyActive = this.replacements.some(node => node.active);
-		this.setVisible(!anyActive);
-		this.setAlpha((!anyActive && anyInside) ? 0.5+0.25*Math.sin(0.008*time) : 1.0);
+
+		// 0.0 if any node is active
+		// 0.5 if any node is held, not yet active
+		// 1.0 if idle
+		this.setAlpha(
+			(anyActive) ?
+				0.0 :
+				(!anyActive && anyInside) ?
+					0.5+0.25*Math.sin(0.008*time) :
+					1.0
+		);
+	}
+
+	addReplacement(node) {
+		this.replacements.push(node);
 	}
 
 	isInsidePlayingField() {
-		return this.replacements.every(node => !node.isInsidePlayingField());
+		return this.visible && this.replacements.every(node => node.stick && !node.isInsidePlayingField());
 	}
 
 	getWidth() {
