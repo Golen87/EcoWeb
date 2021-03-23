@@ -82,7 +82,7 @@ class Simulator2 {
 
 	run() {
 		this.updateInteractions();
-		this.solve(30);
+		this.solve(20);
 	}
 
 	updateInteractions() {

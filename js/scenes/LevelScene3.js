@@ -253,7 +253,7 @@ class LevelScene3 extends Phaser.Scene {
 		let delta = deltaMs / 1000;
 
 		if (this.timeStamp < window.simulator2.time) {
-			this.timeStamp += 0.1;
+			this.timeStamp += 0.05;
 			this.updatePopulations();
 		}
 
