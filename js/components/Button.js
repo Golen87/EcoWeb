@@ -5,12 +5,12 @@ class Button extends Phaser.GameObjects.Container {
 		this.hover = false;
 		this.hold = false;
 
-		this.soundHover = scene.sound.add('hover_button');
-		this.soundHover.setVolume(0.05);
-		this.soundPress = scene.sound.add('press_button');
-		this.soundPress.setVolume(0.2);
-		this.soundRelease = scene.sound.add('release_button');
-		this.soundRelease.setVolume(0.2);
+		// this.soundHover = scene.sound.add('hover_button');
+		// this.soundHover.setVolume(0.05);
+		// this.soundPress = scene.sound.add('press_button');
+		// this.soundPress.setVolume(0.2);
+		// this.soundRelease = scene.sound.add('release_button');
+		// this.soundRelease.setVolume(0.2);
 	}
 
 
@@ -35,17 +35,17 @@ class Button extends Phaser.GameObjects.Container {
 
 	onOver() {
 		this.hover = true;
-		this.soundHover.play();
+		// this.soundHover.play();
 	}
 
 	onDown() {
 		this.hold = true;
-		this.soundRelease.play();
+		// this.soundRelease.play();
 	}
 
 	onUp() {
 		if (this.hold) {
-			this.soundPress.play();
+			// this.soundPress.play();
 			this.hold = false;
 			this.onClick();
 		}

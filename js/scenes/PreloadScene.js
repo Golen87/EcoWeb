@@ -142,18 +142,18 @@ class PreloadScene extends Phaser.Scene {
 
 
 		/* Audio */
-		this.load.audio('hover_button', [ 'assets/audio/hover_button.ogg' ] );
-		this.load.audio('press_button', [ 'assets/audio/press_button.ogg' ] );
-		this.load.audio('release_button', [ 'assets/audio/release_button.ogg' ] );
-		this.load.audio('ui_box_open', [ 'assets/audio/ui_box_open.ogg' ] );
-		this.load.audio('ui_menu_close', [ 'assets/audio/ui_menu_close.ogg' ] );
-		this.load.audio('ui_menu_open', [ 'assets/audio/ui_menu_open.ogg' ] );
-		this.load.audio('ui_dnd_click', [ 'assets/audio/ui_dnd_click.ogg' ] );
-		this.load.audio('ui_dnd_grab', [ 'assets/audio/ui_dnd_grab.ogg' ] );
-		this.load.audio('ui_dnd_drop', [ 'assets/audio/ui_dnd_drop.ogg' ] );
-		this.load.audio('ui_menu_swoosh', [ 'assets/audio/ui_menu_swoosh.ogg' ] );
+		// this.load.audio('hover_button', [ 'assets/audio/hover_button.ogg' ] );
+		// this.load.audio('press_button', [ 'assets/audio/press_button.ogg' ] );
+		// this.load.audio('release_button', [ 'assets/audio/release_button.ogg' ] );
+		// this.load.audio('ui_box_open', [ 'assets/audio/ui_box_open.ogg' ] );
+		// this.load.audio('ui_menu_close', [ 'assets/audio/ui_menu_close.ogg' ] );
+		// this.load.audio('ui_menu_open', [ 'assets/audio/ui_menu_open.ogg' ] );
+		// this.load.audio('ui_dnd_click', [ 'assets/audio/ui_dnd_click.ogg' ] );
+		// this.load.audio('ui_dnd_grab', [ 'assets/audio/ui_dnd_grab.ogg' ] );
+		// this.load.audio('ui_dnd_drop', [ 'assets/audio/ui_dnd_drop.ogg' ] );
+		// this.load.audio('ui_menu_swoosh', [ 'assets/audio/ui_menu_swoosh.ogg' ] );
 
-		this.load.audio('ambience_main_menu', [ 'assets/audio/ambience_main_menu.ogg' ] );
+		// this.load.audio('ambience_main_menu', [ 'assets/audio/ambience_main_menu.ogg' ] );
 
 
 		/* Plugins */
