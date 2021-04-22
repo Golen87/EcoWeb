@@ -28,7 +28,7 @@ class FakeNode extends Button {
 
 	update(time, delta) {
 		let anyInside = this.replacements.some(node => node.isInsidePlayingField() || !node.stick);
-		let anyActive = this.replacements.some(node => node.active);
+		let anyActive = this.replacements.some(node => node.inPlay);
 
 		// 0.0 if any node is active
 		// 0.5 if any node is held, not yet active
@@ -39,6 +39,11 @@ class FakeNode extends Button {
 				(!anyActive && anyInside) ?
 					0.5+0.25*Math.sin(0.008*time) :
 					1.0
+		);
+		this.setScale(
+			(!anyActive && anyInside) ?
+				1.0+0.03*Math.sin(0.008*time) :
+				1.0
 		);
 	}
 

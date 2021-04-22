@@ -13,6 +13,9 @@ const config = {
 			gravity: {y: 200}
 		}
 	},
+	pipeline: [
+		GrayScalePostFilter
+	],
 	scene: [
 		PreloadScene,
 		TitleScene,

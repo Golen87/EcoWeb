@@ -31,12 +31,12 @@ class Path extends Phaser.GameObjects.Container {
 		// 	this.node2
 		// );
 		this.curve = new Phaser.Curves.CubicBezier(new Phaser.Math.Vector2(0,0), new Phaser.Math.Vector2(0,0), new Phaser.Math.Vector2(0,0), new Phaser.Math.Vector2(0,0));
-		this.temp = new Phaser.Math.Vector2(0,0);
 		this.updateCurvePosition();
 
 
 		// this.speed *= this.curve.getLength() / 250;
-		this.dotCount = 1.5 + amount * 3.5;
+		// this.dotCount = 1.5 + amount * 3.5; 
+		this.dotDensity = 1.0;
 
 		this.lineThickness = 2;
 
@@ -75,9 +75,9 @@ class Path extends Phaser.GameObjects.Container {
 		// Draw curve dots
 
 		// let count = Math.min(this.dotCount, 10);
-		let count = this.curve.getLength()/100;
+		let count = this.dotDensity * this.curve.getLength()/100;
 		// let radius = this.getWidth();
-		let hack = Math.max(this.node1.liftSmooth, this.node2.liftSmooth);
+		let hack = Math.max(this.node1.liftSmooth, this.node2.liftSmooth, !this.node1.alive || !this.node2.alive);
 		let radius = (2 - 1.5*hack) * this.lineThickness;
 		let speed = this.speed * this.curve.getLength() / 300;
 		let offset = (time / speed) % (1/count);

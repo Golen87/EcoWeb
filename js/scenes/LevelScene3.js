@@ -6,13 +6,21 @@ class LevelScene3 extends Phaser.Scene {
 
 		// "Role" is a node's role in the scenario, deciding when it appears in the story
 		this.roleMap = {
-			"96b49f05-e31c-46c6-a11b-46a8417073d5":	"carnivore_1",	// Lejon
-			"5ca8345a-20b4-46d8-af6f-b3add4bbd89f":	"herbivore_1",	// Zebra
-			"29fe89a4-abd1-4f18-ad38-baac84902748":	"plant_1",		// Acalypha fruticosa
-			"23871c47-e590-473c-b551-1d9e04b0c612":	"carnivore_2",	// Vildhund
-			"28fdbae5-dc73-47bf-a069-cc72cd277607":	"herbivore_2",	// Kirks dik-dik
-			"e0ec6d69-8d39-45f4-ad7b-9a476ab01362":	"plant_2",		// Allophylus Rubifolius
-			"8243441b-4edb-413d-bf0f-fffdc337fd08":	"plant_3",		// Heteropogon contortus
+			"138fc562-6fb9-45ff-bcdf-656208d2be14": "carnivore_1", // Lion
+			"3c3f0fdf-e6c1-4a94-b52e-e3785a2849ca": "herbivore_1", // Plains zebra
+			"042f48d0-4a28-4e77-874f-b9a5b1f821af": "plant_1", // Heteropogon contortus
+			"f4f32888-4079-4c70-a204-a094647ea210": "herbivore_2", // Kirk's dik-dik
+			// "a11f07e7-554c-4b0a-ab11-ac34d84b6d85": "plant_2", // Acalypha fruticosa
+			"37b60be7-d897-41cb-91e5-56045687788e": "plant_2", // Allophylus rubifolius
+			"93878dd9-1df5-4521-b5ba-57f63450e912": "plant_3", // Panicum coloratum
+
+			// "0fd86e7d-942f-431f-86d4-e5004f1caed1":	"carnivore_1",	// Lejon
+			// "32594c3d-0c63-4cd6-9350-2e40f759a40e":	"herbivore_1",	// Zebra
+			// "4605a453-92f8-4bf5-90bc-9a38fc993f03":	"plant_1",		// Heteropogon contortus
+			// "0c104616-32bf-4b4a-aa1f-5003fcb10a0a":	"carnivore_2",	// Vildhund
+			// "827bbe9a-63fe-4340-8cb6-b97a8f416b5f":	"herbivore_2",	// Kirks dik-dik
+			// "d73dbde0-daf1-499d-a3f0-173ad916cef0":	"plant_2",		// Acalypha fruticosa
+			// "fa53ea56-87fd-4e57-ad86-f4a713d2fa3f":	"plant_3",		// Panicum coloratum
 		};
 		this.story1 = ["carnivore_1", "herbivore_1", "plant_1"];
 		this.story2 = ["carnivore_1", "herbivore_1", "plant_1", "herbivore_2", "plant_2", "plant_3"];
@@ -191,35 +199,51 @@ class LevelScene3 extends Phaser.Scene {
 		// this.containToScreen(land);
 
 
+		// Node slots
+
+		this.nodeSlots = [];
+		let order = [3,4,2,5,1,0];
+
+		for (let i = 0; i < 6; i++) {
+			let x = sbX + 1.3 * NODE_SIZE * (order[i]-3);
+			let y = sbY;
+			let slot = {x, y, taken: false};
+			this.nodeSlots.push(slot);
+		}
 
 
 		// Nodes
 
 		this.nodes = [];
-		const h = Math.ceil(window.simulator2.species.length / 8);
-		const w = window.simulator2.species.length / h;
 		for (let i = 0; i < window.simulator2.species.length; i++) {
 			const organism = window.simulator2.scenario.species[i];
 
-			// let x = this.CX + this.W * (-0.5 + (organism.x / 100));
-			// let y = this.CY + this.H * (-0.5 + (organism.y / 100));
-			let temp = [2, 0, 1, 3, 4, 5, 6][i];
-			let x = sbX + (NODE_SIZE*1.3)*((1-w)/2 + temp%w);
-			let y = sbY + (NODE_SIZE*0.9)*((1-h)/2 + Math.floor(temp/w));
+			if (this.roleMap[organism.id]) {
 
-			// let bg = this.add.sprite(x, y, "circle");
-			// bg.setTint(0x222222).setAlpha(0.5).setScale(NODE_SIZE / bg.height);
+				let node = new Node2(this, 0, 0, organism);
+				this.nodes.push(node);
 
-			let node = new Node2(this, x, y, organism);
+				// Experimental boids
+				node.velocity = new Phaser.Math.Vector2(0, 0);
 
-			this.nodes.push(node);
+				node.setDepth(1);
+				node.setVisible(false);
 
-			// node.size = 0;
-			// this.updateSize(node, 0);
+				node.on('onEnter', this.onNodeAddOrRemove, this);
+				node.on('onExit', this.onNodeAddOrRemove, this);
+				node.on('onPlusMinus', this.onNodePlusMinus, this);
+				node.on('onDeath', this.onNodeDeath, this);
+				node.on('onDragStart', this.dismissWarning, this);
+
+				node.role = this.roleMap[organism.id];
+				node.index = i;
+			}
+		}
+
+
 
 			node.setDepth(1);
 			node.setVisible(false);
-			// node.text.setText(0);
 
 			node.on('onEnter', this.onNodeAddOrRemove, this);
 			node.on('onExit', this.onNodeAddOrRemove, this);
@@ -251,7 +275,9 @@ class LevelScene3 extends Phaser.Scene {
 		// Node-fake relations
 
 		for (const node of this.nodes) {
-			this.fakeNodes[node.role].addReplacement(node);
+			if (node.role) {
+				this.fakeNodes[node.role].addReplacement(node);
+			}
 
 			// this.nodeMap[key].fake = this.fakeNodes[key];
 			// this.fakeNodes[key].node = this.nodeMap[key].fake;
@@ -263,7 +289,7 @@ class LevelScene3 extends Phaser.Scene {
 		this.paths = [];
 		for (const node of this.nodes) {
 			for (const other of this.nodes) {
-				if (node != other) {
+				if (node != other && node.role && other.role) {
 					let eats = false;
 					let amount = 0;
 					for (const item of node.species.diet) {
@@ -275,9 +301,9 @@ class LevelScene3 extends Phaser.Scene {
 							break;
 						}
 					}
-					// amount = 1.0;
+					amount = 1.0;
 					if (eats) {
-						// console.log(node.species.name, '->', other.species.name, '=', amount);
+						// console.log(node.species.name, '->', other.species.name, '=', amount.toFixed(1));
 						const nodeFake = this.fakeNodes[node.role];
 						const otherFake = this.fakeNodes[other.role];
 
@@ -309,7 +335,10 @@ class LevelScene3 extends Phaser.Scene {
 		let delta = deltaMs / 1000;
 
 		if (this.timeStamp < window.simulator2.time) {
-			this.timeStamp += 0.05;
+			let x = (this.timeStamp - (window.simulator2.time - window.simulator2.simTime)) / window.simulator2.simTime;
+			let fac = 1 - Math.pow(x, 2);
+			this.timeStamp += Math.max(0.05 * fac, 0.01);
+			this.timeStamp = Math.min(this.timeStamp, window.simulator2.time);
 			this.updatePopulations();
 			this.graph.draw(this.timeStamp);
 		}
@@ -376,6 +405,13 @@ class LevelScene3 extends Phaser.Scene {
 			}
 			for (const key in this.fakeNodes) {
 				this.fakeNodes[key].setVisible(false);
+			}
+		}
+
+		// Move nodes to slots
+		for (const node of this.nodes) {
+			if (node.requiresSlot()) {
+				this.assignNodeToSlot(node, true);
 			}
 		}
 	}
@@ -481,6 +517,22 @@ class LevelScene3 extends Phaser.Scene {
 	// 	});
 	// }
 
+	assignNodeToSlot(node, forceMove=false) {
+		for (let i = 0; i < this.nodeSlots.length; i++) {
+			let slot = this.nodeSlots[i];
+
+			if (!slot.taken) {
+				slot.taken = true;
+				node.assignSlot(slot.x, slot.y, i, forceMove);
+				break;
+			}
+		}
+	}
+
+	removeNodeFromSlot(node, index) {
+		this.nodeSlots[index].taken = false;
+	}
+
 	onNodeAddOrRemove(node, active, manually) {
 		// Causes an ugly jump
 		// this.timeStamp = window.simulator2.time;
@@ -498,7 +550,7 @@ class LevelScene3 extends Phaser.Scene {
 			let success = true;
 			for (const node of this.nodes) {
 				if ( (this.currentStory == 1 && this.story1.includes(node.role)) || (this.currentStory == 2 && this.story2.includes(node.role)) ) {
-					if (!node.active) {
+					if (!node.inPlay) {
 						success = false;
 						break;
 					}
@@ -518,18 +570,16 @@ class LevelScene3 extends Phaser.Scene {
 		let populations = window.simulator2.getPopulationAt(this.timeStamp);
 
 		for (let i = 0; i < this.nodes.length; i++) {
-			if (this.nodes[i].active) {
-				let min = this.nodes[i].minPopThreshold;
-				let max = this.nodes[i].maxPopThreshold;
-				let value = (populations[i] - min) / (max - min);
-				// let value = populations[i];
-				this.nodes[i].circle.setScale(0.3 + 1.2 * value);
+			let node = this.nodes[i];
+			let index = node.index;
 
-				if (populations[i] < 0.03) {
-					this.nodes[i].resetPosition(false);
-					// window.simulator2.run();
-					// this.updatePaths();
-				}
+			if (node.inPlay) {
+				node.setPopulation(populations[index]);
+
+				// Automatically kill node
+				// if (!node.alive) {
+					// node.resetPosition(false);
+				// }
 			}
 			else {
 				this.nodes[i].circle.setScale(1);
