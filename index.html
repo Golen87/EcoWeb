@@ -428,9 +428,25 @@
 
 						<!-- Name -->
 						<div class="form-group row">
-							<label class="col-sm-4 col-form-label">Name</label>
+							<label class="col-sm-4 col-form-label">Latin</label>
 							<div class="col-sm-8">
 								<input v-model="node.name" type="text" class="form-control" minlength="2" maxlength="30" :required="tab == 1">
+							</div>
+						</div>
+
+						<!-- English -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">English</label>
+							<div class="col-sm-8">
+								<input v-model="node.eng" type="text" class="form-control" minlength="2" maxlength="30">
+							</div>
+						</div>
+
+						<!-- Swedish -->
+						<div class="form-group row">
+							<label class="col-sm-4 col-form-label">Swedish</label>
+							<div class="col-sm-8">
+								<input v-model="node.swe" type="text" class="form-control" minlength="2" maxlength="30">
 							</div>
 						</div>
 

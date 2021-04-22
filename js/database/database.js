@@ -94,7 +94,11 @@ class Database {
 	newNode() {
 		return {
 			"id": this.getUniqueId(),
-			"name": "",
+			"name": "", // Latin
+			"eng": "", // English
+			"swe": "", // Swedish
+			"chi": "", // Chinese
+			"group": -1, // Serengeti node group
 			"image": "missing",
 			"color": "#000000",
 			"description": null,

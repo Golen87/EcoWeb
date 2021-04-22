@@ -13,13 +13,14 @@ class PreloadScene extends Phaser.Scene {
 		});
 		this.loading.setOrigin(0.5);
 
-		this.load.image('bg_title', 'assets/images/background/BgTitel.png');
-		this.load.image('bg_world', 'assets/images/background/BgVärld.png');
-		this.load.image('bg_1', 'assets/images/background/BG1.png');
-		this.load.image('bg_2', 'assets/images/background/BG2.png');
-		this.load.image('bg_3', 'assets/images/background/BG3.png');
+		// this.load.image('bg_title', 'assets/images/background/BgTitel.png');
+		// this.load.image('bg_world', 'assets/images/background/BgVärld.png');
+		// this.load.image('bg_1', 'assets/images/background/BG1.png');
+		// this.load.image('bg_2', 'assets/images/background/BG2.png');
+		// this.load.image('bg_3', 'assets/images/background/BG3.png');
 
 		this.load.image('bg_uni_1', 'assets/images/background/universeum/Serengeti-scene.jpeg');
+		this.load.image('bg_land', 'assets/images/background/universeum/land.png');
 
 		// this.load.image('bg_parallax_1', 'assets/images/background/parallax/1.png');
 		// this.load.image('bg_parallax_2', 'assets/images/background/parallax/2.png');
@@ -97,28 +98,27 @@ class PreloadScene extends Phaser.Scene {
 		this.load.image('frame_search', 'assets/images/ui/frame/search.png');
 
 		// Universeum
-		this.load.image('icon-backToBeginning', 'assets/images/ui/universeum/icon-backToBeginning.png');
-		this.load.image('icon-backward', 'assets/images/ui/universeum/icon-backward.png');
+		this.load.image('icon-foodWeb', 'assets/images/ui/universeum/icon-foodWeb.png');
+		this.load.image('icon-ecoWeb', 'assets/images/ui/universeum/icon-ecoWeb.png');
 		this.load.image('icon-ecoChallenge', 'assets/images/ui/universeum/icon-ecoChallenge.png');
 		this.load.image('icon-ecoMission', 'assets/images/ui/universeum/icon-ecoMission.png');
-		this.load.image('icon-ecoWeb', 'assets/images/ui/universeum/icon-ecoWeb.png');
-		this.load.image('icon-foodWeb', 'assets/images/ui/universeum/icon-foodWeb.png');
+		this.load.image('icon-backToBeginning', 'assets/images/ui/universeum/icon-backToBeginning.png');
+		this.load.image('icon-backward', 'assets/images/ui/universeum/icon-backward.png');
 		this.load.image('icon-forward', 'assets/images/ui/universeum/icon-forward.png');
 		this.load.image('icon-play', 'assets/images/ui/universeum/icon-play.png');
-		this.load.image('icon-rain', 'assets/images/ui/universeum/icon-rain.png');
 		this.load.image('icon-soil', 'assets/images/ui/universeum/icon-soil.png');
 		this.load.image('icon-sun', 'assets/images/ui/universeum/icon-sun.png');
-		// this.load.image('icon-backToBeginning-red', 'assets/images/ui/universeum/icon-backToBeginning-red.png');
-		// this.load.image('icon-backward-red', 'assets/images/ui/universeum/icon-backward-red.png');
-		// this.load.image('icon-ecoChallenge-red', 'assets/images/ui/universeum/icon-ecoChallenge-red.png');
-		// this.load.image('icon-ecoMission-red', 'assets/images/ui/universeum/icon-ecoMission-red.png');
-		// this.load.image('icon-ecoWeb-red', 'assets/images/ui/universeum/icon-ecoWeb-red.png');
-		// this.load.image('icon-foodWeb-red', 'assets/images/ui/universeum/icon-foodWeb-red.png');
-		// this.load.image('icon-forward-red', 'assets/images/ui/universeum/icon-forward-red.png');
-		// this.load.image('icon-play-red', 'assets/images/ui/universeum/icon-play-red.png');
-		// this.load.image('icon-rain-red', 'assets/images/ui/universeum/icon-rain-red.png');
-		// this.load.image('icon-soil-red', 'assets/images/ui/universeum/icon-soil-red.png');
-		// this.load.image('icon-sun-red', 'assets/images/ui/universeum/icon-sun-red.png');
+		this.load.image('icon-rain', 'assets/images/ui/universeum/icon-rain.png');
+		this.load.image('icon-info', 'assets/images/ui/universeum/icon-info.png');
+		this.load.image('icon-reset', 'assets/images/ui/universeum/icon-reset.png');
+		this.load.image('icon-bookmark-saved', 'assets/images/ui/universeum/icon-bookmark-saved.png');
+		this.load.image('icon-annualFlower', 'assets/images/ui/universeum/icon-annualFlower.png');
+		this.load.image('icon-grass', 'assets/images/ui/universeum/icon-grass.png');
+		this.load.image('icon-herb', 'assets/images/ui/universeum/icon-herb.png');
+		this.load.image('icon-shrub', 'assets/images/ui/universeum/icon-shrub.png');
+		this.load.image('icon-tree', 'assets/images/ui/universeum/icon-tree.png');
+		this.load.image('icon-menu-flag-se', 'assets/images/ui/universeum/icon-menu-flag-se.png');
+		this.load.image('icon-menu-flag-en', 'assets/images/ui/universeum/icon-menu-flag-en.png');
 
 
 		/* Videos */
@@ -136,9 +136,9 @@ class PreloadScene extends Phaser.Scene {
 		for (const data of NODE_IMAGES) {
 			this.load.image(data.value, NODE_IMAGES_PATH_SMALL + data.text);
 		}
-		for (const data of NODE_IMAGES) {
-			this.load.image(data.value+"_hq", NODE_IMAGES_PATH + data.text);
-		}
+		// for (const data of NODE_IMAGES) {
+			// this.load.image(data.value+"_hq", NODE_IMAGES_PATH + data.text);
+		// }
 
 
 		/* Audio */

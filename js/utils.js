@@ -136,7 +136,7 @@ function isPlainObject(obj) {
 function createText(scene, x=0, y=0, size=20, color="#FFF", text="") {
 	return scene.add.text(x, y, text, {
 		fontFamily: game.font,
-		fontSize: size + "px",
+		fontSize: Math.max(size, 1) + "px",
 		fill: color
 	});
 }

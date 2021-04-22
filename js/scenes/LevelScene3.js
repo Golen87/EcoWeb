@@ -241,21 +241,77 @@ class LevelScene3 extends Phaser.Scene {
 		}
 
 
+		// Large food web
 
+		this.selectedWebNode = null;
+		let WX = 100;
+		let WY = 100;
+		let WW = this.W - 200;
+		let WH = this.H - 200;
+		this.groupPositions = {
+			1:  new Phaser.Math.Vector2(WX+0.90*WW, WY+0.30*WH),
+			2:  new Phaser.Math.Vector2(WX+0.80*WW, WY+0.65*WH),
+
+			3:  new Phaser.Math.Vector2(WX+0.50*WW, WY+0.10*WH),
+			4:  new Phaser.Math.Vector2(WX+0.55*WW, WY+0.45*WH),
+			5:  new Phaser.Math.Vector2(WX+0.45*WW, WY+0.70*WH),
+			6:  new Phaser.Math.Vector2(WX+0.55*WW, WY+0.90*WH),
+
+			7:  new Phaser.Math.Vector2(WX+0.10*WW, WY+0.00*WH),
+			8:  new Phaser.Math.Vector2(WX+0.20*WW, WY+0.05*WH),
+			9:  new Phaser.Math.Vector2(WX+0.10*WW, WY+0.25*WH),
+			10: new Phaser.Math.Vector2(WX+0.30*WW, WY+0.40*WH),
+			11: new Phaser.Math.Vector2(WX+0.20*WW, WY+0.50*WH),
+			12: new Phaser.Math.Vector2(WX+0.30*WW, WY+0.70*WH),
+			13: new Phaser.Math.Vector2(WX+0.10*WW, WY+0.80*WH),
+			14: new Phaser.Math.Vector2(WX+0.25*WW, WY+1.00*WH),
+		};
+
+		this.webNodes = [];
+		for (let i = 0; i < window.simulator2.species.length; i++) {
+			const organism = window.simulator2.scenario.species[i];
+
+			let tier = (organism.type == 'plant' ? 1 : (organism.food == 'herbivore' ? 2 : 3));
+			let hasImage = !organism.image.startsWith('icon');
+
+			let x = this.groupPositions[organism.group].x + (-1+2*Math.random()) * 100;
+			let y = this.groupPositions[organism.group].y + (-1+2*Math.random()) * 100;
+			let size = 20 + 20 * tier;
+
+			let node = this.add.container(x, y);
 			node.setDepth(1);
 			node.setVisible(false);
+			node.species = organism;
 
-			node.on('onEnter', this.onNodeAddOrRemove, this);
-			node.on('onExit', this.onNodeAddOrRemove, this);
-			node.on('onPlusMinus', this.onNodePlusMinus, this);
+			let circle = this.add.sprite(0, 0, 'circle');
+			circle.setScale(size / circle.width);
+			circle.setTint(0x777777);
+			circle.setAlpha(0.5);
+			// circle.setVisible(tier == 1);
+			node.add(circle);
 
-			if (this.roleMap[node.species.id]) {
-				node.role = this.roleMap[node.species.id];
-			}
-			else {
-				console.error("Unknown role for species:", node.species.name, node.species.id);
-			}
+			let image = this.add.sprite(0, 0, organism.image);
+			// image.setTint(tier > 1 ? 0xFFFFFF : 0x777777);
+			image.setAlpha(hasImage ? 1.0 : 0.5);
+			image.setScale((hasImage ? 1.0 : 0.8) * size / image.width);
+			node.image = image;
+			node.add(image);
+
+			// node.origSize = size;
+			// node.setAlpha(tier > 1 ? 1.0 : 0.5);
+			// node.setVisible(false);
+
+			node.velocity = new Phaser.Math.Vector2(0, 0);
+
+			image.setInteractive({ useHandCursor: true })
+				.on('pointerup', () => {
+					this.selectedWebNode = (this.selectedWebNode != node) ? node : null;
+				});
+
+			this.webNodes.push(node);
 		}
+
+		this.webGraphics = this.add.graphics();
 
 
 		// Empty nodes
@@ -323,12 +379,58 @@ class LevelScene3 extends Phaser.Scene {
 		this.graph.setPosition(this.W - (0.5+0.3) * this.graph.width, this.H-this.graph.height/2);
 
 
+		// Warning popup
 
-		// this.add.image(100, 300, 'icon-soil');
-		// this.add.image(200, 300, 'icon-rain');
-		// this.add.image(300, 300, 'icon-sun');
+		this.warnCont = this.add.container(200, 200);
+		this.warnCont.setAlpha(0);
+		this.warnCont.setDepth(1);
+		this.warnCont.isActive = false;
+
+		this.warnText = createText(this, 0, 0, 24, "#ffffff", "Animals cannot survive\nwithout anything to eat!");
+		this.warnText.setOrigin(0.5);
+		this.warnText.setLineSpacing(10);
+		this.warnCont.add(this.warnText);
+
+		let wbSep = 1.5*24;
+		let wbW = this.warnText.displayWidth + wbSep;
+		let wbH = this.warnText.displayHeight + wbSep;
+		this.warnBox = this.add.rexRoundRectangle(0, 0, wbW, wbH, 5, 0X555555);
+		this.warnBox.setAlpha(0.5);
+		this.warnBox.setOrigin(0.5);
+		this.warnCont.add(this.warnBox);
+		this.warnCont.sendToBack(this.warnBox);
+
 
 		this.startStory(1);
+	}
+
+	drawWeb() {
+		this.webGraphics.clear();
+		if (this.currentStory > 0) {
+			return;
+		}
+
+		for (const node of this.webNodes) {
+			let diet = node.species.diet.map(x => x.node.id);
+
+			for (const other of this.webNodes) {
+				if (node != other && diet.includes(other.species.id)) {
+					// console.log(node.species.name, '->', other.species.name);
+
+					let active = (node == this.selectedWebNode || other == this.selectedWebNode);
+					let thickness = active ? 4.0 : 1.0;
+					let alpha = active ? 0.75 : 0.1;
+					this.webGraphics.lineStyle(thickness, 0XFFFFFF, alpha);
+					// this.webGraphics.setBlendMode(Phaser.BlendModes.ADD);
+
+					// node.setScale((active ? 2 : 1) * node.origSize / node.width);
+					// other.setScale((active ? 1.5 : 1) * node.origSize / node.width);
+
+					let curve = new Phaser.Curves.Line(node, other);
+					curve.draw(this.webGraphics);
+				}
+			}
+		}
 	}
 
 	update(time, deltaMs) {
@@ -358,10 +460,170 @@ class LevelScene3 extends Phaser.Scene {
 		for (const path of this.paths) {
 			path.update(time, delta);
 		}
+
+
+
+		// Boids
+		if (this.currentStory > 0) {
+			for (const node of this.nodes) {
+				if (node.inPlay && node.stick) {
+					let cohSum = new Phaser.Math.Vector2();
+					let cohCount = 0;
+					let sepSum = new Phaser.Math.Vector2();
+
+					for (const other of this.nodes) {
+						let dist = Phaser.Math.Distance.BetweenPoints(node, other);
+
+						let cohRad = 10000;
+						// if (dist < cohRad && node.species.group == other.species.group) {
+							cohSum.add(other);
+							cohCount++;
+						// }
+
+						let sepRad = node.circle.image.displayWidth/2 + other.circle.image.displayWidth/2;
+						sepRad *= 1.2;
+						if (dist < sepRad) {
+							let temp = new Phaser.Math.Vector2(node.x, node.y);
+							temp.subtract(other);
+							temp.scale(Math.pow((sepRad - dist) / sepRad, 1.1));
+							sepSum.add(temp);
+						}
+					}
+
+					let goalPos = new Phaser.Math.Vector2(this.fakeNodes[node.role].x, this.fakeNodes[node.role].y);
+					goalPos.y += 7*Math.sin(time/1500+goalPos.x/400+goalPos.y/1000);
+					goalPos.subtract(node);
+					goalPos.scale(this.storyRunning ? 0 : 0.001);
+					node.velocity.add(goalPos);
+
+					// cohSum.scale(1/cohCount);
+					// cohSum.subtract(node);
+					// cohSum.scale(0.01);
+					// node.velocity.add(cohSum);
+
+					sepSum.scale(0.02);
+					node.velocity.add(sepSum);
+
+					node.velocity.scale(0.95);
+					node.goalX += node.velocity.x;
+					node.goalY += node.velocity.y;
+
+					if (node.goalX < node.limitLeft) {
+						node.goalX = node.limitLeft;
+						node.velocity.x *= -1;
+					}
+					if (node.goalY < node.limitTop) {
+						node.goalY = node.limitTop;
+						node.velocity.y *= -1;
+					}
+					if (node.goalX > node.limitRight) {
+						node.goalX = node.limitRight;
+						node.velocity.x *= -1;
+					}
+					if (node.goalY > node.limitBottom) {
+						node.goalY = node.limitBottom;
+						node.velocity.y *= -1;
+					}
+
+					node.stickX = node.goalX;
+					node.stickY = node.goalY;
+				}
+			}
+		}
+
+
+
+		// Boids
+		if (this.currentStory == 0) {
+			for (const node of this.webNodes) {
+				let cohSum = new Phaser.Math.Vector2();
+				let cohCount = 0;
+				let sepSum = new Phaser.Math.Vector2();
+
+				for (const other of this.webNodes) {
+					let dist = Phaser.Math.Distance.BetweenPoints(node, other);
+
+					let cohRad = 10000;
+					// if (dist < cohRad && node.species.group == other.species.group) {
+						cohSum.add(other);
+						cohCount++;
+					// }
+
+					let sepRad = node.image.displayWidth/2 + other.image.displayWidth/2;
+					sepRad *= 1.1;
+					if (dist < sepRad) {
+						let temp = new Phaser.Math.Vector2(node.x, node.y);
+						temp.subtract(other);
+						temp.scale(Math.pow((sepRad - dist) / sepRad, 2));
+						sepSum.add(temp);
+					}
+				}
+
+				let goalPos = this.groupPositions[node.species.group].clone();
+				goalPos.y += 7*Math.sin(time/1500+goalPos.x/400+goalPos.y/1000);
+				goalPos.subtract(node);
+				goalPos.scale(0.001);
+				node.velocity.add(goalPos);
+
+				// cohSum.scale(1/cohCount);
+				// cohSum.subtract(node);
+				// cohSum.scale(0.01);
+				// node.velocity.add(cohSum);
+
+				sepSum.scale(0.2);
+				node.velocity.add(sepSum);
+
+				node.velocity.scale(0.95);
+				node.x += node.velocity.x;
+				node.y += node.velocity.y;
+
+				if (node.x < 100) {
+					node.x = 100;
+					node.velocity.x *= -1;
+				}
+				if (node.y < 100) {
+					node.y = 100;
+					node.velocity.y *= -1;
+				}
+				if (node.x > this.W - 100) {
+					node.x = this.W - 100;
+					node.velocity.x *= -1;
+				}
+				if (node.y > this.H - 100) {
+					node.y = this.H - 100;
+					node.velocity.y *= -1;
+				}
+			}
+		}
+
+		this.drawWeb();
 	}
 
 
 	startStory(number) {
+		this.dismissWarning();
+
+		let selectedChapter = number > 0 ? 0 : 2;
+
+		for (var i = this.chapterTabs.length - 1; i >= 0; i--) {
+			this.chapterTabs[i].setAlpha(i == selectedChapter ? 1.0 : 0.5);
+		}
+
+		if (number == 0) {
+			this.sidebarBg.setVisible(false);
+			this.graph.setVisible(false);
+			for (const node of this.webNodes) {
+				node.setVisible(true);
+			}
+		}
+		else {
+			this.sidebarBg.setVisible(true);
+			this.graph.setVisible(true);
+			for (const node of this.webNodes) {
+				node.setVisible(false);
+			}
+		}
+
 		this.storyRunning = true;
 		this.currentStory = number;
 
@@ -447,6 +709,7 @@ class LevelScene3 extends Phaser.Scene {
 		window.simulator2.reset();
 		window.simulator2.run(0);
 		this.updatePaths();
+		this.dismissWarning();
 		this.startStory(1);
 	}
 
@@ -493,6 +756,58 @@ class LevelScene3 extends Phaser.Scene {
 			}
 		});
 		*/
+	}
+
+	onNodeDeath(node) {
+		if (this.storyRunning) {
+			this.showWarning(node.x, node.y);
+		}
+	}
+
+	showWarning(x, y) {
+		if (!this.warnCont.isActive) {
+			let w = this.warnBox.displayWidth;
+			let h = this.warnBox.displayHeight;
+			let offset = 20;
+			let isOutside = (x - 1.7*w < 0);
+
+			this.warnCont.isActive = true;
+			this.warnCont.dir = (isOutside ? 1 : -1);
+			this.warnCont.setAlpha(0);
+			this.warnCont.setPosition(
+				x + this.warnCont.dir * ( 0.7 * w + offset ),
+				y
+			);
+
+			this.warnCont.tween = this.tweens.add({
+				targets: this.warnCont,
+				alpha: { from: 0, to: 1 },
+				x: (this.warnCont.dir == 1 ? '-' : '+') + '=' + offset,
+				ease: 'Cubic',
+				duration: 800
+			});
+		}
+	}
+
+	dismissWarning() {
+		if (this.warnCont.isActive) {
+			let w = this.warnBox.displayWidth;
+			let offset = 10;
+
+			if (this.warnCont.tween) {
+				this.warnCont.tween.stop();
+			}
+
+			this.tweens.add({
+				targets: this.warnCont,
+				alpha: { from: this.warnCont.alpha, to: 0 },
+				x: (this.warnCont.dir == 1 ? '+' : '-') + '=' + offset,
+				ease: 'Cubic.In',
+				duration: 300
+			});
+
+			this.warnCont.isActive = false;
+		}
 	}
 
 	// updateSize(node, value, delay=0) {

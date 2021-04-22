@@ -2,12 +2,14 @@ class Organism {
 	constructor(node, actor) {
 		this.id = node.id;
 		this.name = node.name;
+		// this.image = node.type == 'plant' ? "placeholder_plant" : node.image;
 		this.image = node.image;
 		this.color = node.color;
 		this.description = node.description;
 		this.type = node.type;
 		this.relations = node.relations;
 		this.stages = {};
+		this.group = node.group; // Serengeti
 
 		this.x = actor.position[0];
 		this.y = actor.position[1];
@@ -259,6 +261,11 @@ class Organism {
 			this.stages[id].finalize(dt);
 		}
 	}
+
+	isPlant() { return false; }
+	isAnimal() { return false; }
+	isHerbivore() { return false; }
+	isCarnivore() { return false; }
 }
 
 
@@ -290,6 +297,10 @@ class Animal extends Organism {
 		// 	return Math.pow(x, 4 * x) - 0.4 * Math.exp(-10 * x);
 		// };
 	}
+
+	isAnimal() { return true; }
+	isHerbivore() { return this.food == 'herbivore'; }
+	isCarnivore() { return this.food == 'carnivore'; }
 }
 
 
@@ -352,6 +363,8 @@ class Plant extends Organism {
 		// 	this.stages.largeLeaves.population.total.toFixed(0)
 		// ));
 	}
+
+	isPlant() { return true; }
 }
 
 
