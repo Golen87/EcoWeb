@@ -1,11 +1,13 @@
 class Simulator2 {
 	constructor() {
+		this.simTime = 20;
 	}
 
 	loadScenario(scenarioData) {
 		this.scenario = new Scenario(scenarioData);
 
 		this.time = 0;
+		this.history = {x:[], y:[]};
 		this.population = [];
 		this.growthRate = [];
 		this.carryingCapacity = [];
@@ -46,6 +48,8 @@ class Simulator2 {
 			// Sort relations by size
 			this.relationMap[i].sort((a, b) => (a.value < b.value) ? 1 : -1);
 		}
+
+		this.solve(0, 1);
 	}
 
 	getRelationPref(predIndex, preyIndex) {
@@ -61,7 +65,7 @@ class Simulator2 {
 		let index = this.species.findIndex(x => x.id == species.id);
 
 		if (active) {
-			this.population[index] = 0.1;
+			this.population[index] = 0.05;
 		}
 		else {
 			this.population[index] = 0;
@@ -80,9 +84,19 @@ class Simulator2 {
 		}
 	}
 
-	run() {
+	reset() {
+		this.time = 0;
+		this.history = {x:[], y:[]};
+
+		for (let i = 0; i < this.species.length; i++) {
+			this.population[i] = 0;
+			this.interactionMatrix[i][i] = -1;
+		}
+	}
+
+	run(startTime) {
 		this.updateInteractions();
-		this.solve(20);
+		this.solve(startTime, this.simTime);
 	}
 
 	updateInteractions() {
@@ -107,6 +121,11 @@ class Simulator2 {
 				for (const rel of this.relationMap[i]) {
 					let j = rel.index;
 
+					// Stop lions from eating themselves
+					if (i == j) {
+						continue;
+					}
+
 					if (this.population[j] > 0 && weights.length > 0) {
 						let value = weights.shift();
 						this.interactionMatrix[i][j] = value;
@@ -122,20 +141,29 @@ class Simulator2 {
 	}
 
 
-	solve(duration) {
-		if (duration <= 0)
-			return;
-
-		// console.log("> Solving", this.time, "-", (this.time+duration));
+	solve(startTime, duration) {
+		console.log("> Solving", startTime.toFixed(0), "-", (startTime+duration).toFixed(0));
 
 		// ODE Solver
-		let start = this.time;
+		let start = startTime;
 		let end = start + duration;
 		let population = this.population;
 
 		this.sol = numeric.dopri(start, end, population, this.getDerivative.bind(this), 1e-6, 2000);
 		this.population = [...this.sol.y[this.sol.y.length-1]]; // Copy
 		this.time = end;
+
+		// Discard history that'll be overwritten
+		for (let i = 0; i < this.history.x.length; i++) {
+			if (this.history.x[i] > start) {
+				this.history.x.splice(i);
+				this.history.y.splice(i);
+				break;
+			}
+		}
+
+		this.history.x = this.history.x.concat(this.sol.x);
+		this.history.y = this.history.y.concat(this.sol.y);
 
 		// if (this.sol.x[0] == this.result.x[this.result.x.length-1]) {
 			// this.result.x.pop();
@@ -174,7 +202,15 @@ class Simulator2 {
 
 
 	getPopulationAt(t) {
-		return this.sol.at(t);
+		if (!this.sol || t >= this.time) {
+			return this.population;
+		}
+		else if (t <= this.sol.x[0]) {
+			return this.sol.y[0];
+		}
+		else {
+			return this.sol.at(t);
+		}
 	}
 
 	getValueAt(speciesIndex, pos) {
