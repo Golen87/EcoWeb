@@ -16,12 +16,12 @@ class LevelScene3 extends Phaser.Scene {
 		};
 		this.story1 = ["carnivore_1", "herbivore_1", "plant_1"];
 		this.story2 = ["carnivore_1", "herbivore_1", "plant_1", "herbivore_2", "plant_2", "plant_3"];
+		this.timeStamp = 0;
 		this.currentStory = 0;
 		this.storyRunning = false;
 	}
 
 	create() {
-		this.timeStamp = 0;
 		this.input.addPointer(2);
 
 		let bg = this.add.image(this.CX, this.CY, 'bg_uni_1');
@@ -40,7 +40,7 @@ class LevelScene3 extends Phaser.Scene {
 		let sbW = this.W;
 		let sbH = 0.22 * this.H;
 		let sbX = this.CX;
-		let sbY = this.H - sbH/2;
+		let sbY = this.H - 0.5*sbH;
 		this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0X000000);
 		this.sidebarBg.setAlpha(0.2);
 		// this.sidebarBg = this.add.rexRoundRectangle(sbX, sbY, sbW, sbH, 10, 0XFF0000);
@@ -48,14 +48,15 @@ class LevelScene3 extends Phaser.Scene {
 
 
 		// Scenario name text
-		this.text = createText(this, 10, 10, 20, "#FFF", window.simulator2.scenario.name + " Food Web");
-		this.text.setOrigin(0);
+		this.titleText = createText(this, 10, 10, 20, "#fcb061", window.simulator2.scenario.name + " Food Web");
+		this.titleText.setAlpha(0.75);
+		this.titleText.setOrigin(0);
 
 		// Instructions text
 		this.instructionText = createText(this, sbX, sbY - 0.85*NODE_SIZE , 20, "#FFF", "Instruction text");
 		this.instructionText.setOrigin(0.5);
 
-		this.storyText1 = createText(this, sbX, sbY-0.30*sbH , 30, "#fcb061", "Big instruction text");
+		this.storyText1 = createText(this, sbX, sbY-0.30*sbH , 30, "#fcb061", "Large instruction text");
 		this.storyText1.setOrigin(0.5);
 		this.storyText2 = createText(this, sbX, sbY-0.10*sbH, 20, "#FFF", "Small instruction text");
 		this.storyText2.setOrigin(0.5);
@@ -71,30 +72,125 @@ class LevelScene3 extends Phaser.Scene {
 		this.nextText = createText(this, sbX, sbY+0.20*sbH, 30, "#FFF", "Next");
 		this.nextText.setOrigin(0.5);
 
-		// Time debug text
-		this.timeText = createText(this, this.W-10, 10, 20, "#FFF", this.timeStamp);
-		this.timeText.setOrigin(1, 0);
-		this.timeText.setVisible(false);
 
-		// Relation matrix debug
-		this.matrix = [];
-		for (let i = 0; i < window.simulator2.species.length; i++) {
-			// createText(this, 25+25*(i+1), this.H-120+15*0, 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
-			// createText(this, 25+25*0, this.H-120+15*(i+1), 10, "#FFF", window.simulator2.species[i].name.slice(0,3)).setOrigin(0.5);
-			this.matrix[i] = [];
-			for (let j = 0; j < window.simulator2.species.length; j++) {
-				this.matrix[i][j] = createText(this, 25+25*(j+1), this.H-120+15*(i+1), 10, "#FFF", window.simulator2.interactionMatrix[i][j]);
-				this.matrix[i][j].setOrigin(0.5);
-				this.matrix[i][j].setVisible(false);
-			}
+		// Chapter tabs
+
+		let ctW = 0.03 * this.W;
+		let ctH = 0.17 * this.H;
+		let ctX = this.W;
+		let ctY = this.CY;
+		const chapters = [
+			{
+				name: 'Food Web',
+				image: 'icon-foodWeb',
+				function: () => {
+					this.startStory(1);
+				}
+			},
+			{
+				name: 'Eco Challenge',
+				image: 'icon-ecoChallenge',
+				function: () => {}
+			},
+			// {
+				// name: 'Eco Mission',
+				// image: 'icon-ecoMission',
+				// function: () => {}
+			// },
+			{
+				name: 'Eco Web',
+				image: 'icon-ecoWeb',
+				function: () => {
+					this.startStory(0);
+				}
+			},
+		];
+
+		this.chapterTabs = [];
+		for (let i = 0; i < chapters.length; i++) {
+			let chapter = chapters[i];
+			let x = ctX - ctW/2;
+			let y = ctY + (i-2)*ctH + (i-1)*ctH*0.01;
+
+			let tab = this.add.container(x, y);
+			tab.setAlpha(0.5);
+			let bg = this.add.rexRoundRectangle(0.5*ctW, 0, 2*ctW, ctH, 10, 0XFFFFFF);
+			bg.setAlpha(0.2);
+			let image = this.add.image(0, -0.3*ctH, chapter.image);
+			image.setScale(0.45 * ctW / image.width);
+			image.setOrigin(0.5);
+			let text = createText(this, 0, -0.15*ctH, 15, "#FFF", chapter.name);
+			text.setOrigin(0, 0.5);
+			text.setAngle(90);
+
+			tab.add(bg);
+			tab.add(text);
+			tab.add(image);
+			this.chapterTabs.push(tab);
+
+			bg.setInteractive({ useHandCursor: true })
+				.on('pointerup', chapter.function.bind(this));
 		}
 
-		// Reset button
-		this.resetButton = new TextButton(this, this.W-40, sbY, 'Reset', 20, this.reset.bind(this));
-		this.resetButton.setOrigin(1, 0.5);
-		this.add.existing(this.resetButton);
 
-		// this.scale.refresh();
+		// Toolbox
+
+		let tbX = this.W - ctW/2;
+		let tbY = this.H - sbH/2;
+		const toolButtons = [
+			{
+				image: 'icon-bookmark-saved',
+				function: () => {}
+			},
+			{
+				image: 'icon-info',
+				function: () => {}
+			},
+			{
+				image: 'icon-reset',
+				function: this.reset
+			},
+			{
+				image: 'icon-menu-flag-se',
+				function: () => {}
+			},
+			{
+				image: 'icon-menu-flag-en',
+				function: () => {}
+			}
+		];
+
+		for (let i = 0; i < toolButtons.length; i++) {
+			let button = toolButtons[i];
+			let size = 0.02 * this.H;
+			let x = tbX;
+			let y = tbY + (i - (toolButtons.length-1)/2) * 1.75*size;
+
+			let image = this.add.image(x, y, button.image);
+			image.setScale(size / image.height);
+			image.setAlpha(0.65);
+			image.setInteractive({ useHandCursor: true })
+				// .on('pointerover', () => {image.setAlpha(1.0);})
+				// .on('pointerout', () => {image.setAlpha(0.5);})
+				.on('pointerup', button.function.bind(this));
+		}
+
+		// this.add.image(100, 100, 'icon-backToBeginning');
+		// this.add.image(200, 100, 'icon-backward');
+		// this.add.image(300, 100, 'icon-forward');
+		// this.add.image(400, 100, 'icon-play');
+		// this.add.image(100, 300, 'icon-soil');
+		// this.add.image(300, 300, 'icon-sun');
+		// this.add.image(200, 300, 'icon-rain');
+		// 'icon-annualFlower'
+		// 'icon-grass'
+		// 'icon-herb'
+		// 'icon-shrub'
+		// 'icon-tree'
+		// let land = this.add.image(this.CX, this.H - sbH - NODE_SIZE/2, 'bg_land');
+		// this.containToScreen(land);
+
+
 
 
 		// Nodes
@@ -151,43 +247,6 @@ class LevelScene3 extends Phaser.Scene {
 			plant_3:		new FakeNode(this, 0.75 * this.W, 0.65 * this.H, 'Plant'),
 		};
 
-		// this.emptyCarnivore = new FakeNode(this, this.W*0.45, this.W*0.10, 'Carnivore');
-		// this.emptyHerbivore = new FakeNode(this, this.W*0.60, this.W*0.23, 'Herbivore');
-		// this.emptyPlant = new FakeNode(this, this.W*0.50, this.W*0.37, 'Plant');
-		// this.fakeNodes = [this.emptyCarnivore, this.emptyHerbivore, this.emptyPlant];
-
-		/*
-		this.paths.push(new Path(this, this.emptyCarnivore, this.emptyHerbivore, 1));
-		this.paths.push(new Path(this, this.emptyHerbivore, this.emptyPlant, 1));
-		for (const node of this.nodes) {
-			if (node.species.type == "animal") {
-				if (node.species.food == "carnivore") {
-					this.paths.push(new Path(this, node, this.emptyHerbivore, 1));
-					// this.emptyCarnivore.addReplacement(node);
-				}
-				else if (node.species.food == "herbivore") {
-					this.paths.push(new Path(this, node, this.emptyPlant, 1));
-					this.paths.push(new Path(this, this.emptyCarnivore, node, 1));
-					// this.emptyHerbivore.addReplacement(node);
-				}
-			}
-			else if (node.species.type == "plant") {
-				this.paths.push(new Path(this, this.emptyHerbivore, node, 1));
-				// this.emptyPlant.addReplacement(node);
-			}
-
-			if (node.species.id == this.nodeMap.carnivore_1) {
-				this.emptyCarnivore.addReplacement(node);
-			}
-			if (node.species.id == this.nodeMap.herbivore_1) {
-				this.emptyHerbivore.addReplacement(node);
-			}
-			if (node.species.id == this.nodeMap.plant_1) {
-				this.emptyPlant.addReplacement(node);
-			}
-		}
-		*/
-
 
 		// Node-fake relations
 
@@ -232,15 +291,12 @@ class LevelScene3 extends Phaser.Scene {
 		}
 
 
-		// this.add.image(100, 100, 'icon-backToBeginning');
-		// this.add.image(200, 100, 'icon-backward');
-		// this.add.image(300, 100, 'icon-forward');
-		// this.add.image(400, 100, 'icon-play');
+		// Graph
 
-		// this.add.image(100, 200, 'icon-foodWeb');
-		// this.add.image(200, 200, 'icon-ecoWeb');
-		// this.add.image(300, 200, 'icon-ecoChallenge');
-		// this.add.image(400, 200, 'icon-ecoMission');
+		this.graph = new Graph(this, 400, 200);
+		this.graph.setPosition(this.W - (0.5+0.3) * this.graph.width, this.H-this.graph.height/2);
+
+
 
 		// this.add.image(100, 300, 'icon-soil');
 		// this.add.image(200, 300, 'icon-rain');
@@ -255,7 +311,10 @@ class LevelScene3 extends Phaser.Scene {
 		if (this.timeStamp < window.simulator2.time) {
 			this.timeStamp += 0.05;
 			this.updatePopulations();
+			this.graph.draw(this.timeStamp);
 		}
+
+		this.graph.update(time, delta);
 
 		//console.log(game.input.mousePointer.x, game.input.mousePointer.y);
 
@@ -283,7 +342,16 @@ class LevelScene3 extends Phaser.Scene {
 		this.storyText1.setVisible(false);
 		this.storyText2.setVisible(false);
 
-		if (number == 1) {
+		if (number == 0) {
+			this.instructionText.setText("");
+			for (const node of this.nodes) {
+				node.setVisible(false);
+			}
+			for (const key in this.fakeNodes) {
+				this.fakeNodes[key].setVisible(false);
+			}
+		}
+		else if (number == 1) {
 			this.instructionText.setText("Build a food chain by placing the plants and animals");//("Place the plants and animals at the right slots in the food chain");
 			for (const node of this.nodes) {
 				node.setVisible(this.story1.includes(node.role));
@@ -337,7 +405,11 @@ class LevelScene3 extends Phaser.Scene {
 			// this.updateSize(node, -node.size);
 			node.resetPosition(false);
 		}
-		window.simulator2.run();
+		this.timeStamp = 0;
+		this.graph.draw(this.timeStamp);
+
+		window.simulator2.reset();
+		window.simulator2.run(0);
 		this.updatePaths();
 		this.startStory(1);
 	}
@@ -345,7 +417,7 @@ class LevelScene3 extends Phaser.Scene {
 	onNodePlusMinus(node, value) {
 		this.timeStamp = window.simulator2.time;
 		window.simulator2.changeGrowthRate(node.species, value);
-		window.simulator2.run();
+		window.simulator2.run(this.timeStamp);
 		this.updatePaths();
 
 		/*
@@ -410,10 +482,14 @@ class LevelScene3 extends Phaser.Scene {
 	// }
 
 	onNodeAddOrRemove(node, active, manually) {
-		this.timeStamp = window.simulator2.time;
+		// Causes an ugly jump
+		// this.timeStamp = window.simulator2.time;
+
+		window.simulator2.population = window.simulator2.sol.at(this.timeStamp);
 		window.simulator2.addOrRemoveSpecies(node.species, active);
+
 		if (manually) {
-			window.simulator2.run();
+			window.simulator2.run(this.timeStamp);
 			this.updatePaths();
 		}
 		this.updatePopulations();
@@ -439,8 +515,6 @@ class LevelScene3 extends Phaser.Scene {
 
 
 	updatePopulations() {
-		this.timeText.setText(this.timeStamp.toFixed(1));
-
 		let populations = window.simulator2.getPopulationAt(this.timeStamp);
 
 		for (let i = 0; i < this.nodes.length; i++) {
@@ -479,19 +553,17 @@ class LevelScene3 extends Phaser.Scene {
 	}
 
 	updatePaths() {
-		for (let i in window.simulator2.species) {
-			for (let j in window.simulator2.species) {
+		for (let i in this.nodes) {
+			for (let j in this.nodes) {
 
 				// Update path thickness
 				for (const path of this.paths) {
 					if (path.node1 == this.nodes[i] && path.node2 == this.nodes[j]) {
-						let value = window.simulator2.interactionMatrix[i][j];
-						path.lineThickness = 3*value;
+						let value = window.simulator2.interactionMatrix[path.node1.index][path.node2.index];
+						path.lineThickness = (path.node2.species.type == 'plant' ? 3 : 2) * value;
+						path.dotDensity = path.node2.species.type == 'plant' ? 1.1 : 0.6;
 					}
 				}
-
-				// Update debug matrix
-				this.matrix[i][j].setText(window.simulator2.interactionMatrix[i][j]);
 			}
 		}
 	}
