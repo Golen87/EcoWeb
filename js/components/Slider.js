@@ -1,63 +1,89 @@
 class Slider extends Phaser.GameObjects.Container {
-	constructor(scene, x, y, width) {
+	constructor(scene, x, y, width, height, thinHeight, steps) {
 		super(scene, x, y);
+		this.scene = scene;
 		this.width = width;
+		this.height = height;
+		this.thinHeight = thinHeight;
+		this.steps = steps;
 
-		this.background = scene.add.image(x, y, 'time_bar');
-		this.background.setScale(this.width / this.background.width);
-		this.background.setOrigin(0, 1);
 
-		const SLIDER_WIDTH = 0.85 * this.width;
-		const offsetX = 0.5 * (this.background.width-36) * this.background.scaleX;
-		const offsetY = -0.5 * (this.background.height-36) * this.background.scaleY;
+		// Slider background
+		this.background = scene.add.rexRoundRectangle(0, 0, width + thinHeight, thinHeight, thinHeight/2, 0XFFFFFF);
+		this.background.setAlpha(0.5);
+		this.add(this.background);
 
-		this.stepMax = 8;
-		this.stepSize = SLIDER_WIDTH / this.stepMax;
 
-		this.slider = scene.add.image(offsetX, offsetY, "time_background");
-		this.slider.setScale(1.01 * SLIDER_WIDTH / this.slider.width);
-		this.add(this.slider);
+		// Step notches
+		if (steps > 0) {
+			for (let i = 0; i < steps; i++) {
+				let x = -width/2 + i / (steps - 1) * width;
+				let y = 0;
+				let size = 0.75 * thinHeight;
 
-		for (let i = 0; i <= this.stepMax; i++) {
-			let timeStamp = web.maxTime * i / this.stepMax;
-
-			let marker = scene.add.image(offsetX + (i - this.stepMax/2) * this.stepSize, offsetY, "circle");
-			marker.setScale(0.7 * this.slider.height * this.slider.scaleY / marker.width);
-			marker.setTint(0xe3e3d1);
-			this.add(marker);
-
-			if (i % 3 == 0) {
-				let eventButton = new AddEventButton(
-					scene,
-					offsetX + (i - this.stepMax/2) * this.stepSize,
-					offsetY,
-					0.2 * this.width,
-					timeStamp
-				);
-				this.add(eventButton);
-				eventButton.on('onEventChange', this.onEventChange, this);
+				let notch = scene.add.ellipse(x, y, size, size, 0x000000, 1.0);
+				notch.setAlpha(0.5);
+				this.add(notch);
 			}
 		}
 
-		const size = 0.1 * this.width;
-		this.button = new SliderButton(scene, offsetX, offsetY, size, this.stepSize, this.stepMax);
+
+		// Slider button
+		this.button = scene.add.ellipse(0, 0, height, height, 0xFFFFFF, 1.0);
+		this.button.targetX = this.button.x;
+		this.button.targetY = this.button.y;
 		this.add(this.button);
+
+		this.button.setInteractive({ hitArea: this.button, useHandCursor: true, draggable: true })
+			.on('drag', this.onDrag.bind(this));
+
+		this.minV = 0;
+		this.maxV = 1;
+		this.minX = -this.width/2;
+		this.maxX = this.width/2;
+
+		this.value = 0;
 	}
 
-	update(delta) {
-		this.button.update(delta);
-		if (this.prevValue != this.value) {
-			this.emit('onChange');
-		}
-		this.prevValue = this.value;
+
+	setRange(min, max) {
+		this.minV = min;
+		this.maxV = max;
 	}
 
-	onEventChange() {
-		this.emit('onChange');
+	set value(value) {
+		let x = this.minX + value * (this.maxX - this.minX);
+		this.button.x = x;
+		this.button.targetX = x;
 	}
-
 
 	get value() {
-		return this.button.softValue / this.stepMax;
+		let baseValue = (this.button.targetX - this.minX) / (this.maxX - this.minX);
+		let scaledValue = this.minV + baseValue * this.maxV;
+		return scaledValue;
+	}
+
+
+	onDrag(pointer, x, y) {
+		x = Phaser.Math.Clamp(x, this.minX, this.maxX);
+		y = 0;
+
+		// If slider is segmented, find value, round it to step, and convert back to position
+		if (this.steps > 0) {
+			let value = (x - this.minX) / (this.maxX - this.minX);
+			value = Math.round(value * (this.steps-1)) / (this.steps-1);
+			x = this.minX + value * (this.maxX - this.minX);
+		}
+
+		this.button.targetX = x;
+		this.button.targetY = y;
+
+		this.emit('onChange', this.value);
+	}
+
+	update(time, delta) {
+		// Approach target position gradually
+		this.button.x += 0.5 * (this.button.targetX - this.button.x);
+		this.button.y += 0.5 * (this.button.targetY - this.button.y);
 	}
 }
