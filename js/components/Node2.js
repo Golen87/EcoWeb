@@ -41,7 +41,8 @@ class Node2 extends Button {
 			}
 			else if (this.species.food == 'carnivore') {
 				// this.minPopThreshold = 0.25;
-				this.maxPopThreshold = 0.35;
+				// this.maxPopThreshold = 0.35;
+				this.maxPopThreshold = 0.60;
 			}
 		}
 

@@ -33,6 +33,11 @@ class Organism {
 		this.show = false;
 
 
+		/* Graph population modifier */
+
+		this.populationModifier = 1;
+
+
 		/* Simulation */
 
 		this.init(node, actor);
@@ -280,6 +285,15 @@ class Animal extends Organism {
 		// this.age = node.animal.age;
 		// this.offspring = node.animal.offspring;
 
+		if (this.food == 'carnivore') {
+			this.populationModifier = 100;
+			this.populationModifier = 0.5;
+		}
+		else if (this.food == 'herbivore') {
+			// this.populationModifier = 1000;
+			this.populationModifier = 0.9;
+		}
+
 		// this.maxAge = this.age;
 
 		// this.fertileFunction = createSmoothstepPlateau(
@@ -308,6 +322,9 @@ class Plant extends Organism {
 	// growthrate = vatten x ljus x pollination
 	constructor(node, actor) {
 		super(node, actor);
+
+		// this.populationModifier = 10;
+		this.populationModifier = 1;
 	}
 
 	update(world, dt) {
