@@ -14,7 +14,8 @@ const config = {
 		}
 	},
 	pipeline: [
-		GrayScalePostFilter
+		GrayScalePostFilter,
+		BlurPostFilter
 	],
 	scene: [
 		PreloadScene,

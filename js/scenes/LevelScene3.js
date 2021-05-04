@@ -34,7 +34,10 @@ class LevelScene3 extends Phaser.Scene {
 
 		let bg = this.add.image(this.CX, this.CY, 'bg_uni_1');
 		bg.setAlpha(0.2);
+		bg.setPostPipeline(BlurPostFilter);
 		this.fitToScreen(bg);
+
+		// this.cameras.main.setPostPipeline(BlurPostFilter);
 
 
 		// Sidebar background
