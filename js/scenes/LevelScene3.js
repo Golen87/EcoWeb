@@ -378,8 +378,8 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Graph
 
-		this.graph = new Graph(this, 400, 200);
-		this.graph.setPosition(this.W - (0.5+0.3) * this.graph.width, this.H-this.graph.height/2);
+		this.graph = new Graph(this, 360, 160);
+		this.graph.setPosition((0.5+0.25) * this.graph.width, sbY + 0.03*this.graph.height);
 
 
 		// Warning popup
