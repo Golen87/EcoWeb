@@ -31,42 +31,43 @@ class Slider extends Phaser.GameObjects.Container {
 		// Slider button
 		this.button = scene.add.ellipse(0, 0, height, height, 0xFFFFFF, 1.0);
 		this.button.targetX = this.button.x;
-		this.button.targetY = this.button.y;
 		this.add(this.button);
 
 		this.button.setInteractive({ hitArea: this.button, useHandCursor: true, draggable: true })
 			.on('drag', this.onDrag.bind(this));
 
-		this.minV = 0;
-		this.maxV = 1;
 		this.minX = -this.width/2;
 		this.maxX = this.width/2;
-
-		this.value = 0;
+		this.minV = 0;
+		this.maxV = 1;
+		this._value = 0.5;
 	}
 
 
 	setRange(min, max) {
 		this.minV = min;
 		this.maxV = max;
+		this.value = this._value; // Will clamp
 	}
 
 	set value(value) {
-		let x = this.minX + value * (this.maxX - this.minX);
-		this.button.x = x;
-		this.button.targetX = x;
+		value = Phaser.Math.Clamp(value, this.minV, this.maxV);
+		this._value = value;
+		this.emit('onChange', this._value);
+
+		let fac = (value - this.minV) / (this.maxV - this.minV);
+		let x = this.minX + fac * (this.maxX - this.minX);
+		this.button.x = this.button.targetX = x;
 	}
 
 	get value() {
-		let baseValue = (this.button.targetX - this.minX) / (this.maxX - this.minX);
-		let scaledValue = this.minV + baseValue * this.maxV;
-		return scaledValue;
+		return this._value;
 	}
 
 
 	onDrag(pointer, x, y) {
+		// Clamp x-coord
 		x = Phaser.Math.Clamp(x, this.minX, this.maxX);
-		y = 0;
 
 		// If slider is segmented, find value, round it to step, and convert back to position
 		if (this.steps > 0) {
@@ -76,14 +77,17 @@ class Slider extends Phaser.GameObjects.Container {
 		}
 
 		this.button.targetX = x;
-		this.button.targetY = y;
 
-		this.emit('onChange', this.value);
+		// Update value based on button's x-coord
+		let baseValue = (x - this.minX) / (this.maxX - this.minX);
+		let scaledValue = this.minV + baseValue * this.maxV;
+		this._value = scaledValue;
+
+		this.emit('onChange', this._value);
 	}
 
 	update(time, delta) {
 		// Approach target position gradually
 		this.button.x += 0.5 * (this.button.targetX - this.button.x);
-		this.button.y += 0.5 * (this.button.targetY - this.button.y);
 	}
 }
