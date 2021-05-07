@@ -22,6 +22,8 @@ class FakeNode extends Button {
 
 		this.text = createText(scene, 0, 0, 20, "#FFF", name);
 		this.text.setOrigin(0.5);
+		// Can lead to size issues...
+		language.bind(this.text, name);
 		this.text.setScale(Math.min(0.75 * NODE_SIZE / this.text.width, 1));
 		this.add(this.text);
 	}

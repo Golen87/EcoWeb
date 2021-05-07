@@ -59,9 +59,10 @@ class LevelScene3 extends Phaser.Scene {
 
 
 		// Scenario name text
-		this.titleText = createText(this, 10, 10, 20, "#fcb061", window.simulator2.scenario.name + " Food Web");
+		this.titleText = createText(this, 10, 10, 20, "#fcb061", "Serengeti Food Web");
 		this.titleText.setAlpha(0.75);
 		this.titleText.setOrigin(0);
+		language.bind(this.titleText, "title");
 
 		// Instructions text
 		this.instructionText = createText(this, sbX, sbY - 0.85*NODE_SIZE , 20, "#FFF", "Instruction text");
@@ -72,16 +73,13 @@ class LevelScene3 extends Phaser.Scene {
 		this.storyText2 = createText(this, sbX, sbY-0.10*sbH, 20, "#FFF", "Small instruction text");
 		this.storyText2.setOrigin(0.5);
 
-		// this.nextButton = new PauseButton(this, sbX, sbY-100, "Next", () => {
-			// this.instructionText.setText("awesome sauce");
-		// });
-		// this.add.existing(this.nextButton);
 		this.nextButton = this.add.rexRoundRectangle(sbX, sbY+0.20*sbH, 200, 20, 20, 0xa77440);
 		this.nextButton.setInteractive({ useHandCursor: true })
 			.on('pointerup', () => { this.startStory(this.currentStory + 1); }
 		);
 		this.nextText = createText(this, sbX, sbY+0.20*sbH, 30, "#FFF", "Next");
 		this.nextText.setOrigin(0.5);
+		language.bind(this.nextText, "next_button");
 
 
 		// Chapter tabs
@@ -92,24 +90,24 @@ class LevelScene3 extends Phaser.Scene {
 		let ctY = this.CY;
 		const chapters = [
 			{
-				name: 'Food Web',
+				name: "chapter_1",
 				image: 'icon-foodWeb',
 				function: () => {
 					this.startStory(1);
 				}
 			},
 			{
-				name: 'Eco Challenge',
+				name: "chapter_2",
 				image: 'icon-ecoChallenge',
 				function: () => {}
 			},
 			// {
-				// name: 'Eco Mission',
+				// name: "chapter_3",
 				// image: 'icon-ecoMission',
 				// function: () => {}
 			// },
 			{
-				name: 'Eco Web',
+				name: "chapter_4",
 				image: 'icon-ecoWeb',
 				function: () => {
 					this.startStory(0);
@@ -124,15 +122,17 @@ class LevelScene3 extends Phaser.Scene {
 			let y = ctY + (i-2)*ctH + (i-1)*ctH*0.01;
 
 			let tab = this.add.container(x, y);
+			tab.setDepth(100);
 			tab.setAlpha(0.5);
 			let bg = this.add.rexRoundRectangle(0.5*ctW, 0, 2*ctW, ctH, 10, 0XFFFFFF);
 			bg.setAlpha(0.2);
 			let image = this.add.image(0, -0.3*ctH, chapter.image);
 			image.setScale(0.45 * ctW / image.width);
 			image.setOrigin(0.5);
-			let text = createText(this, 0, -0.15*ctH, 15, "#FFF", chapter.name);
+			let text = createText(this, 0, -0.15*ctH, 15, "#FFF", "Name");
 			text.setOrigin(0, 0.5);
 			text.setAngle(90);
+			language.bind(text, chapter.name);
 
 			tab.add(bg);
 			tab.add(text);
@@ -163,11 +163,15 @@ class LevelScene3 extends Phaser.Scene {
 			},
 			{
 				image: 'icon-menu-flag-se',
-				function: () => {}
+				function: () => {
+					language.setLanguage("Swedish");
+				}
 			},
 			{
 				image: 'icon-menu-flag-en',
-				function: () => {}
+				function: () => {
+					language.setLanguage("English");
+				}
 			}
 		];
 
@@ -205,9 +209,9 @@ class LevelScene3 extends Phaser.Scene {
 		// Node slots
 
 		this.nodeSlots = [];
-		let order = [3,4,2,5,1,0];
+		let order = [3,4,2,5,1,0,6,7,8,9];
 
-		for (let i = 0; i < 6; i++) {
+		for (let i = 0; i < 10; i++) {
 			let x = sbX + 1.3 * NODE_SIZE * (order[i]-3);
 			let y = sbY;
 			let slot = {x, y, taken: false};
@@ -270,6 +274,7 @@ class LevelScene3 extends Phaser.Scene {
 			14: new Phaser.Math.Vector2(WX+0.25*WW, WY+1.00*WH),
 		};
 
+		// Node setup
 		this.webNodes = [];
 		for (let i = 0; i < window.simulator2.species.length; i++) {
 			const organism = window.simulator2.scenario.species[i];
@@ -320,14 +325,14 @@ class LevelScene3 extends Phaser.Scene {
 		// Empty nodes
 
 		this.fakeNodes = {
-			carnivore_1:	new FakeNode(this, 0.49 * this.W, 0.15 * this.H, 'Carnivore'),
-			herbivore_1:	new FakeNode(this, 0.62 * this.W, 0.40 * this.H, 'Herbivore'),
-			plant_1:		new FakeNode(this, 0.53 * this.W, 0.65 * this.H, 'Plant'),
+			carnivore_1:	new FakeNode(this, 0.49 * this.W, 0.15 * this.H, "node_carnivore"),
+			herbivore_1:	new FakeNode(this, 0.62 * this.W, 0.40 * this.H, "node_herbivore"),
+			plant_1:		new FakeNode(this, 0.53 * this.W, 0.65 * this.H, "node_plant"),
 
-			carnivore_2:	new FakeNode(this, 0.32 * this.W, 0.15 * this.H, 'Carnivore'),
-			herbivore_2:	new FakeNode(this, 0.38 * this.W, 0.40 * this.H, 'Herbivore'),
-			plant_2:		new FakeNode(this, 0.27 * this.W, 0.65 * this.H, 'Plant'),
-			plant_3:		new FakeNode(this, 0.75 * this.W, 0.65 * this.H, 'Plant'),
+			carnivore_2:	new FakeNode(this, 0.32 * this.W, 0.15 * this.H, "node_carnivore"),
+			herbivore_2:	new FakeNode(this, 0.38 * this.W, 0.40 * this.H, "node_herbivore"),
+			plant_2:		new FakeNode(this, 0.27 * this.W, 0.65 * this.H, "node_plant"),
+			plant_3:		new FakeNode(this, 0.75 * this.W, 0.65 * this.H, "node_plant"),
 		};
 
 
@@ -389,9 +394,10 @@ class LevelScene3 extends Phaser.Scene {
 		this.warnCont.setDepth(1);
 		this.warnCont.isActive = false;
 
-		this.warnText = createText(this, 0, 0, 24, "#ffffff", "Animals cannot survive\nwithout anything to eat!");
+		this.warnText = createText(this, 0, 0, 24, "#ffffff", "Warning text");
 		this.warnText.setOrigin(0.5);
 		this.warnText.setLineSpacing(10);
+		language.bind(this.warnText, "warning_1");
 		this.warnCont.add(this.warnText);
 
 		let wbSep = 1.5*24;
@@ -646,7 +652,8 @@ class LevelScene3 extends Phaser.Scene {
 			}
 		}
 		else if (number == 1) {
-			this.instructionText.setText("Build a food chain by placing the plants and animals");//("Place the plants and animals at the right slots in the food chain");
+			// this.instructionText.setText("Build a food chain by placing the plants and animals");//("Place the plants and animals at the right slots in the food chain");
+			language.bind(this.instructionText, "instruction_1");
 			for (const node of this.nodes) {
 				node.setVisible(this.story1.includes(node.role));
 			}
@@ -655,7 +662,8 @@ class LevelScene3 extends Phaser.Scene {
 			}
 		}
 		else if (number == 2) {
-			this.instructionText.setText("Now, expand the food chain with more species to build a food web"); // "Place the plants and animals at the right slots in the food web"
+			language.bind(this.instructionText, "instruction_2");
+			// this.instructionText.setText("Now, expand the food chain with more species to build a food web"); // "Place the plants and animals at the right slots in the food web"
 			for (const node of this.nodes) {
 				node.setVisible(this.story2.includes(node.role));
 			}
@@ -664,7 +672,8 @@ class LevelScene3 extends Phaser.Scene {
 			}
 		}
 		else {
-			this.instructionText.setText("Try to remove the plants and animals to see how they influence each other");
+			language.bind(this.instructionText, "instruction_4");
+			this.instructionText.setText();
 			for (const node of this.nodes) {
 				node.setVisible(this.story2.includes(node.role));
 			}
@@ -691,12 +700,16 @@ class LevelScene3 extends Phaser.Scene {
 		this.storyText2.setVisible(true);
 
 		if (this.currentStory == 1) {
-			this.storyText1.setText("You have created a food chain!");
-			this.storyText2.setText("The energy flows from the plant to the herbivore to the carnivore"); // The herbivore eats the plant, and the carnivore eats the herbivore.
+			// this.storyText1.setText("You have created a food chain!");
+			language.bind(this.storyText1, "explanation_1a");
+			// this.storyText2.setText("The energy flows from the plant to the herbivore to the carnivore"); // The herbivore eats the plant, and the carnivore eats the herbivore.
+			language.bind(this.storyText2, "explanation_1b");
 		}
 		else if (this.currentStory == 2) {
-			this.storyText1.setText("You have created a food web!");
-			this.storyText2.setText("Animals prefer some food over other, which makes more energy flow that way");
+			// this.storyText1.setText("You have created a food web!");
+			language.bind(this.storyText1, "explanation_2a");
+			// this.storyText2.setText("Animals prefer some food over other, which makes more energy flow that way");
+			language.bind(this.storyText2, "explanation_2b");
 		}
 	}
 
@@ -763,11 +776,11 @@ class LevelScene3 extends Phaser.Scene {
 
 	onNodeDeath(node) {
 		if (this.storyRunning) {
-			this.showWarning(node.x, node.y);
+			this.showWarning(node.x, node.y, "warning_1");
 		}
 	}
 
-	showWarning(x, y) {
+	showWarning(x, y, key) {
 		if (!this.warnCont.isActive) {
 			let w = this.warnBox.displayWidth;
 			let h = this.warnBox.displayHeight;
@@ -789,6 +802,9 @@ class LevelScene3 extends Phaser.Scene {
 				ease: 'Cubic',
 				duration: 800
 			});
+
+			// May lead to sizing issues
+			language.bind(this.warnText, key);
 		}
 	}
 
@@ -902,14 +918,6 @@ class LevelScene3 extends Phaser.Scene {
 			else {
 				this.nodes[i].circle.setScale(1);
 			}
-
-			// this.nodes[i].text.setText((populations[i]*100).toFixed());
-
-			// let p = Math.round(Phaser.Math.Clamp(populations[i], 0, 1) * 10);
-			// let t = "";
-			// for (let i=0; i<p; i++) {t+="|";}
-			// for (let i=p; i<10; i++) {t+=".";}
-			// this.nodes[i].text.setText(t);
 		}
 	}
 

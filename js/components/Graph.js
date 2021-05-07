@@ -60,15 +60,16 @@ class Graph extends Phaser.GameObjects.Container {
 		let fontSize = 12; // Font size
 		let labelX = -0.5 * this.width; // Label left
 		let labelY = 0.5 * this.height; // Label top
-		let texts = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+		let texts = ["graph_jan","graph_feb","graph_mar","graph_apr","graph_may","graph_jun","graph_jul","graph_aug","graph_sep","graph_oct","graph_nov","graph_dec"];
 
 		for (var i = 0; i < 12; i++) {
 			let sep = 1 * this.padding;
 			let x = labelX + (0.0 + 1/11*i) * (this.width - 2*sep) + sep;
 			let y = labelY - 0.5*this.padding;
-			let label = createText(this.scene, x, y, fontSize, "#FFF", texts[i]);
+			let label = createText(this.scene, x, y, fontSize, "#FFF", "");
 			label.setOrigin(0.5, 0.0);
 			label.setAlpha(0.7);
+			language.bind(label, texts[i]);
 
 			this.add(label);
 			this.xLabels.push(label);
@@ -81,8 +82,9 @@ class Graph extends Phaser.GameObjects.Container {
 		let labelY = -0.5 * this.height; // Label top
 		let texts = ["> 100,000", "> 10,000", "> 1,000", "> 100"];
 
-		let title = createText(this.scene, labelX, labelY-0.5*fontSize, 1.2*fontSize, "#FFF", "Population size");
+		let title = createText(this.scene, labelX, labelY-0.5*fontSize, 1.2*fontSize, "#FFF", "Label");
 		title.setOrigin(0.0, 0.5);
+		language.bind(title, "graph_population");
 		this.add(title);
 
 		for (var i = 0; i < 4; i++) {

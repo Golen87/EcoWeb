@@ -34,4 +34,6 @@ const config = {
 const game = new Phaser.Game(config);
 
 game.font = "Mukta";
-game.language = "English";
+
+const language = new LanguageManager();
+language.setLanguage("Swedish");
