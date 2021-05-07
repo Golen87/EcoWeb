@@ -99,6 +99,7 @@ class Database {
 			"swe": "", // Swedish
 			"chi": "", // Chinese
 			"group": -1, // Serengeti node group
+			"iucn": null, // Serengeti conversation status
 			"image": "missing",
 			"color": "#000000",
 			"description": null,

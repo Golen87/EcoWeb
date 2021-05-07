@@ -10,6 +10,7 @@ class Organism {
 		this.relations = node.relations;
 		this.stages = {};
 		this.group = node.group; // Serengeti
+		this.iucn = node.iucn; // Serengeti
 
 		this.x = actor.position[0];
 		this.y = actor.position[1];
