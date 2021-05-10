@@ -1,6 +1,8 @@
 const languageData = {
 
 	"English": {
+		"null": "",
+
 		"title": "Serengeti Food Web",
 		"next_button": "Next",
 
@@ -41,6 +43,8 @@ const languageData = {
 	},
 
 	"Swedish": {
+		"null": "",
+
 		"title": "Serengeti näringsväv",
 		"next_button": "Gå vidare",
 
@@ -58,12 +62,12 @@ const languageData = {
 
 		"node_carnivore": "Köttätare",
 		"node_herbivore": "Växtätare",
-		"node_plant": "Planta",
+		"node_plant": "Växt",
 
 		"chapter_1": "Näringskedjor",
-		"chapter_2": "Eko-utmaningen",
-		"chapter_3": "Eko-uppdraget",
-		"chapter_4": "Eko-väven",
+		"chapter_2": "Utmaningen",
+		"chapter_3": "Uppdraget",
+		"chapter_4": "Ekosystemet",
 
 		"graph_population": "Populationsstorlek",
 		"graph_jan": "jan",
@@ -112,54 +116,74 @@ class LanguageManager {
 		}
 	}
 
-	setLanguage(language) {
-		console.assert(this.languageList.includes(language), "Language not available.");
-		console.assert(languageData[language], "Language not available.");
-		this.currentLanguage = language;
-		this.updateAllObjects();
+	initNodeNames(nodes) {
+		for (const node of nodes) {
+			languageData.English[node.id] = node.eng || node.name;
+			languageData.Swedish[node.id] = node.swe || node.name;
+			// languageData.Chinese[node.id] = node.chi || node.name;
+		}
 	}
 
+
+	// Change language
+	setLanguage(language) {
+		console.assert(this.languageList.includes(language) && languageData[language], "Language not available.");
+		if (this.currentLanguage != language) {
+			this.currentLanguage = language;
+			this.updateAllObjects();
+		}
+	}
+
+	// Return key-mapped phrase of current selected language
 	get(key) {
 		let text = languageData[this.currentLanguage][key];
 		console.assert(text != null, "Phrase not found in {0}: '{1}'".format(this.currentLanguage, key));
 		return text;
 	}
 
-	bind(object, key) {
+	// Bind a text-object to a phrase with automatic updates upon language change
+	bind(object, key, callback=null) {
 		// Remove old instance (usually when phrase is changed)
 		this.unbind(object);
 
 		// Check that object is text with Phaser's setText function
 		console.assert(typeof object.setText === 'function', "Object does not support 'setText' and cannot be bound.");
 
-		object.languageKey = key;
-		object.languageId = this.getNextId();
-		this.boundObjects[object.languageId] = object;
+		object.bindId = this.getNextId();
+		this.boundObjects[object.bindId] = { object, key, callback, previous: null };
 
 		this.updateObject(object);
 	}
 
+	// Remove object from list of automatic text updates
 	unbind(object) {
-		if (object && object.languageId) {
-			delete this.boundObjects[object.languageId];
+		if (object && object.bindId) {
+			object.bindId = null;
+			delete this.boundObjects[object.bindId];
 		}
 	}
 
 	updateAllObjects() {
-		for (let object of Object.values(this.boundObjects)) {
-			this.updateObject(object);
+		for (let blob of Object.values(this.boundObjects)) {
+			this.updateObject(blob.object);
 		}
 	}
 
 	updateObject(object) {
-		if (object.languageKey) {
-			// Check that the text remains the same.
-			let prev = object.languagePrevious;
-			console.assert(prev == null || object.text == prev, "Phrase has changed since last bind. New text is not translated.");
+		if (object.bindId) {
+			let blob = this.boundObjects[object.bindId];
 
-			let newText = this.get(object.languageKey);
+			// Check that the text remains the same.
+			let phraseCheck = (blob.previous == null || blob.previous == "" || blob.previous == object.text);
+			console.assert(phraseCheck, "Phrase has changed since last bind. '{0}': '{1}' != '{2}'".format(blob.key, blob.previous, object.text));
+	
+			let newText = this.get(blob.key);
 			object.setText(newText);
-			object.languagePrevious = newText;
+			blob.previous = newText;
+
+			if (blob.callback) {
+				blob.callback();
+			}
 		}
 	}
 }

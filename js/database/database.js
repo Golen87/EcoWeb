@@ -60,6 +60,8 @@ class Database {
 		}
 
 		this.save();
+
+		language.initNodeNames(this.nodes);
 	}
 
 	save() {

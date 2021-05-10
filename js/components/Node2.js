@@ -53,13 +53,14 @@ class Node2 extends Button {
 		this.bindInteractive(this.circle.image, true);
 		this.add(this.circle);
 
-		this.text = createText(scene, 0, -0.6*NODE_SIZE, 20, "#FFF", this.species.name);
-		// this.text.setDepth(1);
-		this.text.setOrigin(0.5, 1.0);
-		// this.text.setVisible(false);
-		this.text.setAlpha(0);
-		// this.circle.add(this.text);
-		this.add(this.text);
+		this.name = createText(scene, 0, -0.7*NODE_SIZE, 20, "#FFF", this.species.name);
+		// this.name.setDepth(1);
+		this.name.setOrigin(0.5, 1.0);
+		// this.name.setVisible(false);
+		this.name.setAlpha(0);
+		// this.circle.add(this.name);
+		language.bind(this.name, this.species.id);
+		this.add(this.name);
 
 
 		// let xs = 73 * (NODE_SIZE/100);
@@ -165,7 +166,7 @@ class Node2 extends Button {
 		this.circle.image.setScale(scale * this.circle.image.origScale);
 
 		// Show name when holding the node
-		this.text.setAlpha(this.liftSmooth);
+		this.name.setAlpha(this.liftSmooth);
 
 		this.energyGraphics.clear();
 		if (this.inPlay && this.alive && this.species.isPlant()) {

@@ -84,10 +84,6 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Chapter tabs
 
-		let ctW = 0.03 * this.W;
-		let ctH = 0.17 * this.H;
-		let ctX = this.W;
-		let ctY = this.CY;
 		const chapters = [
 			{
 				name: "chapter_1",
@@ -116,6 +112,11 @@ class LevelScene3 extends Phaser.Scene {
 		];
 
 		this.chapterTabs = [];
+		let ctW = 0.03 * this.W;
+		let ctH = 0.17 * this.H;
+		let ctX = this.W;
+		let ctY = this.CY;
+
 		for (let i = 0; i < chapters.length; i++) {
 			let chapter = chapters[i];
 			let x = ctX - ctW/2;
@@ -124,20 +125,28 @@ class LevelScene3 extends Phaser.Scene {
 			let tab = this.add.container(x, y);
 			tab.setDepth(100);
 			tab.setAlpha(0.5);
+			this.chapterTabs.push(tab);
+
 			let bg = this.add.rexRoundRectangle(0.5*ctW, 0, 2*ctW, ctH, 10, 0XFFFFFF);
 			bg.setAlpha(0.2);
-			let image = this.add.image(0, -0.3*ctH, chapter.image);
+			tab.add(bg);
+
+			let image = this.add.image(0, 0, chapter.image);
 			image.setScale(0.45 * ctW / image.width);
-			image.setOrigin(0.5);
-			let text = createText(this, 0, -0.15*ctH, 15, "#FFF", "Name");
+			image.setOrigin(0.5, 0);
+			tab.add(image);
+
+			let text = createText(this, 0, 0, 15, "#FFF", "Name");
 			text.setOrigin(0, 0.5);
 			text.setAngle(90);
-			language.bind(text, chapter.name);
-
-			tab.add(bg);
 			tab.add(text);
-			tab.add(image);
-			this.chapterTabs.push(tab);
+
+			language.bind(text, chapter.name, () => {
+				let sep = 10;
+				let height = image.displayHeight + sep + text.displayWidth;
+				image.y = -0.5 * height;
+				text.y = image.y + image.displayHeight + sep;
+			});
 
 			bg.setInteractive({ useHandCursor: true })
 				.on('pointerup', chapter.function.bind(this));
