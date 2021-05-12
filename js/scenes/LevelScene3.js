@@ -298,20 +298,20 @@ class LevelScene3 extends Phaser.Scene {
 		this.add.existing(this.modeSlider);
 
 		let modeSep = 1.5 * this.modeSlider.height;
-		this.modeSlider.groupText = createText(this, this.modeSlider.x - this.modeSlider.width/2 - modeSep, this.modeSlider.y, 20, "#FFF", "");
-		this.modeSlider.linkText = createText(this, this.modeSlider.x + this.modeSlider.width/2 + modeSep, this.modeSlider.y, 20, "#FFF", "");
-		this.modeSlider.groupText.setOrigin(1, 0.5);
-		this.modeSlider.linkText.setOrigin(0, 0.5);
-		language.bind(this.modeSlider.groupText, "slider_groups");
-		language.bind(this.modeSlider.linkText, "slider_links");
+		let groupText = createText(this, - this.modeSlider.width/2 - modeSep, 0, 20, "#FFF", "");
+		let linkText = createText(this, this.modeSlider.width/2 + modeSep, 0, 20, "#FFF", "");
+		groupText.setOrigin(1, 0.5);
+		linkText.setOrigin(0, 0.5);
+		this.modeSlider.add(groupText);
+		this.modeSlider.add(linkText);
+		language.bind(groupText, "slider_groups");
+		language.bind(linkText, "slider_links");
 
 		this.modeSlider.value = this.foodWeb.config.mode;
 		this.modeSlider.on('onChange', (value) => {
 			this.foodWeb.config.mode = value;
 		}, this);
-
-
-
+		this.modeSlider.setVisible(false);
 
 
 		// Empty nodes
@@ -527,15 +527,17 @@ class LevelScene3 extends Phaser.Scene {
 			this.chapterTabs[i].setAlpha(i == selectedChapter ? 1.0 : 0.5);
 		}
 
-		if (number == 0) {
+		if (number == 0) { // Large network
 			// this.sidebarBg.setVisible(false);
 			this.graph.setVisible(false);
 			this.foodWeb.setVisible(true);
+			this.modeSlider.setVisible(true);
 		}
-		else {
+		else { // Introduction levels
 			// this.sidebarBg.setVisible(true);
 			this.graph.setVisible(true);
 			this.foodWeb.setVisible(false);
+			this.modeSlider.setVisible(false);
 		}
 
 		this.storyRunning = true;
