@@ -6,7 +6,11 @@ function randReal(min, max) {
 }
 
 function randInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
+	return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function jiggle() {
+	return (Math.random() - 0.5) * 1e-2;
 }
 
 /**

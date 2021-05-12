@@ -67,6 +67,7 @@ class LevelScene3 extends Phaser.Scene {
 		// Instructions text
 		this.instructionText = createText(this, sbX, sbY - 0.85*NODE_SIZE , 20, "#FFF", "Instruction text");
 		this.instructionText.setOrigin(0.5);
+		this.instructionText.setDepth(1);
 
 		this.storyText1 = createText(this, sbX, sbY-0.30*sbH , 30, "#fcb061", "Large instruction text");
 		this.storyText1.setOrigin(0.5);
@@ -82,6 +83,36 @@ class LevelScene3 extends Phaser.Scene {
 		language.bind(this.nextText, "next_button");
 
 
+		// Sliders
+
+		this.sliders = [];
+
+		// Debug sliders
+		for (let i = 0; i < 10; i++) {
+			let x = 100;
+			let y = 70 + 50 * i;
+			let w = 160;
+			let h = 16;
+			let slider = new Slider(this, x, y, w, h, 0.5*h);
+			slider.setDepth(10);
+			slider.setVisible(false);
+			this.sliders.push(slider);
+			this.add.existing(slider);
+
+			slider.text = createText(this, 0.6*w, 0, h, "#FFF", slider.value);
+			slider.text.setOrigin(0.0, 0.5);
+			slider.add(slider.text);
+
+			slider.title = createText(this, -0.5*w, -0.5*h, h, "#FFF", "Name");
+			slider.title.setOrigin(0.0, 1.0);
+			slider.add(slider.title);
+
+			slider.on('onChange', (value) => {
+				slider.text.setText(value.toFixed(2));
+			}, this);
+		}
+
+
 		// Chapter tabs
 
 		const chapters = [
@@ -92,11 +123,11 @@ class LevelScene3 extends Phaser.Scene {
 					this.startStory(1);
 				}
 			},
-			{
-				name: "chapter_2",
-				image: 'icon-ecoChallenge',
-				function: () => {}
-			},
+			// {
+				// name: "chapter_2",
+				// image: 'icon-ecoChallenge',
+				// function: () => {}
+			// },
 			// {
 				// name: "chapter_3",
 				// image: 'icon-ecoMission',
@@ -479,6 +510,10 @@ class LevelScene3 extends Phaser.Scene {
 			path.update(time, delta);
 		}
 
+		for (const slider of this.sliders) {
+			slider.update(time, delta);
+		}
+
 
 
 		// Boids
@@ -543,8 +578,10 @@ class LevelScene3 extends Phaser.Scene {
 						node.velocity.y *= -1;
 					}
 
-					node.stickX = node.goalX;
-					node.stickY = node.goalY;
+					if (!node.hold) {
+						node.stickX = node.goalX;
+						node.stickY = node.goalY;
+					}
 				}
 			}
 		}
@@ -621,7 +658,7 @@ class LevelScene3 extends Phaser.Scene {
 	startStory(number) {
 		this.dismissWarning();
 
-		let selectedChapter = number > 0 ? 0 : 2;
+		let selectedChapter = number > 0 ? 0 : 1;
 
 		for (var i = this.chapterTabs.length - 1; i >= 0; i--) {
 			this.chapterTabs[i].setAlpha(i == selectedChapter ? 1.0 : 0.5);
@@ -661,7 +698,6 @@ class LevelScene3 extends Phaser.Scene {
 			}
 		}
 		else if (number == 1) {
-			// this.instructionText.setText("Build a food chain by placing the plants and animals");//("Place the plants and animals at the right slots in the food chain");
 			language.bind(this.instructionText, "instruction_1");
 			for (const node of this.nodes) {
 				node.setVisible(this.story1.includes(node.role));
@@ -672,7 +708,6 @@ class LevelScene3 extends Phaser.Scene {
 		}
 		else if (number == 2) {
 			language.bind(this.instructionText, "instruction_2");
-			// this.instructionText.setText("Now, expand the food chain with more species to build a food web"); // "Place the plants and animals at the right slots in the food web"
 			for (const node of this.nodes) {
 				node.setVisible(this.story2.includes(node.role));
 			}
@@ -682,7 +717,6 @@ class LevelScene3 extends Phaser.Scene {
 		}
 		else {
 			language.bind(this.instructionText, "instruction_4");
-			this.instructionText.setText();
 			for (const node of this.nodes) {
 				node.setVisible(this.story2.includes(node.role));
 			}
@@ -709,15 +743,11 @@ class LevelScene3 extends Phaser.Scene {
 		this.storyText2.setVisible(true);
 
 		if (this.currentStory == 1) {
-			// this.storyText1.setText("You have created a food chain!");
 			language.bind(this.storyText1, "explanation_1a");
-			// this.storyText2.setText("The energy flows from the plant to the herbivore to the carnivore"); // The herbivore eats the plant, and the carnivore eats the herbivore.
 			language.bind(this.storyText2, "explanation_1b");
 		}
 		else if (this.currentStory == 2) {
-			// this.storyText1.setText("You have created a food web!");
 			language.bind(this.storyText1, "explanation_2a");
-			// this.storyText2.setText("Animals prefer some food over other, which makes more energy flow that way");
 			language.bind(this.storyText2, "explanation_2b");
 		}
 	}
@@ -951,6 +981,15 @@ class LevelScene3 extends Phaser.Scene {
 				}
 			}
 		}
+	}
+
+
+	assignDebugSlider(index, name, minValue, maxValue) {
+		let slider = this.sliders[index];
+		slider.setVisible(true);
+		slider.title.setText(name);
+		slider.setRange(minValue, maxValue);
+		return slider;
 	}
 
 
