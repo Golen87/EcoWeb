@@ -288,78 +288,30 @@ class LevelScene3 extends Phaser.Scene {
 		}
 
 
-		// Large food web
+		/* Large food web */
 
-		this.selectedWebNode = null;
-		let WX = 100;
-		let WY = 100;
-		let WW = this.W - 200;
-		let WH = this.H - 200;
-		this.groupPositions = {
-			1:  new Phaser.Math.Vector2(WX+0.90*WW, WY+0.30*WH),
-			2:  new Phaser.Math.Vector2(WX+0.80*WW, WY+0.65*WH),
+		this.foodWeb = new FoodWeb(this, 0, 0);
 
-			3:  new Phaser.Math.Vector2(WX+0.50*WW, WY+0.10*WH),
-			4:  new Phaser.Math.Vector2(WX+0.55*WW, WY+0.45*WH),
-			5:  new Phaser.Math.Vector2(WX+0.45*WW, WY+0.70*WH),
-			6:  new Phaser.Math.Vector2(WX+0.55*WW, WY+0.90*WH),
+		this.modeSlider = new Slider(this, this.CX, sbY, 250, 24, 6);
+		this.modeSlider.setRange(0, 1);
+		this.sliders.push(this.modeSlider);
+		this.add.existing(this.modeSlider);
 
-			7:  new Phaser.Math.Vector2(WX+0.10*WW, WY+0.00*WH),
-			8:  new Phaser.Math.Vector2(WX+0.20*WW, WY+0.05*WH),
-			9:  new Phaser.Math.Vector2(WX+0.10*WW, WY+0.25*WH),
-			10: new Phaser.Math.Vector2(WX+0.30*WW, WY+0.40*WH),
-			11: new Phaser.Math.Vector2(WX+0.20*WW, WY+0.50*WH),
-			12: new Phaser.Math.Vector2(WX+0.30*WW, WY+0.70*WH),
-			13: new Phaser.Math.Vector2(WX+0.10*WW, WY+0.80*WH),
-			14: new Phaser.Math.Vector2(WX+0.25*WW, WY+1.00*WH),
-		};
+		let modeSep = 1.5 * this.modeSlider.height;
+		this.modeSlider.groupText = createText(this, this.modeSlider.x - this.modeSlider.width/2 - modeSep, this.modeSlider.y, 20, "#FFF", "");
+		this.modeSlider.linkText = createText(this, this.modeSlider.x + this.modeSlider.width/2 + modeSep, this.modeSlider.y, 20, "#FFF", "");
+		this.modeSlider.groupText.setOrigin(1, 0.5);
+		this.modeSlider.linkText.setOrigin(0, 0.5);
+		language.bind(this.modeSlider.groupText, "slider_groups");
+		language.bind(this.modeSlider.linkText, "slider_links");
 
-		// Node setup
-		this.webNodes = [];
-		for (let i = 0; i < window.simulator2.species.length; i++) {
-			const organism = window.simulator2.scenario.species[i];
+		this.modeSlider.value = this.foodWeb.config.mode;
+		this.modeSlider.on('onChange', (value) => {
+			this.foodWeb.config.mode = value;
+		}, this);
 
-			let tier = (organism.type == 'plant' ? 1 : (organism.food == 'herbivore' ? 2 : 3));
-			let hasImage = !organism.image.startsWith('icon');
 
-			let x = this.groupPositions[organism.group].x + (-1+2*Math.random()) * 100;
-			let y = this.groupPositions[organism.group].y + (-1+2*Math.random()) * 100;
-			let size = 20 + 20 * tier;
 
-			let node = this.add.container(x, y);
-			node.setDepth(1);
-			node.setVisible(false);
-			node.species = organism;
-
-			let circle = this.add.sprite(0, 0, 'circle');
-			circle.setScale(size / circle.width);
-			circle.setTint(0x777777);
-			circle.setAlpha(0.5);
-			// circle.setVisible(tier == 1);
-			node.add(circle);
-
-			let image = this.add.sprite(0, 0, organism.image);
-			// image.setTint(tier > 1 ? 0xFFFFFF : 0x777777);
-			image.setAlpha(hasImage ? 1.0 : 0.5);
-			image.setScale((hasImage ? 1.0 : 0.8) * size / image.width);
-			node.image = image;
-			node.add(image);
-
-			// node.origSize = size;
-			// node.setAlpha(tier > 1 ? 1.0 : 0.5);
-			// node.setVisible(false);
-
-			node.velocity = new Phaser.Math.Vector2(0, 0);
-
-			image.setInteractive({ useHandCursor: true })
-				.on('pointerup', () => {
-					this.selectedWebNode = (this.selectedWebNode != node) ? node : null;
-				});
-
-			this.webNodes.push(node);
-		}
-
-		this.webGraphics = this.add.graphics();
 
 
 		// Empty nodes
@@ -451,35 +403,6 @@ class LevelScene3 extends Phaser.Scene {
 
 
 		this.startStory(1);
-	}
-
-	drawWeb() {
-		this.webGraphics.clear();
-		if (this.currentStory > 0) {
-			return;
-		}
-
-		for (const node of this.webNodes) {
-			let diet = node.species.diet.map(x => x.node.id);
-
-			for (const other of this.webNodes) {
-				if (node != other && diet.includes(other.species.id)) {
-					// console.log(node.species.name, '->', other.species.name);
-
-					let active = (node == this.selectedWebNode || other == this.selectedWebNode);
-					let thickness = active ? 4.0 : 1.0;
-					let alpha = active ? 0.75 : 0.1;
-					this.webGraphics.lineStyle(thickness, 0XFFFFFF, alpha);
-					// this.webGraphics.setBlendMode(Phaser.BlendModes.ADD);
-
-					// node.setScale((active ? 2 : 1) * node.origSize / node.width);
-					// other.setScale((active ? 1.5 : 1) * node.origSize / node.width);
-
-					let curve = new Phaser.Curves.Line(node, other);
-					curve.draw(this.webGraphics);
-				}
-			}
-		}
 	}
 
 	update(time, deltaMs) {
@@ -590,68 +513,8 @@ class LevelScene3 extends Phaser.Scene {
 
 		// Boids
 		if (this.currentStory == 0) {
-			for (const node of this.webNodes) {
-				let cohSum = new Phaser.Math.Vector2();
-				let cohCount = 0;
-				let sepSum = new Phaser.Math.Vector2();
-
-				for (const other of this.webNodes) {
-					let dist = Phaser.Math.Distance.BetweenPoints(node, other);
-
-					let cohRad = 10000;
-					// if (dist < cohRad && node.species.group == other.species.group) {
-						cohSum.add(other);
-						cohCount++;
-					// }
-
-					let sepRad = node.image.displayWidth/2 + other.image.displayWidth/2;
-					sepRad *= 1.1;
-					if (dist < sepRad) {
-						let temp = new Phaser.Math.Vector2(node.x, node.y);
-						temp.subtract(other);
-						temp.scale(Math.pow((sepRad - dist) / sepRad, 2));
-						sepSum.add(temp);
-					}
-				}
-
-				let goalPos = this.groupPositions[node.species.group].clone();
-				goalPos.y += 7*Math.sin(time/1500+goalPos.x/400+goalPos.y/1000);
-				goalPos.subtract(node);
-				goalPos.scale(0.001);
-				node.velocity.add(goalPos);
-
-				// cohSum.scale(1/cohCount);
-				// cohSum.subtract(node);
-				// cohSum.scale(0.01);
-				// node.velocity.add(cohSum);
-
-				sepSum.scale(0.2);
-				node.velocity.add(sepSum);
-
-				node.velocity.scale(0.95);
-				node.x += node.velocity.x;
-				node.y += node.velocity.y;
-
-				if (node.x < 100) {
-					node.x = 100;
-					node.velocity.x *= -1;
-				}
-				if (node.y < 100) {
-					node.y = 100;
-					node.velocity.y *= -1;
-				}
-				if (node.x > this.W - 100) {
-					node.x = this.W - 100;
-					node.velocity.x *= -1;
-				}
-				if (node.y > this.H - 100) {
-					node.y = this.H - 100;
-					node.velocity.y *= -1;
-				}
-			}
+			this.foodWeb.update(time, delta);
 		}
-
-		this.drawWeb();
 	}
 
 
@@ -665,18 +528,14 @@ class LevelScene3 extends Phaser.Scene {
 		}
 
 		if (number == 0) {
-			this.sidebarBg.setVisible(false);
+			// this.sidebarBg.setVisible(false);
 			this.graph.setVisible(false);
-			for (const node of this.webNodes) {
-				node.setVisible(true);
-			}
+			this.foodWeb.setVisible(true);
 		}
 		else {
-			this.sidebarBg.setVisible(true);
+			// this.sidebarBg.setVisible(true);
 			this.graph.setVisible(true);
-			for (const node of this.webNodes) {
-				node.setVisible(false);
-			}
+			this.foodWeb.setVisible(false);
 		}
 
 		this.storyRunning = true;
@@ -689,7 +548,8 @@ class LevelScene3 extends Phaser.Scene {
 		this.storyText2.setVisible(false);
 
 		if (number == 0) {
-			this.instructionText.setText("");
+			// language.bind(this.instructionText, null);
+			language.bind(this.instructionText, "instruction_0");
 			for (const node of this.nodes) {
 				node.setVisible(false);
 			}

@@ -6,6 +6,7 @@ const languageData = {
 		"title": "Serengeti Food Web",
 		"next_button": "Next",
 
+		"instruction_0": "Touch to see the food web of these animals",
 		"instruction_1": "Build a food chain by placing the plants and animals",
 		"instruction_2": "Now, expand the food chain with more species to build a food web",
 		"instruction_3": "Ut id cupidatat sunt exercitation reprehenderit duis aliquip dolor aliquip labore.",
@@ -27,6 +28,9 @@ const languageData = {
 		"chapter_3": "Eco Mission",
 		"chapter_4": "Eco Web",
 
+		"slider_groups": "Layout:  Groups",
+		"slider_links": "Links",
+
 		"graph_population": "Population size",
 		"graph_jan": "Jan",
 		"graph_feb": "Feb",
@@ -40,6 +44,16 @@ const languageData = {
 		"graph_oct": "Oct",
 		"graph_nov": "Nov",
 		"graph_dec": "Dec",
+
+		"iucn_EX":	"Extinct",
+		"iucn_EW":	"Extinct in the wild",
+		"iucn_CR":	"Critically endangered",
+		"iucn_EN":	"Endangered",
+		"iucn_VU":	"Vulnerable",
+		"iucn_NT":	"Near threatened",
+		"iucn_LC":	"Least concern",
+		"iucn_DD":	"Data deficient",
+		"iucn_NE":	"Not evaluated",
 	},
 
 	"Swedish": {
@@ -48,6 +62,7 @@ const languageData = {
 		"title": "Serengeti näringsväv",
 		"next_button": "Gå vidare",
 
+		"instruction_0": "Tryck på djuren för att se deras näringsväv",
 		"instruction_1": "Bygg en näringskedja genom att placera plantor och djur",
 		"instruction_2": "Lägg till fler arter i näringskedjan för att bygga en näringsväv",
 		"instruction_3": "Ut id cupidatat sunt exercitation reprehenderit duis aliquip dolor aliquip labore.",
@@ -69,6 +84,9 @@ const languageData = {
 		"chapter_3": "Uppdraget",
 		"chapter_4": "Ekosystemet",
 
+		"slider_groups": "Layout:  Grupper",
+		"slider_links": "Relationer",
+
 		"graph_population": "Populationsstorlek",
 		"graph_jan": "jan",
 		"graph_feb": "feb",
@@ -82,6 +100,16 @@ const languageData = {
 		"graph_oct": "okt",
 		"graph_nov": "nov",
 		"graph_dec": "dec",
+
+		"iucn_EX":	"Utdöd",
+		"iucn_EW":	"Utdöd i vilt tillstånd",
+		"iucn_CR":	"Akut hotad",
+		"iucn_EN":	"Starkt hotad",
+		"iucn_VU":	"Sårbar",
+		"iucn_NT":	"Nära hotad",
+		"iucn_LC":	"Livskraftig",
+		"iucn_DD":	"Kunskapsbrist",
+		"iucn_NE":	"Ej bedömd",
 	}
 
 };
