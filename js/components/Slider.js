@@ -80,10 +80,16 @@ class Slider extends Phaser.GameObjects.Container {
 
 		// Update value based on button's x-coord
 		let baseValue = (x - this.minX) / (this.maxX - this.minX);
-		let scaledValue = this.minV + baseValue * this.maxV;
+		let scaledValue = this.minV + baseValue * (this.maxV - this.minV);
 		this._value = scaledValue;
 
 		this.emit('onChange', this._value);
+	}
+
+	lock() {
+		this.button.removeInteractive();
+		this.button.fillColor = 0x555555;
+		this.background.fillColor = 0x555555;
 	}
 
 	update(time, delta) {
