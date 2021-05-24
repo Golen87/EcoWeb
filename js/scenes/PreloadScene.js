@@ -19,7 +19,7 @@ class PreloadScene extends Phaser.Scene {
 		// this.load.image('bg_2', 'assets/images/background/BG2.png');
 		// this.load.image('bg_3', 'assets/images/background/BG3.png');
 
-		this.load.image('bg_uni_1', 'assets/images/background/universeum/serengeti-small.png');
+		this.load.image('bg_uni_1', 'assets/images/background/universeum/serengeti-small-blur.png');
 		this.load.image('bg_land', 'assets/images/background/universeum/land.png');
 
 		// this.load.image('bg_parallax_1', 'assets/images/background/parallax/1.png');
