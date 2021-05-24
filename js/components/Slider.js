@@ -35,6 +35,7 @@ class Slider extends Phaser.GameObjects.Container {
 
 		this.button.setInteractive({ hitArea: this.button, useHandCursor: true, draggable: true })
 			.on('drag', this.onDrag.bind(this));
+		this.button.input.hitArea.setTo(-height, -height, 3*height, 3*height);
 
 		this.minX = -this.width/2;
 		this.maxX = this.width/2;
