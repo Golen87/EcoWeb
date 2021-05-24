@@ -6,7 +6,7 @@ const languageData = {
 		"title": "Serengeti Food Web",
 		"next_button": "Next",
 
-		"instruction_0": "Touch to see the food web of these animals",
+		"instruction_0": "Press a species to see its food web",
 		"instruction_1": "Build a food chain by placing the plants and animals",
 		"instruction_2": "Now, expand the food chain with more species to build a food web",
 		"instruction_3": "Ut id cupidatat sunt exercitation reprehenderit duis aliquip dolor aliquip labore.",
@@ -45,6 +45,7 @@ const languageData = {
 		"graph_nov": "Nov",
 		"graph_dec": "Dec",
 
+		"iucn_status": "Conservation status:",
 		"iucn_EX":	"Extinct",
 		"iucn_EW":	"Extinct in the wild",
 		"iucn_CR":	"Critically endangered",
@@ -62,7 +63,7 @@ const languageData = {
 		"title": "Serengeti näringsväv",
 		"next_button": "Gå vidare",
 
-		"instruction_0": "Tryck på djuren för att se deras näringsväv",
+		"instruction_0": "Tryck på en art för att se dess näringsväv",
 		"instruction_1": "Bygg en näringskedja genom att placera plantor och djur",
 		"instruction_2": "Lägg till fler arter i näringskedjan för att bygga en näringsväv",
 		"instruction_3": "Ut id cupidatat sunt exercitation reprehenderit duis aliquip dolor aliquip labore.",
@@ -101,6 +102,7 @@ const languageData = {
 		"graph_nov": "nov",
 		"graph_dec": "dec",
 
+		"iucn_status": "Bevarandestatus:",
 		"iucn_EX":	"Utdöd",
 		"iucn_EW":	"Utdöd i vilt tillstånd",
 		"iucn_CR":	"Akut hotad",

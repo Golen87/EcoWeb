@@ -35,6 +35,12 @@ class FoodWeb extends Phaser.GameObjects.Container {
 		let groupColors = {
 			1: 0xF44336, 2: 0xE91E63, 3: 0x9C27B0, 4: 0x673AB7, 5: 0x3F51B5, 6: 0x2196F3, 7: 0x03A9F4, 8: 0x00BCD4, 9: 0x009688, 10: 0x4CAF50, 11: 0x8BC34A, 12: 0xCDDC39, 13: 0xFFEB3B, 14: 0xFFC107
 		};
+		let iucnColors = {
+			"null": 0x9E9E9E, CR: 0xe40521, EN: 0xeb6209, VU: 0xe29b00, NT: 0x007060, LC: 0x006d8a
+		};
+		let iucnTextColors = {
+			"null": "#FFFFFF", CR: "#000000", EN: "#000000", VU: "#000000", NT: "#FFFFFF", LC: "#FFFFFF"
+		};
 
 		// Settings for the large web, used by nodes and changed by scene sliders
 		this.config = {
@@ -50,6 +56,8 @@ class FoodWeb extends Phaser.GameObjects.Container {
 
 			groupPositions, // Group positions
 			groupColors, // Group outline colors
+			iucnColors, // IUCN endangerment colors
+			iucnTextColors, // IUCN endangerment text colors
 			center: new Phaser.Math.Vector2(WX+WW/2, WY+WH/2), // Center point which gravity pulls towards
 
 			// Borders which nodes stay within
@@ -61,6 +69,10 @@ class FoodWeb extends Phaser.GameObjects.Container {
 
 		this.initNodes();
 		this.initRelations();
+		this.initButtons();
+		this.initInfoBox();
+
+		this.bringToTop(this.nodeContainer);
 	}
 
 
@@ -103,11 +115,16 @@ class FoodWeb extends Phaser.GameObjects.Container {
 		for (const node of this.nodes) {
 			node.update(time, delta);
 		}
+
+		this.nodeContainer.sort("y");
 	}
 
 
 	initNodes() {
 		this.nodes = [];
+		this.nodeContainer = this.scene.add.container(0, 0);
+		this.add(this.nodeContainer);
+
 		for (let i = 0, n = window.simulator2.scenario.species.length; i < n; i++) {
 
 			let species = window.simulator2.scenario.species[i];
@@ -119,8 +136,20 @@ class FoodWeb extends Phaser.GameObjects.Container {
 			// let y = this.groupPositions[species.group].y + (-1+2*Math.random()) * 100;
 
 			let node = new FoodWebNode(this.scene, x, y, species, this.config);
-			this.add(node);
+			this.nodeContainer.add(node);
 			this.nodes.push(node);
+
+			node.on('onSelect', (target, active) => {
+				for (const node of this.nodes) {
+					node._selected = false;
+				}
+				if (active) {
+					this.setInfoBox(target);
+				}
+				else {
+					this.clearInfoBox();
+				}
+			});
 		}
 	}
 
@@ -153,6 +182,164 @@ class FoodWeb extends Phaser.GameObjects.Container {
 			prey,
 			line: new Phaser.Curves.Line(pred, prey) // Might be a hack?
 		});
+	}
+
+	initButtons() {
+		this.buttons = [];
+
+		let chosen = [
+			"138fc562-6fb9-45ff-bcdf-656208d2be14", // Lion
+			"00107254-185b-47ab-bc45-bc68e13ace3f", // Vildhund
+			"3c3f0fdf-e6c1-4a94-b52e-e3785a2849ca", // Plains zebra
+			"f4f32888-4079-4c70-a204-a094647ea210", // Kirk's dik-dik
+			"2dd450bc-8faa-4971-ad5d-53b04a958105", // Gnu
+			// "c2d58e40-9606-4d58-9a62-dc08ccb02e2b", // Impala
+			"6f868898-a03f-467b-a797-a1252e75e36c", // Vattenbock
+			// "042f48d0-4a28-4e77-874f-b9a5b1f821af", // Heteropogon contortus
+			"37b60be7-d897-41cb-91e5-56045687788e", // Allophylus rubifolius
+			"93878dd9-1df5-4521-b5ba-57f63450e912", // Panicum coloratum
+			// "93d59a4b-5517-4eb5-8e81-1caa61b9db6a", // Kängrugräs
+			// "70640c68-402d-4a0b-ae47-4089329d0b01", // Fingerhirs
+			"f62f5010-632f-4870-91a8-9bf4d90e961c", // Acacia
+		];
+
+		let count = 0;
+		for (const id of chosen) {
+			for (const node of this.nodes) {
+				if (id == node.species.id) {
+					let size = 50;
+					let x = this.scene.CX + 1.4 * size * (count - (chosen.length-1)/2);
+					let y = 0.88 * this.scene.H;
+
+					// Colored background circle
+					let circle = this.scene.add.image(x, y, 'circle');
+					circle.setScale((size+6) / circle.width);
+					this.add(circle);
+
+					// Image of species (or icon if missing)
+					let image = this.scene.add.image(x, y, node.species.image);
+					image.setScale(size / image.width);
+					this.add(image);
+
+					node.hyperLink = circle;
+					circle.setInteractive({ useHandCursor: true, draggable: true })
+						.on('pointerdown', () => {
+							circle._held = true;
+						})
+						.on('pointerout', () => {
+							circle._held = false;
+						})
+						.on('pointerup', () => {
+							if (circle._held) {
+								node.selected = !node._selected;
+								circle._held = false;
+							}
+						});
+
+					count++;
+				}
+			}
+		}
+
+	}
+
+	initInfoBox() {
+		let m = 15;
+		let p = 15;
+		let w = 0.25 * this.scene.W;
+		let h = 0.22 * this.scene.H - 2*m;
+		let x = w/2 + m;
+		let y = this.scene.H - h/2 - m;
+
+		this.infoBox = this.scene.add.container(x, y);
+		this.infoBox.setAlpha(0);
+		this.add(this.infoBox);
+
+		this.infoBg = this.scene.add.rexRoundRectangle(0, 0, w, h, 5, 0X222222);
+		this.infoBg.setAlpha(0.5);
+		this.infoBox.add(this.infoBg);
+
+		let titleSize = 24;
+		let imgFac = 1.4;
+
+		this.infoTitle = createText(this.scene, -w/2+p, -h/2+p + 1*titleSize/2, titleSize, "#ffffff", "Title");
+		this.infoTitle.setOrigin(0, 0.5);
+		this.infoBox.add(this.infoTitle);
+
+		this.infoDescription = createText(this.scene, -w/2+p, -h/2+p + (1+0.5)*titleSize, 16, "#ffffff", "Description");
+		this.infoDescription.setOrigin(0);
+		this.infoDescription.setWordWrapWidth(w-2*p, true);
+		// this.infoDescription.setLineSpacing(10);
+		this.infoBox.add(this.infoDescription);
+
+		this.infoImage = this.scene.add.image(w/2-p, -h/2+p, "PANLEO");
+		this.infoImage.setScale(imgFac*titleSize / this.infoImage.width);
+		this.infoImage.setOrigin(1.0, 0.0);
+		this.infoBox.add(this.infoImage);
+
+		let size = titleSize;
+		let ix = w/2-p;
+		let iy = h/2-p-size/2;
+
+		this.infoIucnBg = this.scene.add.rexRoundRectangle(ix, iy, size, size, size/2, 0xFFFFFF, 1.0);
+		this.infoIucnBg.setOrigin(1.0, 0.5);
+		this.infoBox.add(this.infoIucnBg);
+
+		this.infoIucnText = createText(this.scene, ix, iy, 14, "#000000", "XX");
+		this.infoIucnText.setOrigin(0.5);
+		this.infoBox.add(this.infoIucnText);
+
+		this.infoIucnStatus = createText(this.scene, ix, iy, 14, "#ffffff", "Status");
+		this.infoIucnStatus.setOrigin(1.0, 0.5);
+		language.bind(this.infoIucnStatus, "iucn_status");
+		this.infoBox.add(this.infoIucnStatus);
+
+		this.clearInfoBox();
+	}
+
+	setInfoBox(node) {
+		// this.infoBox.setVisible(true);
+		language.bind(this.infoTitle, node.species.id);
+		// language.bind(this.infoDescription, "...");
+		this.infoDescription.setText("Dolore in consectetur dolor sunt cupidatat mollit veniam consectetur mollit dolore velit fugiat laborum labore do do veniam.");
+		// this.infoIucnText.setText(node.species.iucn);
+
+		this.infoImage.setTexture(node.species.image);
+
+		let key = node.species.iucn ? "iucn_" + node.species.iucn : null;
+		language.bind(this.infoIucnText, key, this.resizeInfoIucn.bind(this));
+
+		this.infoIucnText.setColor(this.config.iucnTextColors[node.species.iucn]);
+		this.infoIucnBg.fillColor = this.config.iucnColors[node.species.iucn];
+
+		this.scene.tweens.add({
+			targets: this.infoBox,
+			alpha: { from: this.infoBox.alpha, to: 1 },
+			duration: 150
+		});
+	}
+
+	clearInfoBox() {
+		// this.infoBox.setVisible(false);
+		this.scene.tweens.add({
+			targets: this.infoBox,
+			alpha: { from: this.infoBox.alpha, to: 0 },
+			duration: 150
+		});
+	}
+
+	resizeInfoIucn() {
+		if (this.infoIucnText.displayWidth > 0) {
+			this.infoIucnBg.setVisible(true);
+			this.infoIucnStatus.setVisible(true);
+			this.infoIucnBg.width = this.infoIucnText.width + this.infoIucnBg.height;
+			this.infoIucnText.x = this.infoIucnBg.x - this.infoIucnBg.width/2;
+			this.infoIucnStatus.x = this.infoIucnBg.x - this.infoIucnBg.width - this.infoIucnBg.height/4;
+		}
+		else {
+			this.infoIucnBg.setVisible(false);
+			this.infoIucnStatus.setVisible(false);
+		}
 	}
 
 
@@ -254,8 +441,8 @@ class FoodWeb extends Phaser.GameObjects.Container {
 			// let alpha = active ? 0.75 : 0.14;
 			// this.relationGraphics.setBlendMode(Phaser.BlendModes.ADD);
 
-			let selected = relation.pred.selected || relation.prey.selected;
 			let visibility = relation.pred.visibility * relation.prey.visibility;
+			let selected = visibility * (relation.pred.selected || relation.prey.selected);
 
 			let strokeWidth = selected ? 2.5 : 1.5;
 			let strokeColor = selected ? 0xFFFFFF : 0xFFFFFF;

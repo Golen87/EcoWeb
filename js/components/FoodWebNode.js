@@ -28,12 +28,19 @@ class FoodWebNode extends Phaser.GameObjects.Container {
 		this.image.setScale((this.hasImage ? 1.0 : 0.8) * this.size / this.image.width);
 		this.add(this.image);
 
+		// Name background
+		this.nameBg = this.scene.add.rexRoundRectangle(0, -this.size/2 - 24, 24, 24, 24/2, 0xFFFFFF, 1.0);
+		this.nameBg.setOrigin(0.5);
+		this.add(this.nameBg);
+
 		// Name label next to node
-		this.name = createText(scene, this.size/2 + 18, 0, 18, "#ffffff", species.name);
-		this.name.setOrigin(0, 0.5);
-		this.name.setVisible(false);
+		this.name = createText(scene, this.nameBg.x, this.nameBg.y, 14, "#000000", "");
+		this.name.setOrigin(0.5);
 		this.add(this.name);
-		language.bind(this.name, species.id);
+		language.bind(this.name, species.id, () => {
+			this.nameBg.width = this.name.width + this.nameBg.height;
+			// this.name.x = this.nameBg.x + this.nameBg.width/2;
+		});
 
 		this.velocity = new Phaser.Math.Vector2(10, 0);
 		this.arbitraryLockTimer = 2 * (1 - Math.pow(Math.random(), 1.5));
@@ -51,7 +58,7 @@ class FoodWebNode extends Phaser.GameObjects.Container {
 			})
 			.on('pointerup', () => {
 				if (this._held) {
-					this._selected = !this._selected;
+					this.selected = !this._selected;
 					this._held = false;
 				}
 			})
@@ -62,7 +69,7 @@ class FoodWebNode extends Phaser.GameObjects.Container {
 				this._dragY = pointer.y;
 			})
 			.on('drag', (pointer, dragX, dragY) => {
-				if (this._held && (Math.abs(pointer.x - this._dragX) > 10 || Math.abs(pointer.y - this._dragY) > 10)) {
+				if (this._held && (Math.abs(pointer.x - this._dragX) > 20 || Math.abs(pointer.y - this._dragY) > 20)) {
 					this._held = false;
 				}
 				this._dragged = true;
@@ -110,10 +117,12 @@ class FoodWebNode extends Phaser.GameObjects.Container {
 			// if (this.velocity.lengthSq() > maxVel * maxVel) {
 				// this.velocity.setLength(maxVel);
 			// }
-			this.velocity.scale((maxVel-maxVel*Math.exp(-vel/maxVel))/vel);
-			this.x += this.velocity.x;
-			this.y += this.velocity.y;
-			this.velocity.scale(this.config.friction);
+			if (vel > 0) {
+				this.velocity.scale((maxVel-maxVel*Math.exp(-vel/maxVel))/vel);
+				this.x += this.velocity.x;
+				this.y += this.velocity.y;
+				this.velocity.scale(this.config.friction);
+			}
 		}
 
 		// Keep within border
@@ -142,15 +151,21 @@ class FoodWebNode extends Phaser.GameObjects.Container {
 		if (!this.hasImage) {
 			this.image.setTint(this.selected ? 0x000000 : 0xFFFFFF);
 		}
+		this.nameBg.setVisible(this.selected);
 		this.name.setVisible(this.selected);
 
 		// this.alpha += 0.1 * (this.alphaGoal - this.alpha);
 		this.alpha += Phaser.Math.Clamp(this.alphaGoal - this.alpha, -4*delta, 4*delta);
+
+		if (this.hyperLink) {
+			this.hyperLink.setAlpha(this._selected ? 1.0 : 0.4);
+			this.hyperLink.setTint(this.selected ? 0xFFFFFF : this.config.groupColors[this.species.group]);
+		}
 	}
 
 
 	move(dx, dy) {
-		if (!this.locked) {
+		if (!this.locked && !this._dragged) {
 			this.x += dx;
 			this.y += dy;
 		}
@@ -162,6 +177,11 @@ class FoodWebNode extends Phaser.GameObjects.Container {
 
 	get selected() {
 		return this._selected || this._dragged || this._held;
+	}
+
+	set selected(value) {
+		this.emit('onSelect', this, value);
+		this._selected = value;
 	}
 
 	get locked() {

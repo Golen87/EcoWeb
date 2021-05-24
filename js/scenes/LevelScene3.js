@@ -30,14 +30,12 @@ class LevelScene3 extends Phaser.Scene {
 	}
 
 	create() {
-		this.input.addPointer(2);
+		this.input.addPointer(3);
 
 		let bg = this.add.image(this.CX, this.CY, 'bg_uni_1');
 		bg.setAlpha(0.2);
 		bg.setPostPipeline(BlurPostFilter);
 		this.fitToScreen(bg);
-
-		// this.cameras.main.setPostPipeline(BlurPostFilter);
 
 
 		// Sidebar background
@@ -292,7 +290,7 @@ class LevelScene3 extends Phaser.Scene {
 
 		this.foodWeb = new FoodWeb(this, 0, 0);
 
-		this.modeSlider = new Slider(this, this.CX, sbY, 250, 24, 6);
+		this.modeSlider = new Slider(this, this.CX, 0.96*this.H, 250, 24, 6);
 		this.modeSlider.setRange(0, 1);
 		this.sliders.push(this.modeSlider);
 		this.add.existing(this.modeSlider);
