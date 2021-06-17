@@ -17,7 +17,9 @@ const languageData = {
 		"explanation_2a": "You have created a food web!",
 		"explanation_2b": "Animals prefer some food over other, which makes more energy flow that way",
 
-		"warning_1": "Animals cannot survive\nwithout anything to eat!",
+		"popup_1": "Animals cannot survive without anything to eat!",
+		"popup_2": "The grass absorbs energy from its surroundings.",
+		"popup_3": "Zebror får sin näring från någonting...",
 
 		"node_carnivore": "Carnivore",
 		"node_herbivore": "Herbivore",
@@ -46,15 +48,15 @@ const languageData = {
 		"graph_dec": "Dec",
 
 		"iucn_status": "Conservation status:",
-		"iucn_EX":	"Extinct",
-		"iucn_EW":	"Extinct in the wild",
-		"iucn_CR":	"Critically endangered",
-		"iucn_EN":	"Endangered",
-		"iucn_VU":	"Vulnerable",
-		"iucn_NT":	"Near threatened",
-		"iucn_LC":	"Least concern",
-		"iucn_DD":	"Data deficient",
-		"iucn_NE":	"Not evaluated",
+		"iucn_EX": "Extinct",
+		"iucn_EW": "Extinct in the wild",
+		"iucn_CR": "Critically endangered",
+		"iucn_EN": "Endangered",
+		"iucn_VU": "Vulnerable",
+		"iucn_NT": "Near threatened",
+		"iucn_LC": "Least concern",
+		"iucn_DD": "Data deficient",
+		"iucn_NE": "Not evaluated",
 	},
 
 	"Swedish": {
@@ -74,7 +76,9 @@ const languageData = {
 		"explanation_2a": "Du har byggt en näringsväv!",
 		"explanation_2b": "Djuren föredrar ibland viss mat över annan, vilket får mer energi att flöda mellan dem",
 
-		"warning_1": "Djuren kan inte överleva\nutan någonting att äta!",
+		"popup_1": "Djuren kan inte överleva utan någonting att äta!",
+		"popup_2": "Gräset får sin näring från sin omgivning.",
+		"popup_3": "Zebror får sin näring från någonting...",
 
 		"node_carnivore": "Köttätare",
 		"node_herbivore": "Växtätare",
@@ -103,15 +107,15 @@ const languageData = {
 		"graph_dec": "dec",
 
 		"iucn_status": "Bevarandestatus:",
-		"iucn_EX":	"Utdöd",
-		"iucn_EW":	"Utdöd i vilt tillstånd",
-		"iucn_CR":	"Akut hotad",
-		"iucn_EN":	"Starkt hotad",
-		"iucn_VU":	"Sårbar",
-		"iucn_NT":	"Nära hotad",
-		"iucn_LC":	"Livskraftig",
-		"iucn_DD":	"Kunskapsbrist",
-		"iucn_NE":	"Ej bedömd",
+		"iucn_EX": "Utdöd",
+		"iucn_EW": "Utdöd i vilt tillstånd",
+		"iucn_CR": "Akut hotad",
+		"iucn_EN": "Starkt hotad",
+		"iucn_VU": "Sårbar",
+		"iucn_NT": "Nära hotad",
+		"iucn_LC": "Livskraftig",
+		"iucn_DD": "Kunskapsbrist",
+		"iucn_NE": "Ej bedömd",
 	}
 
 };

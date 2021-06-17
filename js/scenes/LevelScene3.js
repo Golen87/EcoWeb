@@ -14,6 +14,14 @@ class LevelScene3 extends Phaser.Scene {
 			"37b60be7-d897-41cb-91e5-56045687788e": "plant_2", // Allophylus rubifolius
 			"93878dd9-1df5-4521-b5ba-57f63450e912": "plant_3", // Panicum coloratum
 
+			"00107254-185b-47ab-bc45-bc68e13ace3f": "c2", // Vildhund
+			"2dd450bc-8faa-4971-ad5d-53b04a958105": "h2", // Gnu
+			"c2d58e40-9606-4d58-9a62-dc08ccb02e2b": "h3", // Impala
+			"6f868898-a03f-467b-a797-a1252e75e36c": "h4", // Vattenbock
+			"93d59a4b-5517-4eb5-8e81-1caa61b9db6a": "p1", // Kängrugräs
+			"70640c68-402d-4a0b-ae47-4089329d0b01": "p3", // Fingerhirs
+			"f62f5010-632f-4870-91a8-9bf4d90e961c": "p4", // Acacia
+
 			// "0fd86e7d-942f-431f-86d4-e5004f1caed1":	"carnivore_1",	// Lejon
 			// "32594c3d-0c63-4cd6-9350-2e40f759a40e":	"herbivore_1",	// Zebra
 			// "4605a453-92f8-4bf5-90bc-9a38fc993f03":	"plant_1",		// Heteropogon contortus
@@ -24,6 +32,7 @@ class LevelScene3 extends Phaser.Scene {
 		};
 		this.story1 = ["carnivore_1", "herbivore_1", "plant_1"];
 		this.story2 = ["carnivore_1", "herbivore_1", "plant_1", "herbivore_2", "plant_2", "plant_3"];
+		this.story3 = ["carnivore_1", "c2", "herbivore_1", "h2", "h3", "h4", "p1", "plant_1", "p3", "p4"];
 		this.timeStamp = 0;
 		this.currentStory = 0;
 		this.storyRunning = false;
@@ -31,6 +40,13 @@ class LevelScene3 extends Phaser.Scene {
 
 	create() {
 		this.input.addPointer(3);
+
+		// this.minimap = this.cameras.add(0, 0, this.W, this.H).setZoom(1.0).setName('mini');
+		// this.minimap.setBackgroundColor(0x000000);
+		// this.minimap.setPostPipeline(BlurPostFilter);
+		// this.minimap.scrollX = 0;
+		// this.minimap.scrollY = 0;
+		// this.cameras.main.setPostPipeline(BlurPostFilter);
 
 		let bg = this.add.image(this.CX, this.CY, 'bg_uni_1');
 		bg.setAlpha(0.2);
@@ -118,6 +134,7 @@ class LevelScene3 extends Phaser.Scene {
 				name: "chapter_1",
 				image: 'icon-foodWeb',
 				function: () => {
+					this.reset();
 					this.startStory(1);
 				}
 			},
@@ -135,6 +152,7 @@ class LevelScene3 extends Phaser.Scene {
 				name: "chapter_4",
 				image: 'icon-ecoWeb',
 				function: () => {
+					this.reset();
 					this.startStory(0);
 				}
 			},
@@ -193,7 +211,7 @@ class LevelScene3 extends Phaser.Scene {
 			},
 			{
 				image: 'icon-info',
-				function: () => {}
+				function: this.openInfoWindow
 			},
 			{
 				image: 'icon-reset',
@@ -278,7 +296,7 @@ class LevelScene3 extends Phaser.Scene {
 				node.on('onExit', this.onNodeAddOrRemove, this);
 				node.on('onPlusMinus', this.onNodePlusMinus, this);
 				node.on('onDeath', this.onNodeDeath, this);
-				node.on('onDragStart', this.dismissWarning, this);
+				node.on('onDragStart', this.dismissInfoPopup, this);
 
 				node.role = this.roleMap[organism.id];
 				node.index = i;
@@ -312,6 +330,27 @@ class LevelScene3 extends Phaser.Scene {
 		this.modeSlider.setVisible(false);
 
 
+		// this.V1 = this.assignDebugSlider(0, "Gravity", 0, 100);
+		// this.V1.value = this.foodWeb.config.gravity;
+		// this.V2 = this.assignDebugSlider(1, "Link distance", 0, 400);
+		// this.V2.value = this.foodWeb.config.linkDistance;
+		// this.V3 = this.assignDebugSlider(2, "Link strength", 0, 0.1);
+		// this.V3.value = this.foodWeb.config.linkStrength;
+		// this.V4 = this.assignDebugSlider(3, "Charge", -100, 0);
+		// this.V4.value = this.foodWeb.config.charge;
+		// this.V5 = this.assignDebugSlider(4, "Friction", 0, 1);
+		// this.V5.value = this.foodWeb.config.friction;
+		// this.V6 = this.assignDebugSlider(5, "Group strength", 0, 100);
+		// this.V6.value = this.foodWeb.config.groupStrength;
+
+		// this.V1.lock();
+		// this.V2.lock();
+		// this.V3.lock();
+		// this.V4.lock();
+		// this.V5.lock();
+		// this.V6.lock();
+
+
 		// Empty nodes
 
 		this.fakeNodes = {
@@ -323,6 +362,14 @@ class LevelScene3 extends Phaser.Scene {
 			herbivore_2:	new FakeNode(this, 0.38 * this.W, 0.40 * this.H, "node_herbivore"),
 			plant_2:		new FakeNode(this, 0.27 * this.W, 0.65 * this.H, "node_plant"),
 			plant_3:		new FakeNode(this, 0.75 * this.W, 0.65 * this.H, "node_plant"),
+
+			c2:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_carnivore"),
+			h2:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_herbivore"),
+			h3:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_herbivore"),
+			h4:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_herbivore"),
+			p1:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_plant"),
+			p3:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_plant"),
+			p4:				new FakeNode(this, 0.50 * this.W, 0.50 * this.H, "node_plant"),
 		};
 
 
@@ -377,23 +424,21 @@ class LevelScene3 extends Phaser.Scene {
 		this.graph.setPosition((0.5+0.25) * this.graph.width, sbY + 0.03*this.graph.height);
 
 
-		// Warning popup
+		// Info text popup
 
 		this.warnCont = this.add.container(200, 200);
 		this.warnCont.setAlpha(0);
 		this.warnCont.setDepth(1);
 		this.warnCont.isActive = false;
 
-		this.warnText = createText(this, 0, 0, 24, "#ffffff", "Warning text");
+		this.warnText = createText(this, 0, 0, 20, "#ffffff", "Warning text");
 		this.warnText.setOrigin(0.5);
 		this.warnText.setLineSpacing(10);
-		language.bind(this.warnText, "warning_1");
+		this.warnText.setWordWrapWidth(0.15*this.W, true);
+		language.bind(this.warnText, "popup_1");
 		this.warnCont.add(this.warnText);
 
-		let wbSep = 1.5*24;
-		let wbW = this.warnText.displayWidth + wbSep;
-		let wbH = this.warnText.displayHeight + wbSep;
-		this.warnBox = this.add.rexRoundRectangle(0, 0, wbW, wbH, 5, 0X555555);
+		this.warnBox = this.add.rexRoundRectangle(0, 0, 10, 10, 5, 0X555555);
 		this.warnBox.setAlpha(0.5);
 		this.warnBox.setOrigin(0.5);
 		this.warnCont.add(this.warnBox);
@@ -517,7 +562,7 @@ class LevelScene3 extends Phaser.Scene {
 
 
 	startStory(number) {
-		this.dismissWarning();
+		this.dismissInfoPopup();
 
 		let selectedChapter = number > 0 ? 0 : 1;
 
@@ -575,6 +620,20 @@ class LevelScene3 extends Phaser.Scene {
 				this.fakeNodes[key].setVisible(this.story2.includes(key));
 			}
 		}
+		else if (number == 3) {
+			language.bind(this.instructionText, "instruction_3");
+			for (const node of this.nodes) {
+				node.setVisible(this.story3.includes(node.role));
+				if (node.inPlay && !node.visible) {
+					// TODO: Fix since this re-runs simulation 3 times
+					this.onNodeAddOrRemove(node, false, true);
+				}
+			}
+			for (const key in this.fakeNodes) {
+				// this.fakeNodes[key].setVisible(this.story3.includes(key));
+				this.fakeNodes[key].setVisible(false);
+			}
+		}
 		else {
 			language.bind(this.instructionText, "instruction_4");
 			for (const node of this.nodes) {
@@ -605,6 +664,8 @@ class LevelScene3 extends Phaser.Scene {
 		if (this.currentStory == 1) {
 			language.bind(this.storyText1, "explanation_1a");
 			language.bind(this.storyText2, "explanation_1b");
+			this.showInfoPopup(this.fakeNodes.plant_1.x, this.fakeNodes.plant_1.y, "popup_2");
+			// this.showInfoPopup(this.fakeNodes.herbivore_1.x, this.fakeNodes.herbivore_1.y, "popup_3");
 		}
 		else if (this.currentStory == 2) {
 			language.bind(this.storyText1, "explanation_2a");
@@ -624,7 +685,7 @@ class LevelScene3 extends Phaser.Scene {
 		window.simulator2.reset();
 		window.simulator2.run(0);
 		this.updatePaths();
-		this.dismissWarning();
+		this.dismissInfoPopup(false);
 		this.startStory(1);
 	}
 
@@ -675,12 +736,18 @@ class LevelScene3 extends Phaser.Scene {
 
 	onNodeDeath(node) {
 		if (this.storyRunning) {
-			this.showWarning(node.x, node.y, "warning_1");
+			this.showInfoPopup(node.x, node.y, "popup_1");
 		}
 	}
 
-	showWarning(x, y, key) {
+	showInfoPopup(x, y, key) {
 		if (!this.warnCont.isActive) {
+			language.bind(this.warnText, key, () => {
+				let sep = 1.5 * 20;
+				this.warnBox.width = this.warnText.displayWidth + sep;
+				this.warnBox.height = this.warnText.displayHeight + sep;
+			});
+
 			let w = this.warnBox.displayWidth;
 			let h = this.warnBox.displayHeight;
 			let offset = 20;
@@ -690,7 +757,7 @@ class LevelScene3 extends Phaser.Scene {
 			this.warnCont.dir = (isOutside ? 1 : -1);
 			this.warnCont.setAlpha(0);
 			this.warnCont.setPosition(
-				x + this.warnCont.dir * ( 0.7 * w + offset ),
+				x + this.warnCont.dir * ( 0.8 * w + offset ),
 				y
 			);
 
@@ -701,13 +768,10 @@ class LevelScene3 extends Phaser.Scene {
 				ease: 'Cubic',
 				duration: 800
 			});
-
-			// May lead to sizing issues
-			language.bind(this.warnText, key);
 		}
 	}
 
-	dismissWarning() {
+	dismissInfoPopup(animated=true) {
 		if (this.warnCont.isActive) {
 			let w = this.warnBox.displayWidth;
 			let offset = 10;
@@ -716,13 +780,18 @@ class LevelScene3 extends Phaser.Scene {
 				this.warnCont.tween.stop();
 			}
 
-			this.tweens.add({
-				targets: this.warnCont,
-				alpha: { from: this.warnCont.alpha, to: 0 },
-				x: (this.warnCont.dir == 1 ? '+' : '-') + '=' + offset,
-				ease: 'Cubic.In',
-				duration: 300
-			});
+			if (animated) {
+				this.tweens.add({
+					targets: this.warnCont,
+					alpha: { from: this.warnCont.alpha, to: 0 },
+					x: (this.warnCont.dir == 1 ? '+' : '-') + '=' + offset,
+					ease: 'Cubic.In',
+					duration: 300
+				});
+			}
+			else {
+				this.warnCont.alpha = 0;
+			}
 
 			this.warnCont.isActive = false;
 		}
@@ -841,6 +910,29 @@ class LevelScene3 extends Phaser.Scene {
 				}
 			}
 		}
+	}
+
+
+	openInfoWindow() {
+		/*
+		let textureManager = this.textures;
+		let scene = this;
+
+		this.game.renderer.snapshot((image) => {
+		// this.game.renderer.snapshotArea(740, 720, 200, 200, (image) => {
+			document.body.appendChild(image);
+
+			if (textureManager.exists('snap')) {
+				textureManager.remove('snap');
+			}
+			textureManager.addImage('snap', image);
+
+			if (!this.test)
+				this.test = this.add.image(0, 0, 'snap');
+			this.test.setPosition(200+200*Math.random(), 200+200*Math.random());
+			this.test.setTexture('snap');
+		});
+		*/
 	}
 
 

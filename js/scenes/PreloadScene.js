@@ -90,12 +90,12 @@ class PreloadScene extends Phaser.Scene {
 		// this.load.image('arrow_up_small', 'assets/images/ui/arrow/UpSmall.png');
 
 		// this.load.image('frame_ui', 'assets/images/ui/frame/Ram.png');
-		this.load.image('frame_ui', 'assets/images/ui/frame/UI_Ram2.png');
-		this.load.image('frame_briefing', 'assets/images/ui/frame/LevelIntroBlank.png');
+		// this.load.image('frame_ui', 'assets/images/ui/frame/UI_Ram2.png');
+		// this.load.image('frame_briefing', 'assets/images/ui/frame/LevelIntroBlank.png');
 		// this.load.image('frame_briefing', 'assets/images/ui/frame/LevelIntroConcept.png');
-		this.load.image('frame_ok', 'assets/images/ui/frame/OK.png');
-		this.load.image('frame_timeline', 'assets/images/ui/frame/Timeline.png');
-		this.load.image('frame_search', 'assets/images/ui/frame/search.png');
+		// this.load.image('frame_ok', 'assets/images/ui/frame/OK.png');
+		// this.load.image('frame_timeline', 'assets/images/ui/frame/Timeline.png');
+		// this.load.image('frame_search', 'assets/images/ui/frame/search.png');
 
 		// Universeum
 		this.load.image('icon-foodWeb', 'assets/images/ui/universeum/icon-foodWeb.png');
